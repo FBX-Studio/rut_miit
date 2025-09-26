@@ -49,7 +49,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
   const fetchDrivers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/drivers');
+      const response = await fetch('/api/v1/drivers/');
       if (response.ok) {
         const data = await response.json();
         setDrivers(data);
@@ -67,7 +67,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
   const handleCreateDriver = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/drivers', {
+      const response = await fetch('/api/v1/drivers/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
 
   const handleUpdateDriver = async (driverId: number, updates: Partial<Driver>) => {
     try {
-      const response = await fetch(`/api/drivers/${driverId}`, {
+      const response = await fetch(`/api/v1/drivers/${driverId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
     }
 
     try {
-      const response = await fetch(`/api/drivers/${driverId}`, {
+      const response = await fetch(`/api/v1/drivers/${driverId}`, {
         method: 'DELETE'
       });
 
@@ -351,7 +351,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
                       <button
                         onClick={() => {
                           // Open driver location on map (placeholder)
-                          toast.info('Функция просмотра на карте в разработке');
+                          toast('Функция просмотра на карте в разработке');
                         }}
                         className="flex-1 px-3 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md transition-colors"
                       >

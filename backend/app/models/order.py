@@ -27,6 +27,9 @@ class Order(Base):
     # Customer relationship
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
     
+    # Driver relationship
+    driver_id = Column(Integer, ForeignKey("drivers.id"), nullable=True)
+    
     # Delivery information
     delivery_address = Column(Text, nullable=False)
     delivery_latitude = Column(Float, nullable=False)
@@ -56,12 +59,21 @@ class Order(Base):
     planned_delivery_time = Column(DateTime(timezone=True))
     actual_delivery_time = Column(DateTime(timezone=True))
     
+    # Дополнительные поля для расширенного тестирования
+    scenario_name = Column(String, nullable=True)
+    complexity_level = Column(String, nullable=True)
+    weather_condition = Column(String, nullable=True)
+    traffic_condition = Column(String, nullable=True)
+    risk_factors = Column(Text, nullable=True)
+    cost_multiplier = Column(Float, default=1.0)
+    
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
     customer = relationship("Customer", back_populates="orders")
+    driver = relationship("Driver", back_populates="orders")
     route_stops = relationship("RouteStop", back_populates="order")
     
     def __repr__(self):

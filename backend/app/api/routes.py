@@ -575,30 +575,7 @@ async def get_vehicles(
         logger.error(f"Error fetching vehicles: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch vehicles")
 
-@router.get("/drivers", response_model=List[DriverResponse])
-async def get_drivers(
-    status: Optional[str] = Query(None, description="Filter by driver status"),
-    available_only: bool = Query(False, description="Show only available drivers"),
-    db: Session = Depends(get_db)
-):
-    """
-    Get drivers with optional filtering
-    """
-    try:
-        query = db.query(Driver)
-        
-        if status:
-            query = query.filter(Driver.current_status == status)
-        if available_only:
-            query = query.filter(Driver.current_status == "available")
-        
-        drivers = query.all()
-        
-        return [DriverResponse.from_orm(driver) for driver in drivers]
-        
-    except Exception as e:
-        logger.error(f"Error fetching drivers: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch drivers")
+
 
 @router.get("/events", response_model=List[EventResponse])
 async def get_events(

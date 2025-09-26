@@ -70,6 +70,14 @@ class Route(Base):
     notes = Column(Text)
     driver_comments = Column(Text)
     
+    # Дополнительные параметры для расширенного тестирования
+    scenario_name = Column(String, nullable=True)
+    complexity_level = Column(String, nullable=True)
+    weather_condition = Column(String, nullable=True)
+    traffic_condition = Column(String, nullable=True)
+    special_requirements = Column(Text, nullable=True)
+    risk_factors = Column(Text, nullable=True)
+    
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

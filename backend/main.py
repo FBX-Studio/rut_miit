@@ -14,6 +14,9 @@ import uvicorn
 from app.api.routes import router as api_router
 from app.api.websocket import websocket_router
 from app.api.v1.monitoring import router as monitoring_router
+from app.api.v1.drivers import router as drivers_router
+from app.api.v1.routes import router as routes_router
+from app.api.v1.simulation import router as simulation_router
 from app.optimization.vrptw_solver import VRPTWSolver
 from app.optimization.adaptive_optimizer import AdaptiveOptimizer
 from app.services.yandex_maps_service import YandexMapsService
@@ -85,6 +88,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Configure JSON response encoding
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+import json
+
+@app.middleware("http")
+async def add_utf8_encoding(request, call_next):
+    response = await call_next(request)
+    if response.headers.get("content-type", "").startswith("application/json"):
+        response.headers["content-type"] = "application/json; charset=utf-8"
+    return response
+
 # Add middleware
 app.add_middleware(
     CORSMiddleware,
@@ -96,10 +111,13 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Include API routes
-app.include_router(api_router, prefix="/api/v1")
+# Include routers
+app.include_router(drivers_router, prefix="/api/v1/drivers")
+app.include_router(routes_router, prefix="/api/v1/routes")
+app.include_router(simulation_router, prefix="/api/v1/simulation")
 app.include_router(monitoring_router, prefix="/api/v1/monitoring")
-app.include_router(websocket_router, prefix="/ws")
+app.include_router(api_router, prefix="/api/v1")
+app.include_router(websocket_router)
 
 @app.get("/")
 async def root():

@@ -49,9 +49,9 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
       
       // Fetch orders, vehicles, and drivers
       const [ordersRes, vehiclesRes, driversRes] = await Promise.all([
-        fetch('/api/orders'),
-        fetch('/api/vehicles'),
-        fetch('/api/drivers')
+        fetch('/api/v1/orders'),
+        fetch('/api/v1/vehicles'),
+        fetch('/api/v1/drivers/')
       ]);
 
       if (ordersRes.ok) {

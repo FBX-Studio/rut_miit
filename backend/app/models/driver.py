@@ -6,15 +6,13 @@ from app.database import Base
 
 class DriverStatus(PyEnum):
     AVAILABLE = "available"
-    ON_ROUTE = "on_route"
-    ON_BREAK = "on_break"
+    BUSY = "busy"
     OFF_DUTY = "off_duty"
 
 class ExperienceLevel(PyEnum):
-    NOVICE = "novice"        # < 6 months
-    INTERMEDIATE = "intermediate"  # 6 months - 2 years
-    EXPERIENCED = "experienced"    # 2-5 years
-    EXPERT = "expert"             # > 5 years
+    JUNIOR = "junior"
+    MIDDLE = "middle"
+    SENIOR = "senior"
 
 class Driver(Base):
     __tablename__ = "drivers"
@@ -34,7 +32,7 @@ class Driver(Base):
     license_categories = Column(String(20))  # A, B, C, D, etc.
     
     # Experience and skills
-    experience_level = Column(Enum(ExperienceLevel), default=ExperienceLevel.NOVICE)
+    experience_level = Column(Enum(ExperienceLevel), default=ExperienceLevel.JUNIOR)
     years_of_experience = Column(Float, default=0.0)
     max_stops_per_route = Column(Integer, default=15)  # Based on experience
     
@@ -59,6 +57,10 @@ class Driver(Base):
     restricted_areas = Column(Text) # JSON array of restricted areas
     can_handle_fragile = Column(Boolean, default=True)
     can_handle_high_value = Column(Boolean, default=False)
+    specialization = Column(String, default="Стандартная доставка")
+    can_work_nights = Column(Boolean, default=False)
+    can_work_weekends = Column(Boolean, default=True)
+    notes = Column(Text, nullable=True)
     
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -67,6 +69,8 @@ class Driver(Base):
     
     # Relationships
     routes = relationship("Route", back_populates="driver")
+    orders = relationship("Order", back_populates="driver")
+    vehicles = relationship("Vehicle", back_populates="driver")
     
     def __repr__(self):
         return f"<Driver(id={self.id}, name='{self.first_name} {self.last_name}', experience='{self.experience_level}')>"

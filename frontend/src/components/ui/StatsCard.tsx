@@ -1,5 +1,8 @@
 import { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
+import { clsx } from 'clsx';
+
+const cn = clsx;
 
 interface StatsCardProps {
   title: string;

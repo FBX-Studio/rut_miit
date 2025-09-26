@@ -9,7 +9,9 @@ engine = create_engine(
     pool_pre_ping=True,
     pool_recycle=300,
     echo=settings.debug,
-    connect_args={"check_same_thread": False}  # Fix for SQLite threading issues
+    connect_args={
+        "check_same_thread": False  # Fix for SQLite threading issues
+    }
 )
 
 # Create session factory

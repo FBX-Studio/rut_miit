@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from enum import Enum as PyEnum
@@ -52,6 +52,14 @@ class Vehicle(Base):
     cost_per_km = Column(Float, default=0.5)
     cost_per_hour = Column(Float, default=25.0)
     
+    # Дополнительные характеристики для расширенного тестирования
+    age_years = Column(Integer, default=0)
+    reliability_score = Column(Float, default=1.0)
+    specialization = Column(String, default="Стандартная доставка")
+    has_gps = Column(Boolean, default=True)
+    has_refrigeration = Column(Boolean, default=False)
+    notes = Column(Text, nullable=True)
+    
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -60,6 +68,10 @@ class Vehicle(Base):
     
     # Relationships
     routes = relationship("Route", back_populates="vehicle")
+    
+    # Driver assignment
+    driver_id = Column(Integer, ForeignKey("drivers.id"), nullable=True)
+    driver = relationship("Driver", back_populates="vehicles")
     
     def __repr__(self):
         return f"<Vehicle(id={self.id}, plate='{self.license_plate}', type='{self.vehicle_type}')>"

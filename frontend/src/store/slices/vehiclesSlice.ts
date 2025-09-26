@@ -488,7 +488,7 @@ const vehiclesSlice = createSlice({
         }
         
         if (state.selectedVehicle?.id === vehicle_id) {
-          state.selectedVehicle.current_location = {
+          state.selectedVehicle!.current_location = {
             latitude: locationData.latitude,
             longitude: locationData.longitude,
             address: locationData.address,

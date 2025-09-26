@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-09-26T23:40:48.743829",
+  "summary": {
+    "total_tests": 17,
+    "passed": 15,
+    "failed": 2,
+    "success_rate": 88.24
+  },
+  "modules": {
+    "route_optimization": {
+      "passed": 3,
+      "failed": 0,
+      "errors": []
+    },
+    "parameter_modification": {
+      "passed": 3,
+      "failed": 0,
+      "errors": []
+    },
+    "realtime_simulation": {
+      "passed": 4,
+      "failed": 0,
+      "errors": []
+    },
+    "test_data_generation": {
+      "passed": 2,
+      "failed": 2,
+      "errors": [
+        "generate_drivers: (sqlite3.OperationalError) table drivers has no column named specialization\n[SQL: INSERT INTO drivers (employee_id, first_name, last_name, email, phone, license_number, license_expiry, license_categories, experience_level, years_of_experience, max_stops_per_route, max_working_hours, shift_start_time, shift_end_time, status, current_latitude, current_longitude, average_delivery_time, on_time_delivery_rate, customer_rating, total_deliveries, preferred_areas, restricted_areas, can_handle_fragile, can_handle_high_value, specialization, can_work_nights, can_work_weekends, notes, updated_at, last_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]\n[parameters: ('DRV0001', 'Фадеева', 'Мария', 'ninel_06@example.org', '+7 (199) 579-1179', '7735613573', None, None, 'MIDDLE', 3.4192759852438974, 15, 8, None, None, 'OFF_DUTY', None, None, 0.0, 0.0, 4.1, 0, None, None, 1, 0, 'Хрупкие грузы', 0, 1, 'Специализация: Хрупкие грузы, Сложные грузы: Да', None, None)]\n(Background on this error at: https://sqlalche.me/e/14/e3q8)",
+        "generate_vehicles: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (sqlite3.OperationalError) table drivers has no column named specialization\n[SQL: INSERT INTO drivers (employee_id, first_name, last_name, email, phone, license_number, license_expiry, license_categories, experience_level, years_of_experience, max_stops_per_route, max_working_hours, shift_start_time, shift_end_time, status, current_latitude, current_longitude, average_delivery_time, on_time_delivery_rate, customer_rating, total_deliveries, preferred_areas, restricted_areas, can_handle_fragile, can_handle_high_value, specialization, can_work_nights, can_work_weekends, notes, updated_at, last_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]\n[parameters: ('DRV0001', 'Фадеева', 'Мария', 'ninel_06@example.org', '+7 (199) 579-1179', '7735613573', None, None, 'MIDDLE', 3.4192759852438974, 15, 8, None, None, 'OFF_DUTY', None, None, 0.0, 0.0, 4.1, 0, None, None, 1, 0, 'Хрупкие грузы', 0, 1, 'Специализация: Хрупкие грузы, Сложные грузы: Да', None, None)]\n(Background on this error at: https://sqlalche.me/e/14/e3q8) (Background on this error at: https://sqlalche.me/e/14/7s2a)"
+      ]
+    },
+    "basic_calculations": {
+      "passed": 3,
+      "failed": 0,
+      "errors": []
+    }
+  },
+  "status": "PARTIAL"
+}

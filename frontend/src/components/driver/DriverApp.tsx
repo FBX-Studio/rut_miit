@@ -158,6 +158,8 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
 
       return () => navigator.geolocation.clearWatch(watchId);
     }
+    
+    return undefined;
   };
 
   const checkBatteryStatus = async () => {

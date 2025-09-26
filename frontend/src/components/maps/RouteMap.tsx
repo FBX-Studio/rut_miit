@@ -146,7 +146,7 @@ const RouteBuilder = withYMaps(({ ymaps, routes, onRouteSelect }: any) => {
     setMultiRoutes(newRoutes);
 
     return () => {
-      newRoutes.forEach(route => {
+      newRoutes.forEach((route: any) => {
         if (route && mapInstance) {
           mapInstance.geoObjects.remove(route);
         }
@@ -279,9 +279,8 @@ export const RouteMap = ({
           {showTraffic && (
             <TrafficControl 
               options={{ 
-                float: 'right',
                 floatIndex: 100,
-              }} 
+              } as any} 
             />
           )}
 

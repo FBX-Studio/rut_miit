@@ -414,7 +414,7 @@ const routesSlice = createSlice({
         }
         
         if (state.selectedRoute?.id === route_id) {
-          updateStopInRoute(state.selectedRoute);
+          updateStopInRoute(state.selectedRoute!);
         }
       });
   },
