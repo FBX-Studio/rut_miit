@@ -1,0 +1,255 @@
+'use client';
+
+import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+
+// Notification types
+export interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message?: string;
+  duration?: number;
+  persistent?: boolean;
+  actions?: NotificationAction[];
+  timestamp: Date;
+}
+
+export interface NotificationAction {
+  label: string;
+  action: () => void;
+  style?: 'primary' | 'secondary' | 'danger';
+}
+
+// Notification context type
+interface NotificationContextType {
+  notifications: Notification[];
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => string;
+  removeNotification: (id: string) => void;
+  clearAll: () => void;
+  showSuccess: (title: string, message?: string, duration?: number) => string;
+  showError: (title: string, message?: string, duration?: number) => string;
+  showWarning: (title: string, message?: string, duration?: number) => string;
+  showInfo: (title: string, message?: string, duration?: number) => string;
+}
+
+const NotificationContext = createContext<NotificationContextType | null>(null);
+
+// Notification provider props
+interface NotificationProviderProps {
+  children: ReactNode;
+}
+
+export const NotificationProvider = ({ children }: NotificationProviderProps) => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const generateId = () => {
+    return `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const addNotification = useCallback((notificationData: Omit<Notification, 'id' | 'timestamp'>) => {
+    const id = generateId();
+    const notification: Notification = {
+      ...notificationData,
+      id,
+      timestamp: new Date(),
+    };
+
+    setNotifications(prev => [notification, ...prev]);
+
+    // Auto-remove non-persistent notifications
+    if (!notification.persistent) {
+      const duration = notification.duration || 5000;
+      setTimeout(() => {
+        removeNotification(id);
+      }, duration);
+    }
+
+    return id;
+  }, []);
+
+  const removeNotification = useCallback((id: string) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
+  const showSuccess = useCallback((title: string, message?: string, duration?: number) => {
+    toast.success(message || title, {
+      duration: duration || 4000,
+      position: 'top-right',
+    });
+    
+    return addNotification({
+      type: 'success',
+      title,
+      message,
+      duration,
+    });
+  }, [addNotification]);
+
+  const showError = useCallback((title: string, message?: string, duration?: number) => {
+    toast.error(message || title, {
+      duration: duration || 6000,
+      position: 'top-right',
+    });
+    
+    return addNotification({
+      type: 'error',
+      title,
+      message,
+      duration,
+    });
+  }, [addNotification]);
+
+  const showWarning = useCallback((title: string, message?: string, duration?: number) => {
+    toast(message || title, {
+      duration: duration || 5000,
+      position: 'top-right',
+      icon: '⚠️',
+      style: {
+        background: '#FEF3C7',
+        color: '#92400E',
+        border: '1px solid #F59E0B',
+      },
+    });
+    
+    return addNotification({
+      type: 'warning',
+      title,
+      message,
+      duration,
+    });
+  }, [addNotification]);
+
+  const showInfo = useCallback((title: string, message?: string, duration?: number) => {
+    toast(message || title, {
+      duration: duration || 4000,
+      position: 'top-right',
+      icon: 'ℹ️',
+      style: {
+        background: '#DBEAFE',
+        color: '#1E40AF',
+        border: '1px solid #3B82F6',
+      },
+    });
+    
+    return addNotification({
+      type: 'info',
+      title,
+      message,
+      duration,
+    });
+  }, [addNotification]);
+
+  const value: NotificationContextType = {
+    notifications,
+    addNotification,
+    removeNotification,
+    clearAll,
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo,
+  };
+
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Default options for all toasts
+          className: '',
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+            fontSize: '14px',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          },
+          
+          // Default options for specific types
+          success: {
+            duration: 4000,
+            style: {
+              background: '#10B981',
+              color: '#fff',
+            },
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#10B981',
+            },
+          },
+          
+          error: {
+            duration: 6000,
+            style: {
+              background: '#EF4444',
+              color: '#fff',
+            },
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#EF4444',
+            },
+          },
+        }}
+      />
+    </NotificationContext.Provider>
+  );
+};
+
+// Custom hook to use notification context
+export const useNotifications = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotifications must be used within a NotificationProvider');
+  }
+  return context;
+};
+
+// Utility hooks for common notification patterns
+export const useApiNotifications = () => {
+  const { showSuccess, showError, showWarning } = useNotifications();
+  
+  return {
+    onSuccess: (message: string) => showSuccess('Success', message),
+    onError: (error: any) => {
+      const message = error?.response?.data?.detail || error?.message || 'An error occurred';
+      showError('Error', message);
+    },
+    onWarning: (message: string) => showWarning('Warning', message),
+  };
+};
+
+export const useRouteNotifications = () => {
+  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
+  
+  return {
+    onOptimizationComplete: (routeCount: number) => 
+      showSuccess('Optimization Complete', `${routeCount} routes have been optimized`),
+    
+    onReoptimizationTriggered: (reason: string) => 
+      showInfo('Reoptimization Started', `Reason: ${reason}`),
+    
+    onRouteDelayed: (routeId: number, delay: number) => 
+      showWarning('Route Delayed', `Route ${routeId} is delayed by ${delay} minutes`),
+    
+    onDeliveryCompleted: (orderId: number) => 
+      showSuccess('Delivery Completed', `Order ${orderId} has been delivered`),
+    
+    onVehicleBreakdown: (vehicleId: number) => 
+      showError('Vehicle Breakdown', `Vehicle ${vehicleId} has reported a breakdown`),
+    
+    onTrafficAlert: (routeId: number, impact: string) => 
+      showWarning('Traffic Alert', `Route ${routeId}: ${impact}`),
+  };
+};
