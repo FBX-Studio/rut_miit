@@ -80,36 +80,39 @@ class CustomerResponse(BaseModel):
     id: int
     name: str
     phone: str
-    email: Optional[str]
+    email: Optional[str] = None
     address: str
-    latitude: Optional[float]
-    longitude: Optional[float]
-    business_name: Optional[str]
-    preferred_delivery_start: Optional[time]
-    preferred_delivery_end: Optional[time]
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    city: str
+    postal_code: str
+    business_name: Optional[str] = None
+    preferred_delivery_start: Optional[time] = None
+    preferred_delivery_end: Optional[time] = None
     
     class Config:
         from_attributes = True
 
 class OrderResponse(BaseModel):
     id: int
-    customer_id: int
-    customer: Optional[CustomerResponse]
     order_number: str
+    customer_id: int
+    customer: CustomerResponse
+    driver_id: Optional[int] = None
     delivery_address: str
-    delivery_latitude: Optional[float]
-    delivery_longitude: Optional[float]
-    delivery_date: date
-    time_window_start: Optional[datetime]
-    time_window_end: Optional[datetime]
-    customer_verified_time_window: bool
+    delivery_latitude: float
+    delivery_longitude: float
+    time_window_start: datetime
+    time_window_end: datetime
+    estimated_service_time: int
     weight: float
     volume: float
-    priority: int
-    status: OrderStatus
-    special_requirements: Optional[str]
-    estimated_service_time: int
+    value: float
+    status: str
+    priority: str
+    special_requirements: Optional[str] = None
     created_at: datetime
+    updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
@@ -118,44 +121,49 @@ class VehicleResponse(BaseModel):
     id: int
     license_plate: str
     model: str
-    brand: str
-    year: int
+    brand: Optional[str] = None
+    year: Optional[int] = None
     vehicle_type: VehicleType
     max_weight_capacity: float
     max_volume_capacity: float
-    fuel_consumption_per_km: float
+    fuel_consumption: float
     max_working_hours: int
-    required_break_duration: int
-    current_latitude: Optional[float]
-    current_longitude: Optional[float]
+    requires_break_every: int
+    break_duration: int
+    current_latitude: Optional[float] = None
+    current_longitude: Optional[float] = None
     depot_latitude: float
     depot_longitude: float
     status: str
     has_gps: bool
     has_temperature_control: bool
     has_lift_gate: bool
-    cost_per_km: float
-    cost_per_hour: float
+    cost_per_km: Optional[float] = None
+    cost_per_hour: Optional[float] = None
+    driver_id: Optional[int] = None
     
     class Config:
         from_attributes = True
 
 class DriverResponse(BaseModel):
     id: int
-    name: str
+    employee_id: str
+    first_name: str
+    last_name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
     license_number: str
-    phone: str
-    email: Optional[str]
+    license_expiry: Optional[date] = None
     experience_level: str
+    years_of_experience: Optional[float] = None
+    max_stops_per_route: Optional[int] = None
     max_working_hours: int
-    shift_start_time: Optional[time]
-    shift_end_time: Optional[time]
-    current_status: str
-    current_latitude: Optional[float]
-    current_longitude: Optional[float]
-    total_deliveries: int
-    successful_deliveries: int
-    average_delivery_time: Optional[float]
+    shift_start_time: Optional[time] = None
+    shift_end_time: Optional[time] = None
+    status: str
+    current_latitude: Optional[float] = None
+    current_longitude: Optional[float] = None
+    average_delivery_time: Optional[float] = None
     
     class Config:
         from_attributes = True

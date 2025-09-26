@@ -75,6 +75,7 @@ class Order(Base):
     customer = relationship("Customer", back_populates="orders")
     driver = relationship("Driver", back_populates="orders")
     route_stops = relationship("RouteStop", back_populates="order")
+    order_items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Order(id={self.id}, number='{self.order_number}', status='{self.status}')>"
@@ -90,3 +91,31 @@ class Order(Base):
     def is_time_window_valid(self, delivery_time: DateTime) -> bool:
         """Check if delivery time falls within the time window"""
         return self.time_window_start <= delivery_time <= self.time_window_end
+    
+    @property
+    def total_order_value(self) -> float:
+        """Calculate total order value from order items"""
+        return sum(item.final_price for item in self.order_items)
+    
+    @property
+    def total_order_weight(self) -> float:
+        """Calculate total order weight from order items"""
+        return sum(item.total_weight for item in self.order_items)
+    
+    @property
+    def total_order_volume(self) -> float:
+        """Calculate total order volume from order items"""
+        return sum(item.total_volume for item in self.order_items)
+    
+    @property
+    def item_count(self) -> int:
+        """Get total number of items in the order"""
+        return sum(item.quantity for item in self.order_items)
+    
+    def has_fragile_items(self) -> bool:
+        """Check if order contains fragile items"""
+        return any(item.fragile for item in self.order_items)
+    
+    def has_temperature_controlled_items(self) -> bool:
+        """Check if order contains temperature-controlled items"""
+        return any(item.temperature_controlled for item in self.order_items)
