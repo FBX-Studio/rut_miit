@@ -3,85 +3,126 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15
+    image: postgres:15-alpine
+    container_name: rut_miit_postgres
     environment:
-      POSTGRES_DB: vrptw_db
-      POSTGRES_USER: vrptw_user
-      POSTGRES_PASSWORD: vrptw_password
+      POSTGRES_DB: rut_miit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/init_database.py:/docker-entrypoint-initdb.d/init_database.py
     ports:
       - "5432:5432"
+    networks:
+      - rut_miit_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vrptw_user -d vrptw_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # Redis for caching and Celery
+  # Redis for caching and Celery broker
   redis:
     image: redis:7-alpine
+    container_name: rut_miit_redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - rut_miit_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Backend FastAPI
+  # Backend API
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: rut_miit_backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/rut_miit
+      - REDIS_URL=redis://redis:6379/0
+      - YANDEX_MAPS_API_KEY=${YANDEX_MAPS_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - DEBUG=False
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://vrptw_user:vrptw_password@postgres:5432/vrptw_db
-      - REDIS_URL=redis://redis:6379
-      - YANDEX_API_KEY=${YANDEX_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./backend:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - rut_miit_network
+    command: >
+      sh -c "
+        python -m alembic upgrade head &&
+        python init_database.py &&
+        gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Celery Worker
-  celery-worker:
+  # Celery Worker for background tasks
+  celery_worker:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: rut_miit_celery_worker
     environment:
-      - DATABASE_URL=postgresql://vrptw_user:vrptw_password@postgres:5432/vrptw_db
-      - REDIS_URL=redis://redis:6379
-      - YANDEX_API_KEY=${YANDEX_API_KEY}
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/rut_miit
+      - REDIS_URL=redis://redis:6379/0
+      - YANDEX_MAPS_API_KEY=${YANDEX_MAPS_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./backend:/app
-    command: celery -A app.celery_app worker --loglevel=info
+    networks:
+      - rut_miit_network
+    command: celery -A app.celery_app worker --loglevel=info --concurrency=4
 
-  # Celery Beat (scheduler)
-  celery-beat:
+  # Celery Beat for scheduled tasks
+  celery_beat:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: rut_miit_celery_beat
     environment:
-      - DATABASE_URL=postgresql://vrptw_user:vrptw_password@postgres:5432/vrptw_db
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/rut_miit
+      - REDIS_URL=redis://redis:6379/0
+      - YANDEX_MAPS_API_KEY=${YANDEX_MAPS_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./backend:/app
+    networks:
+      - rut_miit_network
     command: celery -A app.celery_app beat --loglevel=info
 
-  # Frontend React
+  # Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: rut_miit_frontend
     ports:
       - "3000:3000"
     environment:
@@ -90,45 +131,87 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: npm start
+    networks:
+      - rut_miit_network
+    depends_on:
+      - backend
 
-  # Nginx Reverse Proxy
+  # Nginx reverse proxy
   nginx:
     image: nginx:alpine
+    container_name: rut_miit_nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
       - backend
       - frontend
+    networks:
+      - rut_miit_network
 
-  # Prometheus for monitoring
+  # Prometheus for metrics
   prometheus:
     image: prom/prometheus:latest
+    container_name: rut_miit_prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - rut_miit_network
 
   # Grafana for visualization
   grafana:
     image: grafana/grafana:latest
+    container_name: rut_miit_grafana
     ports:
       - "3001:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - rut_miit_network
+
+  # Node Exporter for system metrics
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: rut_miit_node_exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - rut_miit_network
 
 volumes:
   postgres_data:
   redis_data:
   prometheus_data:
   grafana_data:
+
+networks:
+  rut_miit_network:
+    driver: bridge

@@ -15,6 +15,7 @@ from app.api.schemas import (
     RouteOptimizationRequest, RouteResponse, OrderResponse, 
     VehicleResponse, DriverResponse, EventResponse
 )
+from app.api.v1.monitoring import router as monitoring_router
 
 logger = logging.getLogger(__name__)
 

@@ -7,10 +7,14 @@ import dynamic from 'next/dynamic';
 import { ActiveRoutes } from '@/components/routes/ActiveRoutes';
 import { RecentEvents } from '@/components/events/RecentEvents';
 import { PerformanceChart } from '@/components/charts/PerformanceChart';
+import { RouteOptimizationModal } from '@/components/modals/RouteOptimizationModal';
+import { DriverManagementModal } from '@/components/modals/DriverManagementModal';
+import { AnalyticsModal } from '@/components/modals/AnalyticsModal';
 import { useWebSocket, useRouteUpdates, useEventNotifications } from '@/contexts/WebSocketContext';
 import { useNotifications, useRouteNotifications } from '@/contexts/NotificationContext';
 import { useSystemStats } from '@/hooks/useSystemStats';
 import useSWR from 'swr';
+import { Toaster } from 'react-hot-toast';
 
 // Dynamically import RouteMap to avoid SSR issues
 const RouteMap = dynamic(() => import('@/components/maps/RouteMap'), {
@@ -27,6 +31,10 @@ const RouteMap = dynamic(() => import('@/components/maps/RouteMap'), {
 
 const Dashboard = () => {
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [showRouteModal, setShowRouteModal] = useState(false);
+  const [showDriverModal, setShowDriverModal] = useState(false);
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+  const [routeModalMode, setRouteModalMode] = useState<'create' | 'optimize'>('create');
   const { isConnected } = useWebSocket();
   const { stats, isLoading, error, refetch } = useSystemStats();
 
@@ -223,20 +231,65 @@ const Dashboard = () => {
             Быстрые действия
           </h2>
           <div className="flex flex-wrap gap-3">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={() => {
+                setRouteModalMode('create');
+                setShowRouteModal(true);
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Создать новый маршрут
             </button>
-            <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <button 
+              onClick={() => {
+                setRouteModalMode('optimize');
+                setShowRouteModal(true);
+              }}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
               Оптимизировать маршруты
             </button>
-            <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+            <button 
+              onClick={() => setShowDriverModal(true)}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+            >
               Управление водителями
             </button>
-            <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+            <button 
+              onClick={() => setShowAnalyticsModal(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
               Просмотр аналитики
             </button>
           </div>
         </div>
+
+        {/* Modals */}
+        <RouteOptimizationModal
+          isOpen={showRouteModal}
+          onClose={() => setShowRouteModal(false)}
+          mode={routeModalMode}
+        />
+        <DriverManagementModal
+          isOpen={showDriverModal}
+          onClose={() => setShowDriverModal(false)}
+        />
+        <AnalyticsModal
+          isOpen={showAnalyticsModal}
+          onClose={() => setShowAnalyticsModal(false)}
+        />
+
+        {/* Toast Notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+          }}
+        />
       </div>
     </div>
   );

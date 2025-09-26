@@ -5,18 +5,22 @@ Main FastAPI application entry point for the VRPTW optimization system.
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 import uvicorn
 
 from app.api.routes import router as api_router
 from app.api.websocket import websocket_router
+from app.api.v1.monitoring import router as monitoring_router
 from app.optimization.vrptw_solver import VRPTWSolver
 from app.optimization.adaptive_optimizer import AdaptiveOptimizer
 from app.services.yandex_maps_service import YandexMapsService
 from app.optimization.eta_predictor import ETAPredictor
+from app.database import get_db
+from app.core.metrics import get_metrics, update_business_metrics, CONTENT_TYPE_LATEST
+from sqlalchemy.orm import Session
 
 # Setup logging
 logging.basicConfig(
@@ -94,6 +98,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(monitoring_router, prefix="/api/v1/monitoring")
 app.include_router(websocket_router, prefix="/ws")
 
 @app.get("/")
@@ -114,6 +119,15 @@ async def health_check():
             "eta_predictor": eta_predictor is not None,
         }
     }
+
+@app.get("/metrics")
+async def metrics(db: Session = Depends(get_db)):
+    """Endpoint для метрик Prometheus"""
+    # Обновляем бизнес-метрики перед возвратом
+    update_business_metrics(db)
+    
+    metrics_data = get_metrics()
+    return Response(content=metrics_data, media_type=CONTENT_TYPE_LATEST)
 
 # Global exception handler
 @app.exception_handler(Exception)

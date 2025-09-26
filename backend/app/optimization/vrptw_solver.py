@@ -10,19 +10,78 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+class SAAVObjective:
+    """
+    Slot-Aware Adaptive VRPTW Objective Function
+    Implements: minimize α×travel_cost + β×waiting_time + γ×adaptations
+    """
+    
+    def __init__(self, alpha: float = 0.6, beta: float = 0.3, gamma: float = 0.1):
+        """
+        Initialize SAAV objective weights
+        
+        Args:
+            alpha: Weight for travel cost (distance/time)
+            beta: Weight for waiting time penalties
+            gamma: Weight for adaptation penalties
+        """
+        self.alpha = alpha  # Travel cost weight
+        self.beta = beta    # Waiting time weight  
+        self.gamma = gamma  # Adaptation weight
+        
+        # Ensure weights sum to 1.0
+        total = alpha + beta + gamma
+        self.alpha /= total
+        self.beta /= total
+        self.gamma /= total
+        
+    def calculate_objective(
+        self, 
+        travel_cost: float, 
+        waiting_time: float, 
+        adaptations: int = 0,
+        base_cost: float = 1000.0
+    ) -> float:
+        """
+        Calculate SAAV objective value
+        
+        Args:
+            travel_cost: Total travel distance/time cost
+            waiting_time: Total waiting time penalties
+            adaptations: Number of route adaptations made
+            base_cost: Base cost for normalization
+            
+        Returns:
+            Weighted objective value
+        """
+        # Normalize components
+        normalized_travel = travel_cost / base_cost
+        normalized_waiting = waiting_time / (base_cost * 0.1)  # Waiting typically smaller
+        normalized_adaptations = adaptations / 10.0  # Assume max 10 adaptations
+        
+        objective = (
+            self.alpha * normalized_travel +
+            self.beta * normalized_waiting +
+            self.gamma * normalized_adaptations
+        )
+        
+        return objective
+
 class VRPTWSolver:
     """
     Slot-Aware Adaptive VRPTW Solver using OR-Tools
     Implements both static morning planning and adaptive reoptimization
     """
     
-    def __init__(self):
+    def __init__(self, objective_weights: Tuple[float, float, float] = (0.6, 0.3, 0.1)):
         self.distance_matrix = None
         self.time_matrix = None
         self.orders = []
         self.vehicles = []
         self.drivers = []
         self.depot_location = (55.7558, 37.6176)  # Moscow coordinates
+        self.saav_objective = SAAVObjective(*objective_weights)
+        self.adaptation_count = 0
         
     def solve_static_routes(
         self, 
@@ -96,6 +155,9 @@ class VRPTWSolver:
         """
         logger.info(f"Starting local reoptimization for {len(affected_orders)} affected orders")
         
+        # Increment adaptation counter for SAAV objective
+        self.adaptation_count += 1
+        
         # Filter routes that need reoptimization
         routes_to_optimize = [r for r in current_routes if self._route_needs_reoptimization(r, affected_orders)]
         
@@ -104,6 +166,7 @@ class VRPTWSolver:
         
         optimized_routes = []
         changes = []
+        total_improvement = 0
         
         for route in routes_to_optimize:
             # Get unvisited stops
@@ -120,20 +183,33 @@ class VRPTWSolver:
                 # Update route with new sequence
                 updated_route = self._update_route_sequence(route, improved_sequence)
                 optimized_routes.append(updated_route)
+                improvement = improved_sequence.get("improvement", 0)
+                total_improvement += improvement
                 changes.append({
                     "route_id": route.id,
                     "type": "sequence_updated",
-                    "improvement": improved_sequence.get("improvement", 0)
+                    "improvement": improvement
                 })
             else:
                 optimized_routes.append(route)
         
-        logger.info(f"Local reoptimization completed with {len(changes)} changes")
+        # Calculate SAAV objective for the reoptimization
+        total_distance = sum(self._calculate_route_distance(route.route_stops) for route in optimized_routes)
+        saav_objective = self.saav_objective.calculate_objective(
+            travel_cost=total_distance,
+            waiting_time=0,  # Simplified for local reoptimization
+            adaptations=self.adaptation_count
+        )
+        
+        logger.info(f"Local reoptimization completed with {len(changes)} changes, SAAV objective: {saav_objective:.3f}")
         return {
             "success": True,
             "routes": optimized_routes,
             "changes": changes,
-            "optimization_type": "adaptive"
+            "optimization_type": "adaptive",
+            "saav_objective": saav_objective,
+            "total_improvement": total_improvement,
+            "adaptation_count": self.adaptation_count
         }
     
     def _build_matrices(self):
@@ -326,27 +402,59 @@ class VRPTWSolver:
         return routes
     
     def _calculate_metrics(self, solution, routing) -> Dict:
-        """Calculate optimization metrics"""
+        """Calculate optimization metrics with SAAV objective"""
         total_distance = 0
         total_time = 0
+        total_waiting_time = 0
         
         for vehicle_id in range(len(self.vehicles)):
             index = routing.Start(vehicle_id)
             route_distance = 0
+            route_waiting = 0
             
             while not routing.IsEnd(index):
                 previous_index = index
                 index = solution.Value(routing.NextVar(index))
                 route_distance += routing.GetArcCostForVehicle(previous_index, index, vehicle_id)
+                
+                # Calculate waiting time penalties
+                node_index = routing.IndexToNode(index)
+                if node_index > 0:  # Not depot
+                    order = self.orders[node_index - 1]
+                    # Simplified waiting time calculation
+                    # In real implementation, would use time variables from OR-Tools
+                    route_waiting += max(0, order.time_window_start.hour - 9) * 60  # Penalty for early windows
             
             total_distance += route_distance
+            total_waiting_time += route_waiting
+        
+        # Calculate SAAV objective
+        travel_cost = total_distance / 100  # Unscale
+        saav_objective = self.saav_objective.calculate_objective(
+            travel_cost=travel_cost,
+            waiting_time=total_waiting_time,
+            adaptations=self.adaptation_count
+        )
         
         return {
             "total_cost": solution.ObjectiveValue(),
-            "total_distance": total_distance / 100,  # Unscale
+            "saav_objective": saav_objective,
+            "total_distance": travel_cost,
             "total_time": total_time,
+            "total_waiting_time": total_waiting_time,
+            "adaptation_count": self.adaptation_count,
             "vehicles_used": len([r for r in self._extract_routes(None, routing, solution) if r]),
-            "orders_assigned": len(self.orders)
+            "orders_assigned": len(self.orders),
+            "objective_components": {
+                "travel_cost": travel_cost,
+                "waiting_time": total_waiting_time,
+                "adaptations": self.adaptation_count,
+                "weights": {
+                    "alpha": self.saav_objective.alpha,
+                    "beta": self.saav_objective.beta,
+                    "gamma": self.saav_objective.gamma
+                }
+            }
         }
     
     def _route_needs_reoptimization(self, route: Route, affected_orders: List[int]) -> bool:
