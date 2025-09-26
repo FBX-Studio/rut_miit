@@ -23,7 +23,7 @@ interface SystemStats {
 const fetcher = async (url: string): Promise<SystemStats> => {
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error('Failed to fetch system stats');
+    throw new Error('Не удалось загрузить статистику системы');
   }
   return response.json();
 };

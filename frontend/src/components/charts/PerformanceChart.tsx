@@ -52,45 +52,45 @@ interface PerformanceChartProps {
 const chartMetrics: ChartMetric[] = [
   {
     key: 'on_time_percentage',
-    label: 'On-Time %',
+    label: 'Вовремя %',
     color: '#10B981',
     unit: '%',
     format: (value) => `${value.toFixed(1)}%`,
   },
   {
     key: 'delivery_success_rate',
-    label: 'Success Rate',
+    label: 'Успешность',
     color: '#3B82F6',
     unit: '%',
     format: (value) => `${value.toFixed(1)}%`,
   },
   {
     key: 'average_delay_minutes',
-    label: 'Avg Delay',
+    label: 'Ср. задержка',
     color: '#F59E0B',
-    unit: 'min',
-    format: (value) => `${value.toFixed(0)}min`,
+    unit: 'мин',
+    format: (value) => `${value.toFixed(0)}мин`,
   },
   {
     key: 'fuel_efficiency',
-    label: 'Fuel Efficiency',
+    label: 'Расход топлива',
     color: '#8B5CF6',
-    unit: 'L/100km',
-    format: (value) => `${value.toFixed(1)}L`,
+    unit: 'Л/100км',
+    format: (value) => `${value.toFixed(1)}Л`,
   },
   {
     key: 'cost_per_delivery',
-    label: 'Cost/Delivery',
+    label: 'Стоимость/Доставка',
     color: '#EF4444',
-    unit: '$',
-    format: (value) => `$${value.toFixed(2)}`,
+    unit: '₽',
+    format: (value) => `₽${value.toFixed(2)}`,
   },
 ];
 
 const chartTypes = [
-  { id: 'line', label: 'Line Chart', icon: '📈' },
-  { id: 'area', label: 'Area Chart', icon: '📊' },
-  { id: 'bar', label: 'Bar Chart', icon: '📊' },
+  { id: 'line', label: 'Линейный график', icon: '📈' },
+  { id: 'area', label: 'Площадной график', icon: '📊' },
+  { id: 'bar', label: 'Столбчатый график', icon: '📊' },
 ] as const;
 
 type ChartType = typeof chartTypes[number]['id'];
@@ -109,10 +109,10 @@ export const PerformanceChart = ({
   const [chartType, setChartType] = useState<ChartType>('line');
 
   const timeRanges = [
-    { id: '24h', label: 'Last 24h' },
-    { id: '7d', label: 'Last 7 days' },
-    { id: '30d', label: 'Last 30 days' },
-    { id: '90d', label: 'Last 90 days' },
+    { id: '24h', label: 'Последние 24ч' },
+    { id: '7d', label: 'Последние 7 дней' },
+    { id: '30d', label: 'Последние 30 дней' },
+    { id: '90d', label: 'Последние 90 дней' },
   ] as const;
 
   const toggleMetric = (metricKey: string) => {
@@ -127,12 +127,12 @@ export const PerformanceChart = ({
     const date = new Date(tickItem);
     switch (timeRange) {
       case '24h':
-        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       case '7d':
-        return date.toLocaleDateString('en-US', { weekday: 'short' });
+        return date.toLocaleDateString('ru-RU', { weekday: 'short' });
       case '30d':
       case '90d':
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' });
       default:
         return tickItem;
     }
@@ -144,7 +144,7 @@ export const PerformanceChart = ({
       return (
         <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
           <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-            {date.toLocaleDateString('en-US', { 
+            {date.toLocaleDateString('ru-RU', { 
               weekday: 'short', 
               month: 'short', 
               day: 'numeric',
@@ -261,7 +261,7 @@ export const PerformanceChart = ({
     return (
       <div className={`card ${className}`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Performance Metrics</h2>
+          <h2 className="text-lg font-semibold">Метрики производительности</h2>
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
         </div>
         <div className="h-80 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse"></div>
@@ -272,12 +272,12 @@ export const PerformanceChart = ({
   if (!data || data.length === 0) {
     return (
       <div className={`card ${className}`}>
-        <h2 className="text-lg font-semibold mb-4">Performance Metrics</h2>
+        <h2 className="text-lg font-semibold mb-4">Метрики производительности</h2>
         <div className="h-80 flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div className="text-center">
             <div className="text-4xl mb-2">📊</div>
-            <p className="text-gray-600 dark:text-gray-400">No performance data available</p>
-            <p className="text-sm text-gray-500 mt-1">Data will appear after route completion</p>
+            <p className="text-gray-600 dark:text-gray-400">Нет данных о производительности</p>
+            <p className="text-sm text-gray-500 mt-1">Данные появятся после завершения маршрутов</p>
           </div>
         </div>
       </div>
@@ -288,7 +288,7 @@ export const PerformanceChart = ({
     <div className={`card ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Performance Metrics</h2>
+        <h2 className="text-lg font-semibold">Метрики производительности</h2>
         
         {/* Time range selector */}
         <div className="flex items-center space-x-2">
@@ -312,7 +312,7 @@ export const PerformanceChart = ({
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         {/* Chart type selector */}
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Chart:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">График:</span>
           {chartTypes.map(type => (
             <button
               key={type.id}
@@ -331,7 +331,7 @@ export const PerformanceChart = ({
 
         {/* Metric selector */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Metrics:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Метрики:</span>
           {chartMetrics.map(metric => (
             <button
               key={metric.key}

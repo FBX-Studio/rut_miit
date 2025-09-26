@@ -98,25 +98,25 @@ export const ActiveRoutes = ({
   };
 
   const formatTime = (timeString?: string) => {
-    if (!timeString) return 'N/A';
-    return new Date(timeString).toLocaleTimeString('en-US', {
+    if (!timeString) return 'Н/Д';
+    return new Date(timeString).toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit',
     });
   };
 
   const formatDistance = (distance?: number) => {
-    if (!distance) return 'N/A';
+    if (!distance) return 'Н/Д';
     return distance > 1000 
-      ? `${(distance / 1000).toFixed(1)} km`
-      : `${distance.toFixed(0)} m`;
+      ? `${(distance / 1000).toFixed(1)} км`
+      : `${distance.toFixed(0)} м`;
   };
 
   if (loading) {
     return (
       <div className={`card ${className}`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Active Routes</h2>
+          <h2 className="text-lg font-semibold">Активные маршруты</h2>
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
         </div>
         <div className="space-y-4">
@@ -140,11 +140,11 @@ export const ActiveRoutes = ({
   if (localRoutes.length === 0) {
     return (
       <div className={`card ${className}`}>
-        <h2 className="text-lg font-semibold mb-4">Active Routes</h2>
+        <h2 className="text-lg font-semibold mb-4">Активные маршруты</h2>
         <div className="text-center py-8">
           <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">No active routes</p>
-          <p className="text-sm text-gray-500 mt-1">Routes will appear here when optimization is complete</p>
+          <p className="text-gray-600 dark:text-gray-400">Нет активных маршрутов</p>
+          <p className="text-sm text-gray-500 mt-1">Маршруты появятся здесь после завершения оптимизации</p>
         </div>
       </div>
     );
@@ -153,9 +153,9 @@ export const ActiveRoutes = ({
   return (
     <div className={`card ${className}`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Active Routes</h2>
+        <h2 className="text-lg font-semibold mb-4">Активные маршруты</h2>
         <span className="text-sm text-gray-600 dark:text-gray-400">
-          {localRoutes.length} route{localRoutes.length !== 1 ? 's' : ''}
+          {localRoutes.length} маршрут{localRoutes.length !== 1 ? (localRoutes.length < 5 ? 'а' : 'ов') : ''}
         </span>
       </div>
 
@@ -171,11 +171,11 @@ export const ActiveRoutes = ({
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
                   <Truck className="h-5 w-5 text-gray-600" />
-                  <span className="font-medium">Route {route.id}</span>
+                  <span className="font-medium">Маршрут {route.id}</span>
                 </div>
                 <div className={`px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1 ${getStatusColor(route.status)}`}>
                   {getStatusIcon(route.status)}
-                  <span className="capitalize">{route.status}</span>
+                  <span className="capitalize">{route.status === 'active' ? 'Активен' : route.status}</span>
                 </div>
               </div>
               
@@ -187,9 +187,9 @@ export const ActiveRoutes = ({
                       onRouteAction(route.id, 'reoptimize');
                     }}
                     className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                    title="Reoptimize route"
+                    title="Переоптимизировать маршрут"
                   >
-                    Reopt
+                    Переопт
                   </button>
                 </div>
               )}
@@ -199,11 +199,11 @@ export const ActiveRoutes = ({
             <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center space-x-1">
                 <Truck className="h-4 w-4" />
-                <span>{route.vehicle_name || `Vehicle ${route.vehicle_id}`}</span>
+                <span>{route.vehicle_name || `Транспорт ${route.vehicle_id}`}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <User className="h-4 w-4" />
-                <span>{route.driver_name || `Driver ${route.driver_id}`}</span>
+                <span>{route.driver_name || `Водитель ${route.driver_id}`}</span>
               </div>
             </div>
 
@@ -211,7 +211,7 @@ export const ActiveRoutes = ({
             <div className="mb-3">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-600 dark:text-gray-400">
-                  Progress: {route.current_stop_index}/{route.total_stops} stops
+                  Прогресс: {route.current_stop_index}/{route.total_stops} остановок
                 </span>
                 <span className="font-medium">
                   {route.progress_percentage.toFixed(1)}%
@@ -234,7 +234,7 @@ export const ActiveRoutes = ({
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 mb-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Next {route.next_stop.type}
+                    Следующая {route.next_stop.type === 'pickup' ? 'забор' : 'доставка'}
                   </span>
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     ETA: {formatTime(route.next_stop.eta)}
@@ -246,7 +246,7 @@ export const ActiveRoutes = ({
                 </div>
                 {route.next_stop.customer_name && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Customer: {route.next_stop.customer_name}
+                    Клиент: {route.next_stop.customer_name}
                   </p>
                 )}
               </div>
@@ -255,7 +255,7 @@ export const ActiveRoutes = ({
             {/* Route metrics */}
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600 dark:text-gray-400">Distance:</span>
+                <span className="text-gray-600 dark:text-gray-400">Расстояние:</span>
                 <div className="font-medium">
                   {route.completed_distance && route.total_distance ? (
                     <>
@@ -268,15 +268,15 @@ export const ActiveRoutes = ({
               </div>
               
               <div>
-                <span className="text-gray-600 dark:text-gray-400">Completion:</span>
+                <span className="text-gray-600 dark:text-gray-400">Завершение:</span>
                 <div className="font-medium">
-                  {route.estimated_completion ? formatTime(route.estimated_completion) : 'N/A'}
-                </div>
+                    {route.estimated_completion ? formatTime(route.estimated_completion) : 'Н/Д'}
+                  </div>
               </div>
 
               {route.delays_count !== undefined && (
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">Delays:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Задержки:</span>
                   <div className={`font-medium ${route.delays_count > 0 ? 'text-yellow-600' : 'text-green-600'}`}>
                     {route.delays_count}
                   </div>
@@ -285,7 +285,7 @@ export const ActiveRoutes = ({
 
               {route.on_time_percentage !== undefined && (
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">On-time:</span>
+                  <span className="text-gray-600 dark:text-gray-400">В срок:</span>
                   <div className={`font-medium ${
                     route.on_time_percentage >= 90 ? 'text-green-600' :
                     route.on_time_percentage >= 70 ? 'text-yellow-600' : 'text-red-600'

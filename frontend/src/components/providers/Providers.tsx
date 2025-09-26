@@ -22,7 +22,7 @@ export const Providers = ({ children }: ProvidersProps) => {
         errorRetryCount: 3,
         errorRetryInterval: 5000,
         onError: (error) => {
-          console.error('SWR Error:', error);
+          console.error('Ошибка SWR:', error);
         },
       }}
     >

@@ -72,11 +72,11 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
           }
           
           // Handle system notifications
-          if (message.type === 'event_notification' && message.data.severity === 'high') {
-            toast.error(`Alert: ${message.data.title}`);
-          } else if (message.type === 'reoptimization_complete') {
-            toast.success('Route optimization completed');
-          }
+    if (message.type === 'event_notification' && message.data.severity === 'high') {
+      toast.error(`Предупреждение: ${message.data.title}`);
+    } else if (message.type === 'reoptimization_complete') {
+      toast.success('Оптимизация маршрутов завершена');
+    }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
         }
@@ -95,16 +95,16 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
             connect(endpoint);
           }, reconnectDelay * reconnectAttemptsRef.current);
         } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          toast.error('Connection lost. Please refresh the page.');
-        }
+        toast.error('Соединение потеряно. Пожалуйста, обновите страницу.');
+      }
       };
 
       wsRef.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('Ошибка WebSocket:', error);
         setIsConnected(false);
       };
     } catch (error) {
-      console.error('Failed to create WebSocket connection:', error);
+      console.error('Не удалось создать WebSocket соединение:', error);
       setIsConnected(false);
     }
   };
@@ -128,7 +128,7 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
     } else {
-      console.warn('WebSocket is not connected. Cannot send message:', message);
+      console.warn('WebSocket не подключен. Невозможно отправить сообщение:', message);
     }
   };
 
@@ -187,7 +187,7 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (!context) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider');
+    throw new Error('useWebSocket должен использоваться внутри WebSocketProvider');
   }
   return context;
 };

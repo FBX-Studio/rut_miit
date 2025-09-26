@@ -7,17 +7,17 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'VRPTW System - Route Optimization Dashboard',
-  description: 'Advanced Vehicle Routing Problem with Time Windows (VRPTW) optimization system with real-time monitoring and adaptive reoptimization.',
-  keywords: 'VRPTW, route optimization, logistics, delivery, fleet management, real-time monitoring',
-  authors: [{ name: 'VRPTW System Team' }],
+  title: 'ВРПТВ Система - Панель оптимизации маршрутов',
+  description: 'Продвинутая система оптимизации задачи маршрутизации транспорта с временными окнами (ВРПТВ) с мониторингом в реальном времени и адаптивной реоптимизацией.',
+  keywords: 'ВРПТВ, оптимизация маршрутов, логистика, доставка, управление автопарком, мониторинг в реальном времени',
+  authors: [{ name: 'Команда ВРПТВ Системы' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
-    title: 'VRPTW System - Route Optimization Dashboard',
-    description: 'Advanced Vehicle Routing Problem with Time Windows optimization system',
+    title: 'ВРПТВ Система - Панель оптимизации маршрутов',
+    description: 'Продвинутая система оптимизации задачи маршрутизации транспорта с временными окнами',
     type: 'website',
-    locale: 'en_US',
+    locale: 'ru_RU',
   },
 };
 
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

@@ -149,14 +149,14 @@ export const RecentEvents = ({
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${diffDays}d ago`;
+    if (diffMins < 1) return 'Только что';
+    if (diffMins < 60) return `${diffMins} мин назад`;
+    if (diffHours < 24) return `${diffHours} ч назад`;
+    return `${diffDays} дн назад`;
   };
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
+    return new Date(timestamp).toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -166,7 +166,7 @@ export const RecentEvents = ({
     return (
       <div className={`card ${className}`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Recent Events</h2>
+          <h2 className="text-lg font-semibold">Последние события</h2>
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
         </div>
         <div className="space-y-3">
@@ -188,11 +188,11 @@ export const RecentEvents = ({
   if (localEvents.length === 0) {
     return (
       <div className={`card ${className}`}>
-        <h2 className="text-lg font-semibold mb-4">Recent Events</h2>
+        <h2 className="text-lg font-semibold mb-4">Последние события</h2>
         <div className="text-center py-8">
           <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">No recent events</p>
-          <p className="text-sm text-gray-500 mt-1">System events will appear here</p>
+          <p className="text-gray-600 dark:text-gray-400">Нет последних событий</p>
+          <p className="text-sm text-gray-500 mt-1">Системные события появятся здесь</p>
         </div>
       </div>
     );
@@ -201,9 +201,9 @@ export const RecentEvents = ({
   return (
     <div className={`card ${className}`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Recent Events</h2>
+        <h2 className="text-lg font-semibold">Последние события</h2>
         <span className="text-sm text-gray-600 dark:text-gray-400">
-          {localEvents.length} event{localEvents.length !== 1 ? 's' : ''}
+          {localEvents.length} событи{localEvents.length === 1 ? 'е' : localEvents.length < 5 ? 'я' : 'й'}
         </span>
       </div>
 
@@ -232,10 +232,15 @@ export const RecentEvents = ({
                   </h3>
                   <div className="flex items-center space-x-2 ml-2">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getSeverityBadgeColor(event.severity)}`}>
-                      {event.severity}
+                      {event.severity === 'critical' ? 'критический' : 
+                       event.severity === 'high' ? 'высокий' :
+                       event.severity === 'medium' ? 'средний' : 
+                       event.severity === 'low' ? 'низкий' : event.severity}
                     </span>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(event.status)}`}>
-                      {event.status}
+                      {event.status === 'active' ? 'активный' :
+                       event.status === 'resolved' ? 'решен' :
+                       event.status === 'acknowledged' ? 'принят' : event.status}
                     </span>
                   </div>
                 </div>
@@ -253,7 +258,7 @@ export const RecentEvents = ({
                     {event.route_id && (
                       <span className="flex items-center space-x-1">
                         <MapPin className="h-3 w-3" />
-                        <span>Route {event.route_id}</span>
+                        <span>Маршрут {event.route_id}</span>
                       </span>
                     )}
                     {event.vehicle_id && (
@@ -278,17 +283,17 @@ export const RecentEvents = ({
                     <div className="flex items-center justify-between">
                       {event.estimated_impact.delay_minutes && (
                         <span className="text-yellow-600">
-                          +{event.estimated_impact.delay_minutes}min delay
+                          +{event.estimated_impact.delay_minutes} мин задержки
                         </span>
                       )}
                       {event.estimated_impact.affected_orders && (
                         <span className="text-orange-600">
-                          {event.estimated_impact.affected_orders} orders affected
+                          {event.estimated_impact.affected_orders} заказов затронуто
                         </span>
                       )}
                       {event.estimated_impact.cost_impact && (
                         <span className="text-red-600">
-                          ${event.estimated_impact.cost_impact} impact
+                          ${event.estimated_impact.cost_impact} ущерб
                         </span>
                       )}
                     </div>
@@ -305,7 +310,7 @@ export const RecentEvents = ({
                       }}
                       className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                     >
-                      Acknowledge
+                      Принять
                     </button>
                     {event.type !== 'system' && (
                       <button
@@ -315,7 +320,7 @@ export const RecentEvents = ({
                         }}
                         className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
                       >
-                        Resolve
+                        Решить
                       </button>
                     )}
                   </div>
@@ -330,7 +335,7 @@ export const RecentEvents = ({
       {localEvents.length >= maxEvents && (
         <div className="mt-4 text-center">
           <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-            View all events →
+            Показать все события →
           </button>
         </div>
       )}

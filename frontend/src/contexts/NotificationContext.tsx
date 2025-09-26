@@ -211,7 +211,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error('useNotifications must be used within a NotificationProvider');
+    throw new Error('useNotifications должен использоваться внутри NotificationProvider');
   }
   return context;
 };
@@ -221,12 +221,12 @@ export const useApiNotifications = () => {
   const { showSuccess, showError, showWarning } = useNotifications();
   
   return {
-    onSuccess: (message: string) => showSuccess('Success', message),
+    onSuccess: (message: string) => showSuccess('Успех', message),
     onError: (error: any) => {
-      const message = error?.response?.data?.detail || error?.message || 'An error occurred';
-      showError('Error', message);
+      const message = error?.response?.data?.detail || error?.message || 'Произошла ошибка';
+      showError('Ошибка', message);
     },
-    onWarning: (message: string) => showWarning('Warning', message),
+    onWarning: (message: string) => showWarning('Предупреждение', message),
   };
 };
 
@@ -235,21 +235,21 @@ export const useRouteNotifications = () => {
   
   return {
     onOptimizationComplete: (routeCount: number) => 
-      showSuccess('Optimization Complete', `${routeCount} routes have been optimized`),
+      showSuccess('Оптимизация завершена', `${routeCount} маршрутов было оптимизировано`),
     
     onReoptimizationTriggered: (reason: string) => 
-      showInfo('Reoptimization Started', `Reason: ${reason}`),
+      showInfo('Переоптимизация запущена', `Причина: ${reason}`),
     
     onRouteDelayed: (routeId: number, delay: number) => 
-      showWarning('Route Delayed', `Route ${routeId} is delayed by ${delay} minutes`),
+      showWarning('Маршрут задержан', `Маршрут ${routeId} задержан на ${delay} минут`),
     
     onDeliveryCompleted: (orderId: number) => 
-      showSuccess('Delivery Completed', `Order ${orderId} has been delivered`),
+      showSuccess('Доставка завершена', `Заказ ${orderId} был доставлен`),
     
     onVehicleBreakdown: (vehicleId: number) => 
-      showError('Vehicle Breakdown', `Vehicle ${vehicleId} has reported a breakdown`),
+      showError('Поломка транспорта', `Транспорт ${vehicleId} сообщил о поломке`),
     
     onTrafficAlert: (routeId: number, impact: string) => 
-      showWarning('Traffic Alert', `Route ${routeId}: ${impact}`),
+      showWarning('Предупреждение о пробках', `Маршрут ${routeId}: ${impact}`),
   };
 };

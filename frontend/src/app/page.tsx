@@ -19,7 +19,7 @@ const RouteMap = dynamic(() => import('@/components/maps/RouteMap'), {
     <div className="h-96 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Loading map...</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Загрузка карты...</p>
       </div>
     </div>
   ),
@@ -55,15 +55,15 @@ const Dashboard = () => {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="text-red-600 text-lg font-medium mb-2">
-              Failed to load dashboard data
-            </div>
-            <p className="text-gray-600 mb-4">{error.message}</p>
-            <button
-              onClick={() => refetch()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Retry
-            </button>
+               Не удалось загрузить данные панели управления
+             </div>
+             <p className="text-gray-600 mb-4">{error.message}</p>
+             <button
+               onClick={() => refetch()}
+               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+             >
+               Повторить
+             </button>
           </div>
         </div>
       </div>
@@ -77,18 +77,18 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Route Optimization Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Real-time monitoring and management of delivery routes
-            </p>
+               Панель управления оптимизацией маршрутов
+             </h1>
+             <p className="text-gray-600 dark:text-gray-400 mt-1">
+               Мониторинг и управление маршрутами доставки в реальном времени
+             </p>
           </div>
           
           {/* Connection Status */}
           <div className="flex items-center space-x-2">
             <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {isConnected ? 'Connected' : 'Disconnected'}
+              {isConnected ? 'Подключено' : 'Отключено'}
             </span>
           </div>
         </div>
@@ -96,31 +96,31 @@ const Dashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
-            title="Total Routes"
+            title="Всего маршрутов"
             value={stats?.total_routes || 0}
             icon={MapPin}
-            change={{ value: 12, type: 'increase', period: 'vs last month' }}
+            change={{ value: 12, type: 'increase', period: 'за прошлый месяц' }}
             className="bg-white dark:bg-gray-800"
           />
           <StatsCard
-            title="Active Deliveries"
+            title="Активные доставки"
             value={stats?.active_routes || 0}
             icon={Truck}
-            change={{ value: 8, type: 'increase', period: 'vs last month' }}
+            change={{ value: 8, type: 'increase', period: 'за прошлый месяц' }}
             className="bg-white dark:bg-gray-800"
           />
           <StatsCard
-            title="Pending Orders"
+            title="Ожидающие заказы"
             value={stats?.pending_orders || 0}
             icon={Package}
-            change={{ value: 5, type: 'decrease', period: 'vs last month' }}
+            change={{ value: 5, type: 'decrease', period: 'за прошлый месяц' }}
             className="bg-white dark:bg-gray-800"
           />
           <StatsCard
-            title="On-Time Rate"
+            title="Доставка в срок"
             value={`${stats?.on_time_delivery_rate || 0}%`}
             icon={Clock}
-            change={{ value: 3, type: 'increase', period: 'vs last month' }}
+            change={{ value: 3, type: 'increase', period: 'за прошлый месяц' }}
             className="bg-white dark:bg-gray-800"
           />
         </div>
@@ -132,10 +132,10 @@ const Dashboard = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Live Route Map
+                  Карта маршрутов в реальном времени
                 </h2>
                 <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  View Full Screen
+                  Полноэкранный режим
                 </button>
               </div>
               <RouteMap
@@ -152,10 +152,10 @@ const Dashboard = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Active Routes
+                  Активные маршруты
                 </h2>
                 <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  View All
+                  Показать все
                 </button>
               </div>
               <ActiveRoutes
@@ -167,10 +167,10 @@ const Dashboard = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Recent Events
+                  Последние события
                 </h2>
                 <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  View All
+                  Показать все
                 </button>
               </div>
               <RecentEvents maxEvents={5} />
@@ -183,12 +183,12 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Delivery Performance
+                Производительность доставки
               </h2>
               <select className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>Last 90 days</option>
+                <option>Последние 7 дней</option>
+                <option>Последние 30 дней</option>
+                <option>Последние 90 дней</option>
               </select>
             </div>
             <PerformanceChart
@@ -201,12 +201,12 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Route Efficiency
+                Эффективность маршрутов
               </h2>
               <select className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>Last 90 days</option>
+                <option>Последние 7 дней</option>
+                <option>Последние 30 дней</option>
+                <option>Последние 90 дней</option>
               </select>
             </div>
             <PerformanceChart
@@ -220,20 +220,20 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Quick Actions
+            Быстрые действия
           </h2>
           <div className="flex flex-wrap gap-3">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Create New Route
+              Создать новый маршрут
             </button>
             <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-              Optimize Routes
+              Оптимизировать маршруты
             </button>
             <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
-              Manage Drivers
+              Управление водителями
             </button>
             <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-              View Analytics
+              Просмотр аналитики
             </button>
           </div>
         </div>
