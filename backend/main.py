@@ -26,14 +26,12 @@ from app.database import get_db
 from app.core.metrics import get_metrics, update_business_metrics, CONTENT_TYPE_LATEST
 from sqlalchemy.orm import Session
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Global instances
 vrptw_solver = None
 adaptive_optimizer = None
 yandex_maps_service = None
@@ -48,7 +46,6 @@ async def lifespan(app: FastAPI):
     logger.info("Starting VRPTW optimization system...")
     
     try:
-        # Initialize services
         yandex_maps_service = YandexMapsService(api_key=os.getenv("YANDEX_MAPS_API_KEY", ""))
         eta_predictor = ETAPredictor()
         vrptw_solver = VRPTWSolver()
@@ -58,14 +55,10 @@ async def lifespan(app: FastAPI):
             delay_threshold_minutes=15
         )
         
-        # Store instances in app state
         app.state.vrptw_solver = vrptw_solver
         app.state.adaptive_optimizer = adaptive_optimizer
         app.state.yandex_maps_service = yandex_maps_service
         app.state.eta_predictor = eta_predictor
-        
-        # Note: Adaptive monitoring will be started via API endpoint
-        # to avoid blocking the startup process
         
         logger.info("VRPTW optimization system started successfully")
         
@@ -75,13 +68,11 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to start application: {e}")
         raise
     finally:
-        # Cleanup
         if adaptive_optimizer:
             adaptive_optimizer.stop_monitoring()
         logger.info("VRPTW optimization system stopped")
 
 
-# Create FastAPI app
 app = FastAPI(
     title="Slot-Aware Adaptive VRPTW System",
     description="Advanced Vehicle Routing Problem with Time Windows solver with real-time optimization",
@@ -89,7 +80,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure JSON response encoding
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import json
@@ -101,10 +91,9 @@ async def add_utf8_encoding(request, call_next):
         response.headers["content-type"] = "application/json; charset=utf-8"
     return response
 
-# Add middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Frontend URLs
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,7 +101,6 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Include routers
 app.include_router(drivers_router, prefix="/api/v1/drivers")
 app.include_router(routes_router, prefix="/api/v1/routes")
 app.include_router(simulation_router, prefix="/api/v1/simulation")
@@ -125,7 +113,6 @@ app.include_router(websocket_router)
 async def root():
     return {"message": "Slot-Aware Adaptive VRPTW System API"}
 
-# Health check endpoint
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
@@ -142,29 +129,15 @@ async def health_check():
 
 @app.get("/metrics")
 async def metrics(db: Session = Depends(get_db)):
-    """Endpoint для метрик Prometheus"""
-    # Обновляем бизнес-метрики перед возвратом
+    """Prometheus metrics endpoint."""
     update_business_metrics(db)
-    
-    metrics_data = get_metrics()
-    return Response(content=metrics_data, media_type=CONTENT_TYPE_LATEST)
-
-# Global exception handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    logger.error(f"Global exception: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"}
-    )
-
+    return Response(content=get_metrics(), media_type=CONTENT_TYPE_LATEST)
 
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=8000,
         reload=True,
-        log_level="info",
-        access_log=True,
+        log_level="debug"
     )

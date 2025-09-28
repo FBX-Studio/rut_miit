@@ -8,7 +8,6 @@ import { ActiveRoutesBlock } from '@/components/dashboard/ActiveRoutesBlock';
 import { RecentEventsBlock } from '@/components/dashboard/RecentEventsBlock';
 import { DeliveryPerformanceBlock } from '@/components/dashboard/DeliveryPerformanceBlock';
 import { RouteEfficiencyBlock } from '@/components/dashboard/RouteEfficiencyBlock';
-
 import { RouteOptimizationModal } from '@/components/modals/RouteOptimizationModal';
 import { DriverManagementModal } from '@/components/modals/DriverManagementModal';
 import { AnalyticsModal } from '@/components/modals/AnalyticsModal';
@@ -20,7 +19,6 @@ import SimulationLauncher from '@/components/dashboard/SimulationLauncher';
 import { NavigationHeader } from '@/components/ui/NavigationHeader';
 import { Toaster } from 'react-hot-toast';
 
-// Dynamically import RouteMap to avoid SSR issues
 const RouteMap = dynamic(() => import('@/components/maps/RouteMap'), {
   ssr: false,
   loading: () => (
@@ -43,11 +41,9 @@ const Dashboard = () => {
   const { stats, isLoading, error, refetch } = useSystemStats();
 
   useEffect(() => {
-    // Refresh stats every 30 seconds
     const interval = setInterval(() => {
       refetch();
     }, 30000);
-
     return () => clearInterval(interval);
   }, [refetch]);
 
@@ -84,7 +80,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Navigation Header */}
       <NavigationHeader
         title="Панель управления оптимизацией маршрутов"
         subtitle="Мониторинг и управление маршрутами доставки в реальном времени"
@@ -99,7 +94,6 @@ const Dashboard = () => {
       />
       
       <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Всего маршрутов"
@@ -131,36 +125,26 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Interactive Information Blocks */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Active Routes Block */}
           <ActiveRoutesBlock 
             className="lg:col-span-1"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
-          
-          {/* Recent Events Block */}
           <RecentEventsBlock 
             className="lg:col-span-1"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
-          
-          {/* Delivery Performance Block */}
           <DeliveryPerformanceBlock 
             className="lg:col-span-1"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
-          
-          {/* Route Efficiency Block */}
           <RouteEfficiencyBlock 
             className="lg:col-span-1"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Map Section */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
@@ -179,14 +163,11 @@ const Dashboard = () => {
               />
             </div>
           </div>
-
-          {/* Simulation Launcher */}
           <div className="space-y-6">
             <SimulationLauncher />
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Быстрые действия
@@ -231,7 +212,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Modals */}
         <RouteOptimizationModal
           isOpen={showRouteModal}
           onClose={() => setShowRouteModal(false)}
@@ -246,7 +226,6 @@ const Dashboard = () => {
           onClose={() => setShowAnalyticsModal(false)}
         />
 
-        {/* Toast Notifications */}
         <Toaster
           position="top-right"
           toastOptions={{

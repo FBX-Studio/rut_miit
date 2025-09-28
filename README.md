@@ -1,282 +1,218 @@
-# Slot-Aware Adaptive VRPTW System
+# Система оптимизации маршрутов доставки (VRPTW)
 
-A comprehensive Vehicle Routing Problem with Time Windows (VRPTW) optimization system featuring real-time adaptive optimization, route monitoring, and a modern React-based dashboard.
+## Описание проекта
 
-## Features
+Система оптимизации маршрутов доставки - это современное веб-приложение для решения задачи маршрутизации транспортных средств с временными окнами (Vehicle Routing Problem with Time Windows, VRPTW). Система предназначена для логистических компаний и служб доставки, которым необходимо оптимизировать маршруты своих транспортных средств с учетом временных ограничений и различных параметров.
 
-### Core Optimization
-- **OR-Tools Integration**: Advanced VRPTW solving using Google OR-Tools
-- **Adaptive Optimization**: Real-time route reoptimization based on traffic, delays, and new orders
-- **Multiple Optimization Strategies**: Local, global, emergency, and manual reoptimization modes
-- **Time Window Management**: Flexible time slot handling with customer preferences
+## Основная функциональность
 
-### Real-Time Monitoring
-- **Live Route Tracking**: Real-time vehicle position and route progress monitoring
-- **Event-Driven Architecture**: Automatic reoptimization triggers for delays, traffic, and breakdowns
-- **WebSocket Integration**: Live updates for routes, events, and system status
-- **Performance Analytics**: Comprehensive metrics and KPI tracking
+### Ключевые возможности:
+- **Оптимизация маршрутов** - автоматическое построение оптимальных маршрутов доставки с использованием алгоритмов OR-Tools
+- **Адаптивная оптимизация** - динамическое перестроение маршрутов в реальном времени при изменении условий
+- **Управление временными окнами** - учет временных ограничений для каждой точки доставки
+- **Мониторинг в реальном времени** - отслеживание выполнения маршрутов и событий системы
+- **Интеграция с картами** - использование Yandex Maps API для расчета расстояний и времени в пути
+- **Прогнозирование ETA** - предсказание времени прибытия с учетом дорожной ситуации
+- **Веб-интерфейс** - современная панель управления на React с интерактивными картами
+- **WebSocket-уведомления** - мгновенные обновления состояния маршрутов
+- **Система аналитики** - отчеты по эффективности доставок и производительности
 
-### External Integrations
-- **Yandex Maps API**: Real-time traffic data, geocoding, and route optimization
-- **ETA Prediction**: Machine learning-based arrival time estimation
-- **Traffic-Aware Routing**: Dynamic route adjustment based on current traffic conditions
+### Технические особенности:
+- Использование алгоритмов Google OR-Tools для решения VRPTW
+- Архитектура на основе событий для адаптивной оптимизации
+- RESTful API с автоматической документацией
+- Поддержка WebSocket для real-time обновлений
+- Интеграция с внешними картографическими сервисами
 
-### Modern Web Interface
-- **React Dashboard**: Interactive route visualization and monitoring
-- **Real-Time Updates**: Live data synchronization via WebSocket
-- **Responsive Design**: Mobile-friendly interface with Tailwind CSS
-- **Interactive Maps**: Leaflet-based route visualization with traffic layers
+## Требования для запуска
 
-## Architecture
+### Backend (Python):
+- Python 3.8 или выше
+- pip (менеджер пакетов Python)
+- SQLite (встроенная база данных)
 
-```
-├── backend/                 # FastAPI backend
-│   ├── app/
-│   │   ├── api/            # REST API endpoints and WebSocket handlers
-│   │   ├── models/         # Data models and ETA prediction
-│   │   ├── optimization/   # VRPTW solver and adaptive optimizer
-│   │   └── services/       # External service integrations
-│   ├── main.py            # Application entry point
-│   └── requirements.txt   # Python dependencies
-│
-├── frontend/               # Next.js React frontend
-│   ├── src/
-│   │   ├── app/           # Next.js app router pages
-│   │   ├── components/    # React components
-│   │   ├── contexts/      # React contexts for state management
-│   │   └── lib/          # Utilities and API client
-│   ├── package.json      # Node.js dependencies
-│   └── tailwind.config.js # Tailwind CSS configuration
-│
-└── README.md             # This file
-```
+### Frontend (Node.js):
+- Node.js 16.0 или выше
+- npm 7.0 или выше
 
-## Quick Start
+### Системные требования:
+- Операционная система: Windows 10/11, macOS 10.15+, Ubuntu 18.04+
+- Оперативная память: минимум 4 ГБ, рекомендуется 8 ГБ
+- Свободное место на диске: минимум 2 ГБ
 
-### Prerequisites
-- Python 3.9+
-- Node.js 18+
-- Yandex Maps API key (optional, for enhanced features)
+### Внешние зависимости:
+- Yandex Maps API ключ (опционально, для полной функциональности карт)
+- Интернет-соединение для загрузки зависимостей
 
-### Backend Setup
+## Пошаговая инструкция по развертыванию
 
-1. **Clone and navigate to backend**:
-   ```bash
-   cd backend
-   ```
+### 1. Подготовка окружения
 
-2. **Create virtual environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure environment**:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-5. **Start the backend**:
-   ```bash
-   python main.py
-   ```
-
-The backend will be available at `http://localhost:8000`
-
-### Frontend Setup
-
-1. **Navigate to frontend**:
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment**:
-   ```bash
-   # Create .env.local with:
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   NEXT_PUBLIC_WS_URL=ws://localhost:8000
-   ```
-
-4. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-The frontend will be available at `http://localhost:3000`
-
-## API Documentation
-
-Once the backend is running, visit:
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
-- **Health Check**: `http://localhost:8000/health`
-
-### Key Endpoints
-
-#### Route Optimization
-- `POST /api/v1/routes/optimize` - Optimize routes for given orders and vehicles
-- `GET /api/v1/routes` - List all routes with filtering options
-- `PUT /api/v1/routes/{route_id}/reoptimize` - Trigger route reoptimization
-
-#### Real-Time Updates
-- `WebSocket /ws/routes` - Real-time route updates
-- `WebSocket /ws/events` - System events and alerts
-- `WebSocket /ws/eta` - ETA predictions and updates
-
-#### Monitoring
-- `GET /api/v1/monitoring/status` - System monitoring status
-- `GET /api/v1/events` - System events and alerts
-- `GET /api/v1/analytics/performance` - Performance metrics
-
-## Configuration
-
-### Environment Variables
-
-#### Backend (.env)
-```env
-# API Configuration
-YANDEX_MAPS_API_KEY=your_api_key_here
-HOST=0.0.0.0
-PORT=8000
-
-# Optimization Settings
-MAX_VEHICLES=50
-MAX_ORDERS=1000
-DELAY_THRESHOLD_MINUTES=15
-TRAFFIC_THRESHOLD_MULTIPLIER=1.5
-
-# WebSocket Settings
-WS_HEARTBEAT_INTERVAL=30
-WS_MAX_CONNECTIONS=100
+Клонируйте репозиторий:
+```bash
+git clone <repository-url>
+cd rut_miit
 ```
 
-#### Frontend (.env.local)
-```env
+### 2. Настройка Backend
+
+Перейдите в директорию backend:
+```bash
+cd backend
+```
+
+Создайте виртуальное окружение Python:
+```bash
+python -m venv venv
+```
+
+Активируйте виртуальное окружение:
+- Windows: `venv\Scripts\activate`
+- macOS/Linux: `source venv/bin/activate`
+
+Установите зависимости:
+```bash
+pip install -r requirements.txt
+```
+
+Создайте файл конфигурации `.env`:
+```bash
+cp .env.example .env
+```
+
+Отредактируйте `.env` файл, добавив необходимые настройки:
+```
+DATABASE_URL=sqlite:///./vrptw.db
+YANDEX_MAPS_API_KEY=your_yandex_maps_api_key_here
+SECRET_KEY=your_secret_key_here
+DEBUG=True
+```
+
+Инициализируйте базу данных:
+```bash
+python -c "from app.database import init_db; init_db()"
+```
+
+Запустите backend сервер:
+```bash
+python main.py
+```
+
+Backend будет доступен по адресу: `http://localhost:8000`
+
+### 3. Настройка Frontend
+
+Откройте новый терминал и перейдите в директорию frontend:
+```bash
+cd frontend
+```
+
+Установите зависимости:
+```bash
+npm install
+```
+
+Создайте файл конфигурации `.env.local`:
+```
 NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_WS_URL=ws://localhost:8000
 ```
 
-## Usage Examples
-
-### Basic Route Optimization
-
-```python
-import requests
-
-# Optimize routes
-response = requests.post('http://localhost:8000/api/v1/routes/optimize', json={
-    "orders": [
-        {
-            "id": 1,
-            "customer_id": 1,
-            "pickup_location": {"lat": 55.7558, "lng": 37.6176},
-            "delivery_location": {"lat": 55.7522, "lng": 37.6156},
-            "time_window": {"start": "09:00", "end": "17:00"},
-            "service_time_minutes": 15,
-            "priority": "normal"
-        }
-    ],
-    "vehicles": [
-        {
-            "id": 1,
-            "capacity": 100,
-            "start_location": {"lat": 55.7558, "lng": 37.6176},
-            "end_location": {"lat": 55.7558, "lng": 37.6176},
-            "available_from": "08:00",
-            "available_until": "18:00"
-        }
-    ]
-})
-
-routes = response.json()
-```
-
-### WebSocket Integration
-
-```javascript
-// Connect to real-time updates
-const ws = new WebSocket('ws://localhost:8000/ws/routes');
-
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    console.log('Route update:', data);
-};
-```
-
-## Development
-
-### Running Tests
-
+Запустите frontend сервер:
 ```bash
-# Backend tests
-cd backend
-pytest
-
-# Frontend tests
-cd frontend
-npm test
+npm run dev
 ```
 
-### Code Quality
+Frontend будет доступен по адресу: `http://localhost:3000`
 
+## Примеры использования
+
+### 1. Создание нового маршрута
+1. Откройте веб-интерфейс по адресу `http://localhost:3000`
+2. Нажмите кнопку "Создать новый маршрут"
+3. Выберите заказы, транспортные средства и водителей
+4. Нажмите "Оптимизировать маршрут"
+5. Просмотрите результат на интерактивной карте
+
+### 2. Мониторинг активных маршрутов
+1. На главной панели отображаются активные маршруты
+2. Кликните на маршрут для просмотра деталей
+3. Отслеживайте прогресс выполнения в реальном времени
+
+### 3. Использование API
+Документация API доступна по адресам:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+Пример запроса оптимизации через API:
 ```bash
-# Backend linting
-cd backend
-black .
-flake8 .
-mypy .
-
-# Frontend linting
-cd frontend
-npm run lint
-npm run type-check
+curl -X POST "http://localhost:8000/api/v1/routes/optimize" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "order_ids": [1, 2, 3],
+    "vehicle_ids": [1],
+    "driver_ids": [1],
+    "depot_location": {"lat": 55.7558, "lng": 37.6176}
+  }'
 ```
 
-## Deployment
+### 4. Запуск симуляции
+1. В разделе "Симуляция" выберите параметры
+2. Нажмите "Запустить симуляцию"
+3. Наблюдайте за процессом оптимизации в реальном времени
 
-### Docker Deployment (Recommended)
+## Структура проекта
 
-```bash
-# Build and run with Docker Compose
-docker-compose up --build
+```
+rut_miit/
+├── backend/                 # Backend приложение (FastAPI)
+│   ├── app/
+│   │   ├── api/            # API маршруты
+│   │   ├── models/         # Модели данных
+│   │   ├── optimization/   # Алгоритмы оптимизации
+│   │   └── services/       # Внешние сервисы
+│   ├── main.py            # Точка входа приложения
+│   └── requirements.txt   # Python зависимости
+├── frontend/              # Frontend приложение (Next.js)
+│   ├── src/
+│   │   ├── components/    # React компоненты
+│   │   ├── contexts/      # React контексты
+│   │   └── hooks/         # Пользовательские хуки
+│   └── package.json       # Node.js зависимости
+└── README.md             # Документация проекта
 ```
 
-### Manual Deployment
+## Устранение неполадок
 
-1. **Backend**: Deploy using Gunicorn or similar WSGI server
-2. **Frontend**: Build and deploy static files
-   ```bash
-   npm run build
-   npm start
-   ```
+### Проблемы с запуском backend:
+- Убедитесь, что Python 3.8+ установлен
+- Проверьте активацию виртуального окружения
+- Убедитесь, что все зависимости установлены: `pip install -r requirements.txt`
 
-## Contributing
+### Проблемы с запуском frontend:
+- Убедитесь, что Node.js 16+ установлен
+- Очистите кэш npm: `npm cache clean --force`
+- Удалите node_modules и переустановите: `rm -rf node_modules && npm install`
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
+### Проблемы с базой данных:
+- Убедитесь, что файл базы данных создан
+- Проверьте права доступа к директории
+- При необходимости пересоздайте базу данных
 
-## License
+## Контакты для обратной связи
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+**Техническая поддержка:**
+- Email: support@vrptw-system.ru
+- Telegram: @vrptw_support
 
-## Support
+**Разработка:**
+- GitHub Issues: [ссылка на репозиторий]
+- Email разработчика: developer@vrptw-system.ru
 
-For questions and support:
-- Create an issue on GitHub
-- Check the API documentation at `/docs`
-- Review the code examples in this README
+**Документация:**
+- Техническая документация: `http://localhost:8000/docs`
+- Пользовательская документация: доступна в веб-интерфейсе
+
+---
+
+*Система разработана для оптимизации логистических процессов и повышения эффективности доставки.*
