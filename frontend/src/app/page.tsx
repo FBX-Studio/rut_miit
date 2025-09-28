@@ -8,7 +8,7 @@ import { ActiveRoutesBlock } from '@/components/dashboard/ActiveRoutesBlock';
 import { RecentEventsBlock } from '@/components/dashboard/RecentEventsBlock';
 import { DeliveryPerformanceBlock } from '@/components/dashboard/DeliveryPerformanceBlock';
 import { RouteEfficiencyBlock } from '@/components/dashboard/RouteEfficiencyBlock';
-import { PerformanceChart } from '@/components/charts/PerformanceChart';
+
 import { RouteOptimizationModal } from '@/components/modals/RouteOptimizationModal';
 import { DriverManagementModal } from '@/components/modals/DriverManagementModal';
 import { AnalyticsModal } from '@/components/modals/AnalyticsModal';
@@ -183,45 +183,6 @@ const Dashboard = () => {
           {/* Simulation Launcher */}
           <div className="space-y-6">
             <SimulationLauncher />
-          </div>
-        </div>
-
-        {/* Performance Charts - Legacy Section (can be removed if not needed) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Дополнительная аналитика
-              </h2>
-              <select className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option>Последние 7 дней</option>
-                <option>Последние 30 дней</option>
-                <option>Последние 90 дней</option>
-              </select>
-            </div>
-            <PerformanceChart
-              data={[]}
-              timeRange="7d"
-              className="h-64"
-            />
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Системные метрики
-              </h2>
-              <select className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option>Последние 7 дней</option>
-                <option>Последние 30 дней</option>
-                <option>Последние 90 дней</option>
-              </select>
-            </div>
-            <PerformanceChart
-              data={[]}
-              timeRange="7d"
-              className="h-64"
-            />
           </div>
         </div>
 
