@@ -4,5 +4,11 @@
     "files": [
       "static/chunks/_app-pages-browser_src_components_maps_RouteMap_tsx.js"
     ]
+  },
+  "components\\testing\\SimulationInterface.tsx -> ./SimulationMap": {
+    "id": "components\\testing\\SimulationInterface.tsx -> ./SimulationMap",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_testing_SimulationMap_tsx.js"
+    ]
   }
 }

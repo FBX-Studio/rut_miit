@@ -261,6 +261,12 @@ const Dashboard = () => {
             >
               Просмотр аналитики
             </button>
+            <button 
+              onClick={() => window.location.href = '/testing'}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Система тестирования
+            </button>
           </div>
         </div>
 
