@@ -12,6 +12,7 @@ import {
   Monitor,
   ChevronRight
 } from 'lucide-react';
+import { NavigationHeader } from '@/components/ui/NavigationHeader';
 import TestingDashboard from './TestingDashboard';
 import VisualizationPanel from './VisualizationPanel';
 import SimulationInterface from './SimulationInterface';
@@ -127,52 +128,40 @@ const LogisticsTestingSystem: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <TestTube className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                    Система тестирования логистики
-                  </h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Комплексное тестирование доставки и оптимизации маршрутов
-                  </p>
-                </div>
-              </div>
+      {/* Navigation Header */}
+      <NavigationHeader
+        title="Система тестирования логистики"
+        subtitle="Комплексное тестирование доставки и оптимизации маршрутов"
+        showBackButton={true}
+        backUrl="/"
+        actions={
+          <div className="flex items-center space-x-4">
+            {/* System Status */}
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full ${
+                systemStatus.color === 'green' ? 'bg-green-500' :
+                systemStatus.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
+              } ${systemStatus.pulse ? 'animate-pulse' : ''}`} />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {systemStatus.text}
+              </span>
             </div>
             
-            <div className="flex items-center space-x-4">
-              {/* System Status */}
-              <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${
-                  systemStatus.color === 'green' ? 'bg-green-500' :
-                  systemStatus.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-                } ${systemStatus.pulse ? 'animate-pulse' : ''}`} />
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {systemStatus.text}
-                </span>
-              </div>
-              
-              {/* Quick Actions */}
-              <div className="flex items-center space-x-2">
-                <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                  <Activity className="h-5 w-5" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                  <Monitor className="h-5 w-5" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                  <Gauge className="h-5 w-5" />
-                </button>
-              </div>
+            {/* Quick Actions */}
+            <div className="flex items-center space-x-2">
+              <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <Activity className="h-5 w-5" />
+              </button>
+              <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <Monitor className="h-5 w-5" />
+              </button>
+              <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <Gauge className="h-5 w-5" />
+              </button>
             </div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Navigation Tabs */}
       <div className="bg-white dark:bg-gray-800 shadow-sm">

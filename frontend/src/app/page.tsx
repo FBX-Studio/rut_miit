@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { Truck, Package, Clock, TrendingUp, MapPin, AlertTriangle } from 'lucide-react';
 import { StatsCard } from '@/components/ui/StatsCard';
 import dynamic from 'next/dynamic';
-import { ActiveRoutes } from '@/components/routes/ActiveRoutes';
-import { RecentEvents } from '@/components/events/RecentEvents';
+import { ActiveRoutesBlock } from '@/components/dashboard/ActiveRoutesBlock';
+import { RecentEventsBlock } from '@/components/dashboard/RecentEventsBlock';
+import { DeliveryPerformanceBlock } from '@/components/dashboard/DeliveryPerformanceBlock';
+import { RouteEfficiencyBlock } from '@/components/dashboard/RouteEfficiencyBlock';
 import { PerformanceChart } from '@/components/charts/PerformanceChart';
 import { RouteOptimizationModal } from '@/components/modals/RouteOptimizationModal';
 import { DriverManagementModal } from '@/components/modals/DriverManagementModal';
@@ -14,6 +16,8 @@ import { useWebSocket, useRouteUpdates, useEventNotifications } from '@/contexts
 import { useNotifications, useRouteNotifications } from '@/contexts/NotificationContext';
 import { useSystemStats } from '@/hooks/useSystemStats';
 import useSWR from 'swr';
+import SimulationLauncher from '@/components/dashboard/SimulationLauncher';
+import { NavigationHeader } from '@/components/ui/NavigationHeader';
 import { Toaster } from 'react-hot-toast';
 
 // Dynamically import RouteMap to avoid SSR issues
@@ -80,27 +84,21 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-               Панель управления оптимизацией маршрутов
-             </h1>
-             <p className="text-gray-600 dark:text-gray-400 mt-1">
-               Мониторинг и управление маршрутами доставки в реальном времени
-             </p>
-          </div>
-          
-          {/* Connection Status */}
+      {/* Navigation Header */}
+      <NavigationHeader
+        title="Панель управления оптимизацией маршрутов"
+        subtitle="Мониторинг и управление маршрутами доставки в реальном времени"
+        actions={
           <div className="flex items-center space-x-2">
             <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {isConnected ? 'Подключено' : 'Отключено'}
             </span>
           </div>
-        </div>
-
+        }
+      />
+      
+      <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
@@ -133,6 +131,33 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* Interactive Information Blocks */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Active Routes Block */}
+          <ActiveRoutesBlock 
+            className="lg:col-span-1"
+            onDetailedView={() => setShowAnalyticsModal(true)}
+          />
+          
+          {/* Recent Events Block */}
+          <RecentEventsBlock 
+            className="lg:col-span-1"
+            onDetailedView={() => setShowAnalyticsModal(true)}
+          />
+          
+          {/* Delivery Performance Block */}
+          <DeliveryPerformanceBlock 
+            className="lg:col-span-1"
+            onDetailedView={() => setShowAnalyticsModal(true)}
+          />
+          
+          {/* Route Efficiency Block */}
+          <RouteEfficiencyBlock 
+            className="lg:col-span-1"
+            onDetailedView={() => setShowAnalyticsModal(true)}
+          />
+        </div>
+
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Map Section */}
@@ -155,43 +180,18 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Active Routes */}
+          {/* Simulation Launcher */}
           <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Активные маршруты
-                </h2>
-                <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  Показать все
-                </button>
-              </div>
-              <ActiveRoutes
-                onRouteSelect={setSelectedRouteId}
-                selectedRouteId={selectedRouteId}
-              />
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Последние события
-                </h2>
-                <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  Показать все
-                </button>
-              </div>
-              <RecentEvents maxEvents={5} />
-            </div>
+            <SimulationLauncher />
           </div>
         </div>
 
-        {/* Performance Charts */}
+        {/* Performance Charts - Legacy Section (can be removed if not needed) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Производительность доставки
+                Дополнительная аналитика
               </h2>
               <select className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                 <option>Последние 7 дней</option>
@@ -209,7 +209,7 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Эффективность маршрутов
+                Системные метрики
               </h2>
               <select className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                 <option>Последние 7 дней</option>
@@ -263,7 +263,7 @@ const Dashboard = () => {
             </button>
             <button 
               onClick={() => window.location.href = '/testing'}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
               Система тестирования
             </button>
