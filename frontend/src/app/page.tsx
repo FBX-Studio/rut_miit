@@ -85,6 +85,11 @@ const Dashboard = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50/30 via-transparent to-emerald-50/30 dark:from-indigo-900/20 dark:via-transparent dark:to-emerald-900/20"></div>
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-200/20 dark:bg-indigo-800/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-emerald-200/20 dark:bg-emerald-800/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        
+        {/* Floating particles for depth */}
+        <div className="absolute top-1/3 left-1/3 w-2 h-2 bg-indigo-400/40 rounded-full animate-bounce delay-500"></div>
+        <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-emerald-400/40 rounded-full animate-bounce delay-700"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-bounce delay-900"></div>
       </div>
       
       <NavigationHeader
@@ -115,7 +120,7 @@ const Dashboard = () => {
             value={stats?.active_routes || 0}
             icon={Truck}
             change={{ value: 8, type: 'increase', period: 'за месяц' }}
-            className="card-minimal"
+            className="card-minimal animate-pulse-subtle"
           />
           <StatsCard
             title="В ожидании"
@@ -153,29 +158,29 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Map Section - Minimalist */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          <div className="lg:col-span-2">
-            <div className="card-minimal">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
-                  Карта маршрутов
-                </h2>
-                <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 transition-colors">
-                  Развернуть
-                </button>
-              </div>
+        {/* Map Section - Centered and Full Width */}
+        <div className="space-y-8">
+          <div className="card-minimal">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
+                Карта маршрутов
+              </h2>
+              <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 transition-colors">
+                Развернуть
+              </button>
+            </div>
+            <div className="flex justify-center">
               <RouteMap
                 routes={[]}
                 selectedRouteId={selectedRouteId ?? undefined}
                 onRouteSelect={setSelectedRouteId}
-                className="h-96 rounded-xl"
+                className="h-96 w-full max-w-4xl rounded-xl"
               />
             </div>
           </div>
-          <div className="space-y-8">
-            <SimulationLauncher />
-          </div>
+          
+          {/* Simulation Launcher - Full Width Below Map */}
+          <SimulationLauncher />
         </div>
 
         {/* Actions Section - Minimalist */}
@@ -190,9 +195,11 @@ const Dashboard = () => {
                 setShowRouteModal(true);
               }}
               className="px-6 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
+                       relative overflow-hidden group"
             >
-              Новый маршрут
+              <span className="relative z-10">Новый маршрут</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button 
               onClick={() => {
@@ -200,30 +207,38 @@ const Dashboard = () => {
                 setShowRouteModal(true);
               }}
               className="px-6 py-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
+                       relative overflow-hidden group"
             >
-              Оптимизировать
+              <span className="relative z-10">Оптимизировать</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button 
               onClick={() => setShowDriverModal(true)}
               className="px-6 py-3 bg-amber-600 text-white rounded-2xl hover:bg-amber-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
+                       relative overflow-hidden group"
             >
-              Водители
+              <span className="relative z-10">Водители</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button 
               onClick={() => setShowAnalyticsModal(true)}
               className="px-6 py-3 bg-violet-600 text-white rounded-2xl hover:bg-violet-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
+                       relative overflow-hidden group"
             >
-              Аналитика
+              <span className="relative z-10">Аналитика</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button 
               onClick={() => window.location.href = '/testing'}
               className="px-6 py-3 bg-slate-600 text-white rounded-2xl hover:bg-slate-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
+                       relative overflow-hidden group"
             >
-              Система тестирования
+              <span className="relative z-10">Система тестирования</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
         </div>

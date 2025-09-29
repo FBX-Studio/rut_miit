@@ -95,28 +95,28 @@ export default function SimulationLauncher({ onLaunch }: QuickSimulationProps) {
         {quickSimulationScenarios.map((scenario) => (
           <div
             key={scenario.id}
-            className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-500 transition-colors cursor-pointer"
+            className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-500 transition-colors cursor-pointer overflow-hidden"
             onClick={() => launchQuickSimulation(scenario.id)}
           >
             <div className="flex items-center mb-2">
-              <div className={`${scenario.color} text-white p-2 rounded-lg mr-3`}>
+              <div className={`${scenario.color} text-white p-2 rounded-lg mr-3 flex-shrink-0`}>
                 {scenario.icon}
               </div>
-              <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">
+              <div className="min-w-0 flex-1">
+                <h4 className="font-medium text-gray-900 dark:text-white break-words">
                   {scenario.name}
                 </h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400 break-words">
                   {scenario.duration}
                 </p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 break-words overflow-hidden">
               {scenario.description}
             </p>
             <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>{scenario.orders} заказов</span>
-              <span>{scenario.vehicles} ТС</span>
+              <span className="break-words">{scenario.orders} заказов</span>
+              <span className="break-words">{scenario.vehicles} ТС</span>
             </div>
           </div>
         ))}

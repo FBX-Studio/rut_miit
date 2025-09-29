@@ -61,16 +61,16 @@ const settingsSections: SettingsSection[] = [
 ];
 
 const ToggleSwitch = ({ enabled, onChange, label }: any) => (
-  <div className="flex items-center justify-between py-2">
-    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+  <div className="flex items-center justify-between py-2 group">
+    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 transition-colors">{label}</span>
     <button
       onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        enabled ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-600'
-      }`}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
+        enabled ? 'bg-indigo-600 shadow-lg shadow-indigo-500/25' : 'bg-gray-200 dark:bg-gray-600'
+      } hover:scale-110 group-hover:shadow-md`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-sm ${
           enabled ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
@@ -145,7 +145,7 @@ export default function SettingsPage() {
           type="text"
           value={settings.companyName}
           onChange={(e) => handleSettingChange('companyName', e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 shadow-sm hover:bg-white/90 dark:hover:bg-gray-800/90 focus:bg-white dark:focus:bg-gray-800"
+          className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 shadow-sm hover:bg-white/90 dark:hover:bg-gray-800/90 focus:bg-white dark:focus:bg-gray-800 break-words"
         />
       </div>
 
@@ -533,17 +533,18 @@ export default function SettingsPage() {
               <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
                 <button
                   onClick={handleReset}
-                  className="px-6 py-3 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm"
+                  className="px-6 py-3 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm hover:scale-105 group"
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
                   Сбросить
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm"
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm hover:shadow-lg hover:scale-105 relative overflow-hidden group"
                 >
-                  <Save className="w-4 h-4" />
-                  Сохранить
+                  <Save className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  <span className="relative z-10">Сохранить</span>
+                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               </div>
             </div>

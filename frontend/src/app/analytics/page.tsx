@@ -125,8 +125,10 @@ export default function AnalyticsPage() {
             </select>
           </div>
           
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Экспорт отчета
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors
+                               relative overflow-hidden group">
+            <span className="relative z-10">Экспорт отчета</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
 
@@ -165,8 +167,9 @@ export default function AnalyticsPage() {
         {/* Графики */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* График производительности */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 
+                          hover:shadow-md transition-all duration-300 group">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-indigo-600 transition-colors">
               Динамика производительности
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -195,8 +198,9 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Распределение по районам */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 
+                          hover:shadow-md transition-all duration-300 group">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-emerald-600 transition-colors">
               Распределение маршрутов по районам
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -206,7 +210,7 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name.length > 10 ? name.substring(0, 10) + '...' : name} ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -222,8 +226,9 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Производительность водителей */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8
+                        hover:shadow-md transition-all duration-300 group">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 transition-colors">
             Топ водителей по производительности
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -269,8 +274,8 @@ export default function AnalyticsPage() {
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {driverPerformance.map((driver, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white break-words max-w-xs">
                       {driver.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
