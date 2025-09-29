@@ -1,23 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Play, 
-  Pause, 
-  Square, 
-  Settings, 
-  BarChart3, 
-  Activity, 
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Users,
-  Truck,
-  Package,
-  TrendingUp,
-  TrendingDown,
-  RefreshCw
-} from 'lucide-react';
+import { Activity, BarChart3, Clock, Settings, X, Play, Square, TrendingUp, TrendingDown, Users, Truck, AlertTriangle, CheckCircle, XCircle, Pause, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 interface DynamicParameter {
@@ -69,12 +53,45 @@ interface VehicleDistributionAnalysis {
   recommendations: string[];
 }
 
+interface DeliveryTimeEvent {
+  timestamp: string;
+  time_change: number;
+  description: string;
+  event_type: string;
+}
+
+interface DeliveryTimeTracker {
+  scenario_id: string;
+  initial_delivery_time: number;
+  current_delivery_time: number;
+  events: DeliveryTimeEvent[];
+  start_time: string;
+}
+
+interface ManualParameterChange {
+  parameter_type: string;
+  value: any;
+  description?: string;
+  time_impact?: number;
+}
+
 const TestingDashboard: React.FC = () => {
   const [activeScenarios, setActiveScenarios] = useState<TestResult[]>([]);
   const [driverAnalysis, setDriverAnalysis] = useState<DriverLoadAnalysis[]>([]);
   const [vehicleAnalysis, setVehicleAnalysis] = useState<VehicleDistributionAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'scenarios' | 'analytics' | 'simulation'>('scenarios');
+
+  // Новые состояния для управления параметрами и отслеживания времени
+  const [deliveryTrackers, setDeliveryTrackers] = useState<Record<string, DeliveryTimeTracker>>({});
+  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [manualParameter, setManualParameter] = useState<ManualParameterChange>({
+    parameter_type: 'traffic_delay',
+    value: 1.0,
+    description: '',
+    time_impact: 0
+  });
+  const [showParameterModal, setShowParameterModal] = useState(false);
 
   // Состояние для создания нового сценария
   const [newScenario, setNewScenario] = useState<TestScenario>({
@@ -87,18 +104,92 @@ const TestingDashboard: React.FC = () => {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Fetch data on component mount and set up intervals
   useEffect(() => {
     fetchActiveScenarios();
     fetchAnalytics();
+    fetchDeliveryTrackers();
     
-    // Обновляем данные каждые 30 секунд
-    const interval = setInterval(() => {
-      fetchActiveScenarios();
-      fetchAnalytics();
-    }, 30000);
-
-    return () => clearInterval(interval);
+    // Set up intervals for real-time updates
+    const scenarioInterval = setInterval(fetchActiveScenarios, 5000);
+    const trackerInterval = setInterval(fetchDeliveryTrackers, 2000);
+    
+    return () => {
+      clearInterval(scenarioInterval);
+      clearInterval(trackerInterval);
+    };
   }, []);
+
+  // Новые функции для работы с отслеживанием времени и ручными параметрами
+  const fetchDeliveryTrackers = async () => {
+    try {
+      const trackerPromises = activeScenarios
+        .filter(scenario => scenario.status === 'running')
+        .map(async (scenario) => {
+          const response = await fetch(`/api/v1/testing/scenarios/${scenario.scenario_id}/time-tracker`);
+          if (response.ok) {
+            const tracker = await response.json();
+            return { [scenario.scenario_id]: tracker };
+          }
+          return null;
+        });
+
+      const trackerResults = await Promise.all(trackerPromises);
+      const trackersMap = trackerResults
+        .filter(result => result !== null)
+        .reduce((acc, tracker) => ({ ...acc, ...tracker }), {});
+      
+      setDeliveryTrackers(trackersMap);
+    } catch (error) {
+      console.error('Error fetching delivery trackers:', error);
+    }
+  };
+
+  const applyManualParameter = async () => {
+    if (!selectedScenario) {
+      toast.error('Выберите сценарий');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/v1/testing/scenarios/${selectedScenario}/modify-parameter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(manualParameter),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        toast.success(`Параметр изменен. Влияние на время: ${result.time_impact > 0 ? '+' : ''}${result.time_impact} мин`);
+        setShowParameterModal(false);
+        fetchActiveScenarios();
+        fetchDeliveryTrackers();
+      } else {
+        const error = await response.json();
+        toast.error(`Ошибка изменения параметра: ${error.detail}`);
+      }
+    } catch (error) {
+      toast.error('Ошибка изменения параметра');
+      console.error('Error applying manual parameter:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTime = (minutes: number): string => {
+    const hours = Math.floor(Math.abs(minutes) / 60);
+    const mins = Math.abs(minutes) % 60;
+    const sign = minutes < 0 ? '-' : '';
+    return `${sign}${hours}:${mins.toString().padStart(2, '0')}`;
+  };
+
+  const formatTimeChange = (change: number): string => {
+    const sign = change > 0 ? '+' : '';
+    return `${sign}${change} мин`;
+  };
 
   const fetchActiveScenarios = async () => {
     try {
@@ -299,97 +390,175 @@ const TestingDashboard: React.FC = () => {
         </nav>
       </div>
 
-      {/* Content */}
-      {selectedTab === 'scenarios' && (
-        <div className="space-y-6">
-          {/* Active Scenarios */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Активные сценарии
-            </h2>
-            
-            {activeScenarios.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Нет активных сценариев</p>
-                <p className="text-sm">Создайте новый сценарий для начала тестирования</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {activeScenarios.map((scenario) => (
-                  <div
-                    key={scenario.scenario_id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {getStatusIcon(scenario.status)}
-                        <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">
-                            {scenario.scenario_id}
-                          </h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Запущен: {new Date(scenario.start_time).toLocaleString('ru-RU')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          scenario.status === 'running' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          scenario.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                          scenario.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                        }`}>
-                          {scenario.status === 'running' ? 'Выполняется' :
-                           scenario.status === 'completed' ? 'Завершен' :
-                           scenario.status === 'failed' ? 'Ошибка' :
-                           scenario.status === 'stopped' ? 'Остановлен' : scenario.status}
-                        </span>
-                        {scenario.status === 'running' && (
-                          <button
-                            onClick={() => stopScenario(scenario.scenario_id)}
-                            className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors"
-                          >
-                            Остановить
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Metrics */}
-                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Изменений</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {scenario.parameter_changes.length}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Реоптимизаций</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {scenario.reoptimization_count}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Маршруты до</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {scenario.metrics_before?.total_routes || 0}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Маршруты после</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {scenario.metrics_after?.total_routes || '-'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+       {/* Content */}
+       {selectedTab === 'scenarios' && (
+         <div className="space-y-6">
+           {/* Active Scenarios */}
+           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+             <div className="flex items-center justify-between mb-4">
+               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                 Активные сценарии
+               </h2>
+               {activeScenarios.some(s => s.status === 'running') && (
+                 <button
+                   onClick={() => setShowParameterModal(true)}
+                   className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center"
+                 >
+                   <Settings className="h-4 w-4 mr-2" />
+                   Изменить параметр
+                 </button>
+               )}
+             </div>
+             
+             {activeScenarios.length === 0 ? (
+               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                 <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                 <p>Нет активных сценариев</p>
+                 <p className="text-sm">Создайте новый сценарий для начала тестирования</p>
+               </div>
+             ) : (
+               <div className="space-y-4">
+                 {activeScenarios.map((scenario) => {
+                   const tracker = deliveryTrackers[scenario.scenario_id];
+                   return (
+                     <div
+                       key={scenario.scenario_id}
+                       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                     >
+                       <div className="flex items-center justify-between">
+                         <div className="flex items-center space-x-3">
+                           {getStatusIcon(scenario.status)}
+                           <div>
+                             <h3 className="font-medium text-gray-900 dark:text-white">
+                               {scenario.scenario_id}
+                             </h3>
+                             <p className="text-sm text-gray-500 dark:text-gray-400">
+                               Запущен: {new Date(scenario.start_time).toLocaleString('ru-RU')}
+                             </p>
+                           </div>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                             scenario.status === 'running' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                             scenario.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                             scenario.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                             'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                           }`}>
+                             {scenario.status === 'running' ? 'Выполняется' :
+                              scenario.status === 'completed' ? 'Завершен' :
+                              scenario.status === 'failed' ? 'Ошибка' :
+                              scenario.status === 'stopped' ? 'Остановлен' : scenario.status}
+                           </span>
+                           {scenario.status === 'running' && (
+                             <button
+                               onClick={() => stopScenario(scenario.scenario_id)}
+                               className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors"
+                             >
+                               Остановить
+                             </button>
+                           )}
+                         </div>
+                       </div>
+
+                       {/* Delivery Time Tracking */}
+                       {tracker && scenario.status === 'running' && (
+                         <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                           <div className="flex items-center justify-between mb-3">
+                             <h4 className="font-medium text-blue-900 dark:text-blue-100 flex items-center">
+                               <Clock className="h-4 w-4 mr-2" />
+                               Отслеживание времени доставки
+                             </h4>
+                             <div className="text-right">
+                               <p className="text-sm text-blue-700 dark:text-blue-300">
+                                 Текущее время: <span className="font-mono font-bold">{formatTime(tracker.current_delivery_time)}</span>
+                               </p>
+                               <p className="text-xs text-blue-600 dark:text-blue-400">
+                                 Изначально: {formatTime(tracker.initial_delivery_time)}
+                               </p>
+                               {/* Time Difference Display */}
+                               {(() => {
+                                 const timeDiff = tracker.current_delivery_time - tracker.initial_delivery_time;
+                                 const isPositive = timeDiff > 0;
+                                 const absTimeDiff = Math.abs(timeDiff);
+                                 
+                                 if (absTimeDiff > 0) {
+                                   return (
+                                     <p className={`text-sm font-bold ${
+                                       isPositive ? 'text-red-600' : 'text-green-600'
+                                     }`}>
+                                       {isPositive ? '⏱️ Потеряно: ' : '⚡ Сэкономлено: '}
+                                       <span className="font-mono">{formatTime(absTimeDiff)}</span>
+                                     </p>
+                                   );
+                                 }
+                                 return (
+                                   <p className="text-sm text-gray-600 dark:text-gray-400">
+                                     📊 Без изменений
+                                   </p>
+                                 );
+                               })()}
+                             </div>
+                           </div>
+                           
+                           {tracker.events.length > 0 && (
+                             <div className="space-y-2">
+                               <h5 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                 Последние события:
+                               </h5>
+                               <div className="max-h-32 overflow-y-auto space-y-1">
+                                 {tracker.events.slice(-5).reverse().map((event, index) => (
+                                   <div key={index} className="flex items-center justify-between text-xs">
+                                     <span className="text-blue-700 dark:text-blue-300">
+                                       {event.description}
+                                     </span>
+                                     <span className={`font-mono font-bold ${
+                                       event.time_change > 0 ? 'text-red-600' : 'text-green-600'
+                                     }`}>
+                                       {formatTimeChange(event.time_change)}
+                                     </span>
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+                           )}
+                         </div>
+                       )}
+                       
+                       {/* Metrics */}
+                       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                         <div className="text-center">
+                           <p className="text-sm text-gray-500 dark:text-gray-400">Изменений</p>
+                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                             {scenario.parameter_changes.length}
+                           </p>
+                         </div>
+                         <div className="text-center">
+                           <p className="text-sm text-gray-500 dark:text-gray-400">Реоптимизаций</p>
+                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                             {scenario.reoptimization_count}
+                           </p>
+                         </div>
+                         <div className="text-center">
+                           <p className="text-sm text-gray-500 dark:text-gray-400">Маршруты до</p>
+                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                             {scenario.metrics_before?.total_routes || 0}
+                           </p>
+                         </div>
+                         <div className="text-center">
+                           <p className="text-sm text-gray-500 dark:text-gray-400">Маршруты после</p>
+                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                             {scenario.metrics_after?.total_routes || '-'}
+                           </p>
+                         </div>
+                       </div>
+                     </div>
+                   );
+                 })}
+               </div>
+             )}
+           </div>
+         </div>
+       )}
 
       {selectedTab === 'analytics' && (
         <div className="space-y-6">
@@ -725,8 +894,119 @@ const TestingDashboard: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
+
+       {/* Manual Parameter Modal */}
+       {showParameterModal && (
+         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+             <div className="flex items-center justify-between mb-4">
+               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                 Изменить параметр
+               </h3>
+               <button
+                 onClick={() => setShowParameterModal(false)}
+                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+               >
+                 <X className="h-5 w-5" />
+               </button>
+             </div>
+             
+             <div className="space-y-4">
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                   Сценарий
+                 </label>
+                 <select
+                   value={selectedScenario || ''}
+                   onChange={(e) => setSelectedScenario(e.target.value)}
+                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                 >
+                   <option value="">Выберите сценарий</option>
+                   {activeScenarios.filter(s => s.status === 'running').map((scenario) => (
+                     <option key={scenario.scenario_id} value={scenario.scenario_id}>
+                       {scenario.scenario_id}
+                     </option>
+                   ))}
+                 </select>
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                   Тип параметра
+                 </label>
+                 <select
+                   value={manualParameter.parameter_type}
+                   onChange={(e) => setManualParameter({
+                     ...manualParameter,
+                     parameter_type: e.target.value as 'traffic_delay' | 'order_volume' | 'driver_availability' | 'weather_impact'
+                   })}
+                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                 >
+                   <option value="traffic_delay">Задержка трафика</option>
+                   <option value="order_volume">Объем заказов</option>
+                   <option value="driver_availability">Доступность водителей</option>
+                   <option value="weather_impact">Влияние погоды</option>
+                 </select>
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                   Значение
+                 </label>
+                 <input
+                   type="number"
+                   value={manualParameter.value}
+                   onChange={(e) => setManualParameter({
+                     ...manualParameter,
+                     value: parseFloat(e.target.value) || 0
+                   })}
+                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                   placeholder="Введите значение"
+                   step="0.1"
+                 />
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                   Описание (опционально)
+                 </label>
+                 <input
+                   type="text"
+                   value={manualParameter.description}
+                   onChange={(e) => setManualParameter({
+                     ...manualParameter,
+                     description: e.target.value
+                   })}
+                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                   placeholder="Описание изменения"
+                 />
+               </div>
+             </div>
+             
+             <div className="flex justify-end space-x-3 mt-6">
+               <button
+                 onClick={() => setShowParameterModal(false)}
+                 className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+               >
+                 Отмена
+               </button>
+               <button
+                 onClick={() => {
+                   if (selectedScenario) {
+                     applyManualParameter();
+                   }
+                 }}
+                 disabled={!selectedScenario}
+                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+               >
+                 Применить
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
+     </div>
+   );
+ };
 
 export default TestingDashboard;

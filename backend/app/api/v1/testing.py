@@ -19,13 +19,41 @@ from app.optimization.adaptive_optimizer import AdaptiveOptimizer
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# Pydantic models for testing system
+# Новые модели для отслеживания времени доставки
+class DeliveryTimeEvent(BaseModel):
+    event_type: str = Field(..., description="Тип события: delay, speedup, breakdown, traffic, weather")
+    time_impact: int = Field(..., description="Влияние на время в минутах (+ задержка, - ускорение)")
+    description: str = Field(..., description="Описание события")
+    timestamp: datetime = Field(default_factory=datetime.now)
+    route_id: Optional[int] = Field(None, description="ID затронутого маршрута")
+
+class DeliveryTimeTracker(BaseModel):
+    scenario_id: str
+    initial_delivery_time: int = Field(..., description="Изначальное время доставки в минутах")
+    current_delivery_time: int = Field(..., description="Текущее время доставки в минутах")
+    time_saved: int = Field(default=0, description="Сэкономленное время в минутах")
+    time_lost: int = Field(default=0, description="Потерянное время в минутах")
+    events: List[DeliveryTimeEvent] = Field(default_factory=list)
+    start_time: datetime = Field(default_factory=datetime.now)
+    last_update: datetime = Field(default_factory=datetime.now)
+    is_active: bool = Field(default=True)
+
+class ManualParameterChange(BaseModel):
+    parameter_type: str = Field(..., description="Тип параметра для изменения")
+    target_id: int = Field(..., description="ID целевого объекта")
+    new_value: Any = Field(..., description="Новое значение")
+    immediate_apply: bool = Field(default=True, description="Применить немедленно")
+    time_impact_minutes: Optional[int] = Field(None, description="Ожидаемое влияние на время доставки")
+    description: Optional[str] = Field(None, description="Описание изменения")
+
+# Расширенные существующие модели
 class DynamicParameter(BaseModel):
-    parameter_type: str = Field(..., description="Тип параметра: traffic_delay, order_volume, driver_change, customer_schedule")
+    parameter_type: str = Field(..., description="Тип параметра: traffic_delay, order_volume, driver_change, customer_schedule, weather_impact, vehicle_breakdown")
     target_id: int = Field(..., description="ID целевого объекта (заказ, маршрут, водитель)")
     value: Any = Field(..., description="Новое значение параметра")
     duration_minutes: Optional[int] = Field(None, description="Длительность изменения в минутах")
     description: Optional[str] = Field(None, description="Описание изменения")
+    time_impact: Optional[int] = Field(None, description="Влияние на время доставки в минутах")
 
 class TestScenario(BaseModel):
     name: str = Field(..., description="Название сценария")
@@ -33,17 +61,21 @@ class TestScenario(BaseModel):
     parameters: List[DynamicParameter] = Field(..., description="Список изменяемых параметров")
     duration_minutes: int = Field(default=60, description="Общая длительность теста")
     auto_reoptimize: bool = Field(default=True, description="Автоматическая реоптимизация при изменениях")
+    initial_delivery_time: int = Field(default=120, description="Изначальное время доставки в минутах")
+    allow_manual_changes: bool = Field(default=True, description="Разрешить ручные изменения во время выполнения")
 
 class TestResult(BaseModel):
     scenario_id: str
     start_time: datetime
     end_time: Optional[datetime]
-    status: str  # running, completed, failed
+    status: str  # running, completed, failed, paused
     metrics_before: Dict[str, Any]
     metrics_after: Optional[Dict[str, Any]]
     parameter_changes: List[Dict[str, Any]]
+    manual_changes: List[Dict[str, Any]] = Field(default_factory=list)
     reoptimization_count: int
     performance_impact: Optional[Dict[str, Any]]
+    time_tracker: Optional[DeliveryTimeTracker] = None
 
 class DriverLoadAnalysis(BaseModel):
     driver_id: int
@@ -67,15 +99,95 @@ class VehicleDistributionAnalysis(BaseModel):
 # Global storage for active test scenarios
 active_scenarios: Dict[str, TestResult] = {}
 
+# Глобальное хранилище для отслеживания времени доставки
+delivery_time_trackers: Dict[str, DeliveryTimeTracker] = {}
+
+# Новые вспомогательные функции
+async def _run_delivery_countdown(scenario_id: str):
+    """Запуск обратного отсчета времени доставки"""
+    try:
+        while scenario_id in delivery_time_trackers and delivery_time_trackers[scenario_id].is_active:
+            tracker = delivery_time_trackers[scenario_id]
+            
+            # Уменьшаем время на 1 минуту каждые 60 секунд реального времени
+            # Для демонстрации используем ускоренный режим: 1 секунда = 1 минута симуляции
+            await asyncio.sleep(1)
+            
+            if tracker.current_delivery_time > 0:
+                tracker.current_delivery_time -= 1
+                tracker.last_update = datetime.now()
+            
+            # Проверяем, завершена ли доставка
+            if tracker.current_delivery_time <= 0:
+                tracker.is_active = False
+                # Добавляем событие завершения
+                completion_event = DeliveryTimeEvent(
+                    event_type="completion",
+                    time_impact=0,
+                    description="Доставка завершена"
+                )
+                tracker.events.append(completion_event)
+                break
+                
+    except Exception as e:
+        logger.error(f"Error in delivery countdown for {scenario_id}: {e}")
+
+async def _update_delivery_time(scenario_id: str, time_impact: int, description: str, event_type: str = "manual"):
+    """Обновление времени доставки с учетом события"""
+    if scenario_id not in delivery_time_trackers:
+        return
+    
+    tracker = delivery_time_trackers[scenario_id]
+    
+    # Создаем событие
+    event = DeliveryTimeEvent(
+        event_type=event_type,
+        time_impact=time_impact,
+        description=description
+    )
+    
+    # Обновляем время
+    tracker.current_delivery_time += time_impact
+    
+    # Обновляем статистику
+    if time_impact > 0:
+        tracker.time_lost += time_impact
+    else:
+        tracker.time_saved += abs(time_impact)
+    
+    # Добавляем событие в историю
+    tracker.events.append(event)
+    tracker.last_update = datetime.now()
+    
+    logger.info(f"Updated delivery time for {scenario_id}: {time_impact} minutes, new total: {tracker.current_delivery_time}")
+
+async def _handle_simulation_time_event(scenario_id: str, event, time_impact: int):
+    """Обработчик событий времени от симуляции"""
+    if scenario_id in delivery_time_trackers:
+        await _update_delivery_time(
+            scenario_id,
+            time_impact,
+            event.description,
+            event.event_type.value
+        )
+
 @router.post("/scenarios/create", response_model=Dict[str, str])
 async def create_test_scenario(
     scenario: TestScenario,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
-    """Создать и запустить тестовый сценарий"""
+    """Создать и запустить тестовый сценарий с отслеживанием времени"""
     try:
         scenario_id = f"test_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Создаем трекер времени доставки
+        time_tracker = DeliveryTimeTracker(
+            scenario_id=scenario_id,
+            initial_delivery_time=scenario.initial_delivery_time,
+            current_delivery_time=scenario.initial_delivery_time
+        )
+        delivery_time_trackers[scenario_id] = time_tracker
         
         # Получаем метрики до изменений
         metrics_before = await _collect_system_metrics(db)
@@ -89,8 +201,10 @@ async def create_test_scenario(
             metrics_before=metrics_before,
             metrics_after=None,
             parameter_changes=[],
+            manual_changes=[],
             reoptimization_count=0,
-            performance_impact=None
+            performance_impact=None,
+            time_tracker=time_tracker
         )
         
         active_scenarios[scenario_id] = test_result
@@ -103,25 +217,122 @@ async def create_test_scenario(
             db
         )
         
+        # Запускаем обратный отсчет времени
+        background_tasks.add_task(
+            _run_delivery_countdown,
+            scenario_id
+        )
+        
         logger.info(f"Created test scenario {scenario_id}: {scenario.name}")
         
         return {
             "scenario_id": scenario_id,
             "status": "created",
-            "message": f"Тестовый сценарий '{scenario.name}' создан и запущен"
+            "message": f"Тестовый сценарий '{scenario.name}' создан и запущен с отслеживанием времени"
         }
         
     except Exception as e:
         logger.error(f"Failed to create test scenario: {e}")
         raise HTTPException(status_code=500, detail=f"Ошибка создания сценария: {str(e)}")
 
-@router.get("/scenarios/{scenario_id}/status", response_model=TestResult)
-async def get_scenario_status(scenario_id: str):
-    """Получить статус тестового сценария"""
+@router.post("/scenarios/{scenario_id}/modify-parameter")
+async def modify_parameter_manually(
+    scenario_id: str,
+    change: ManualParameterChange,
+    db: Session = Depends(get_db)
+):
+    """Ручное изменение параметра во время выполнения теста"""
     if scenario_id not in active_scenarios:
         raise HTTPException(status_code=404, detail="Сценарий не найден")
     
-    return active_scenarios[scenario_id]
+    test_result = active_scenarios[scenario_id]
+    if test_result.status != "running":
+        raise HTTPException(status_code=400, detail="Сценарий не активен")
+    
+    try:
+        route_service = RouteManagementService(db)
+        
+        # Применяем изменение
+        param = DynamicParameter(
+            parameter_type=change.parameter_type,
+            target_id=change.target_id,
+            value=change.new_value,
+            description=change.description,
+            time_impact=change.time_impact_minutes
+        )
+        
+        result = await _apply_parameter_change(param, route_service, db)
+        
+        # Записываем ручное изменение
+        manual_change = {
+            "timestamp": datetime.now(),
+            "change": change.dict(),
+            "result": result
+        }
+        test_result.manual_changes.append(manual_change)
+        
+        # Обновляем время доставки если указано влияние
+        if change.time_impact_minutes and scenario_id in delivery_time_trackers:
+            await _update_delivery_time(
+                scenario_id,
+                change.time_impact_minutes,
+                f"Ручное изменение: {change.description or change.parameter_type}"
+            )
+        
+        return {
+            "status": "success",
+            "message": "Параметр изменен",
+            "result": result,
+            "time_impact": change.time_impact_minutes
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to modify parameter manually: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка изменения параметра: {str(e)}")
+
+@router.get("/scenarios/{scenario_id}/time-tracker", response_model=DeliveryTimeTracker)
+async def get_delivery_time_tracker(scenario_id: str):
+    """Получить информацию о времени доставки"""
+    if scenario_id not in delivery_time_trackers:
+        raise HTTPException(status_code=404, detail="Трекер времени не найден")
+    
+    return delivery_time_trackers[scenario_id]
+
+@router.post("/scenarios/{scenario_id}/add-event")
+async def add_delivery_event(
+    scenario_id: str,
+    event: DeliveryTimeEvent
+):
+    """Добавить событие, влияющее на время доставки"""
+    if scenario_id not in delivery_time_trackers:
+        raise HTTPException(status_code=404, detail="Трекер времени не найден")
+    
+    await _update_delivery_time(
+        scenario_id,
+        event.time_impact,
+        event.description,
+        event.event_type
+    )
+    
+    return {
+        "status": "success",
+        "message": "Событие добавлено",
+        "current_time": delivery_time_trackers[scenario_id].current_delivery_time
+    }
+
+@router.get("/scenarios/{scenario_id}/status", response_model=TestResult)
+async def get_scenario_status(scenario_id: str):
+    """Получить статус тестового сценария с информацией о времени"""
+    if scenario_id not in active_scenarios:
+        raise HTTPException(status_code=404, detail="Сценарий не найден")
+    
+    test_result = active_scenarios[scenario_id]
+    
+    # Обновляем информацию о времени
+    if scenario_id in delivery_time_trackers:
+        test_result.time_tracker = delivery_time_trackers[scenario_id]
+    
+    return test_result
 
 @router.get("/scenarios/active", response_model=List[TestResult])
 async def get_active_scenarios():
@@ -235,10 +446,32 @@ async def _execute_test_scenario(scenario_id: str, scenario: TestScenario, db: S
         test_result = active_scenarios[scenario_id]
         route_service = RouteManagementService(db)
         
+        # Инициализируем трекер времени доставки
+        initial_time = scenario.initial_delivery_time
+        delivery_time_trackers[scenario_id] = DeliveryTimeTracker(
+            scenario_id=scenario_id,
+            initial_delivery_time=initial_time,
+            current_delivery_time=initial_time,
+            events=[],
+            start_time=datetime.now()
+        )
+        
+        # Запускаем обратный отсчет времени
+        asyncio.create_task(_run_delivery_countdown(scenario_id))
+        
         # Применяем изменения параметров
         for param in scenario.parameters:
             change_result = await _apply_parameter_change(param, route_service, db)
             test_result.parameter_changes.append(change_result)
+            
+            # Обновляем время доставки если есть влияние
+            if param.time_impact:
+                await _update_delivery_time(
+                    scenario_id,
+                    param.time_impact,
+                    f"Параметр {param.parameter_type}: {param.description or 'изменение'}",
+                    "parameter_change"
+                )
             
             # Автоматическая реоптимизация если включена
             if scenario.auto_reoptimize and change_result.get("requires_reoptimization"):
@@ -517,3 +750,58 @@ async def _analyze_vehicle_distribution(db: Session) -> VehicleDistributionAnaly
             efficiency_score=0.0,
             recommendations=["Ошибка анализа"]
         )
+
+# Добавляем тестовые данные для демонстрации
+def _initialize_demo_data():
+    """Инициализация демонстрационных данных"""
+    demo_scenario_id = "demo-scenario-001"
+    
+    # Создаем демо-трекер времени с некоторыми событиями
+    demo_tracker = DeliveryTimeTracker(
+        scenario_id=demo_scenario_id,
+        initial_delivery_time=45,  # 45 минут изначально
+        current_delivery_time=52,  # 52 минуты сейчас (потеряно 7 минут)
+        events=[
+            DeliveryTimeEvent(
+                event_type="delay",
+                time_impact=5,
+                timestamp=datetime.now() - timedelta(minutes=10),
+                description="Увеличение объема заказов"
+            ),
+            DeliveryTimeEvent(
+                event_type="traffic",
+                time_impact=8,
+                timestamp=datetime.now() - timedelta(minutes=5),
+                description="Задержка из-за пробок"
+            ),
+            DeliveryTimeEvent(
+                event_type="speedup",
+                time_impact=-6,
+                timestamp=datetime.now() - timedelta(minutes=2),
+                description="Оптимизация маршрута"
+            )
+        ]
+    )
+    
+    # Создаем демо-сценарий
+    demo_scenario = TestResult(
+        scenario_id=demo_scenario_id,
+        name="Демонстрационный сценарий",
+        description="Показывает работу отслеживания времени",
+        start_time=datetime.now() - timedelta(minutes=15),
+        end_time=None,
+        status="running",
+        metrics_before={},
+        metrics_after=None,
+        parameter_changes=[],
+        manual_changes=[],
+        reoptimization_count=0,
+        performance_impact=None,
+        time_tracker=demo_tracker
+    )
+    
+    active_scenarios[demo_scenario_id] = demo_scenario
+    delivery_time_trackers[demo_scenario_id] = demo_tracker
+
+# Инициализируем демо-данные при запуске
+_initialize_demo_data()

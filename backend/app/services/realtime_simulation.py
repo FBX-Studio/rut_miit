@@ -95,6 +95,10 @@ class RealtimeSimulationService:
             "geographic_center": [55.7558, 37.6176],  # Москва
             "geographic_radius": 50.0  # км
         }
+        
+        # Хранилище для связи с тестовыми сценариями
+        self.scenario_id: Optional[str] = None
+        self.time_event_callback: Optional[Callable] = None
     
     def subscribe_to_events(self, callback: Callable[[RealtimeEvent], None]):
         """Подписаться на события в реальном времени"""
@@ -112,8 +116,56 @@ class RealtimeSimulationService:
                 callback(event)
             except Exception as e:
                 logger.error(f"Ошибка при уведомлении подписчика: {e}")
+        
+        # Если есть связанный сценарий, отправляем событие времени
+        if self.scenario_id and self.time_event_callback:
+            try:
+                # Рассчитываем влияние события на время доставки
+                time_impact = self._calculate_time_impact(event)
+                if time_impact != 0:
+                    self.time_event_callback(self.scenario_id, event, time_impact)
+            except Exception as e:
+                logger.error(f"Ошибка при отправке события времени: {e}")
     
-    async def start_simulation(self, params: Dict[str, Any] = None):
+    def _calculate_time_impact(self, event: RealtimeEvent) -> int:
+        """Рассчитать влияние события на время доставки (в секундах)"""
+        impact_map = {
+            EventType.TRAFFIC_CHANGE: {
+                "light": -300,    # экономия 5 минут
+                "normal": 0,      # без изменений
+                "heavy": 600,     # потеря 10 минут
+                "jam": 1800       # потеря 30 минут
+            },
+            EventType.WEATHER_CHANGE: {
+                "clear": -180,    # экономия 3 минуты
+                "rain": 300,      # потеря 5 минут
+                "snow": 900,      # потеря 15 минут
+                "fog": 600,       # потеря 10 минут
+                "storm": 1200     # потеря 20 минут
+            },
+            EventType.VEHICLE_BREAKDOWN: 1800,  # потеря 30 минут
+            EventType.NEW_ORDER: 600,           # потеря 10 минут (перепланирование)
+            EventType.ORDER_CANCELLATION: -300, # экономия 5 минут
+            EventType.ROAD_CLOSURE: 1200,       # потеря 20 минут
+            EventType.DELIVERY_DELAY: 900       # потеря 15 минут
+        }
+        
+        if event.event_type in [EventType.TRAFFIC_CHANGE, EventType.WEATHER_CHANGE]:
+            condition = event.parameters.get("new_condition", "normal")
+            return impact_map[event.event_type].get(condition, 0)
+        else:
+            return impact_map.get(event.event_type, 0)
+    
+    def set_time_event_callback(self, callback: Callable):
+        """Установить callback для событий времени"""
+        self.time_event_callback = callback
+    
+    def update_simulation_parameters(self, params: Dict[str, Any]):
+        """Обновить параметры симуляции во время выполнения"""
+        self.simulation_params.update(params)
+        logger.info(f"Параметры симуляции обновлены: {params}")
+    
+    async def start_simulation(self, params: Dict[str, Any] = None, scenario_id: str = None):
         """Запустить симуляцию в реальном времени"""
         if self.simulation_running:
             return
@@ -121,8 +173,11 @@ class RealtimeSimulationService:
         if params:
             self.simulation_params.update(params)
         
+        # Сохраняем ID сценария для связи с системой отслеживания времени
+        self.scenario_id = scenario_id
+        
         self.simulation_running = True
-        logger.info("Запуск симуляции в реальном времени")
+        logger.info(f"Запуск симуляции в реальном времени для сценария {scenario_id}")
         
         # Инициализируем базовые условия
         await self._initialize_conditions()
