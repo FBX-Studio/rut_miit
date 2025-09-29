@@ -85,6 +85,12 @@ const IntegrationPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'components' | 'tests' | 'health' | 'monitoring'>('components');
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [clientTime, setClientTime] = useState<string>('');
+
+  // Initialize client time to avoid hydration mismatch
+  useEffect(() => {
+    setClientTime(new Date().toLocaleTimeString('ru-RU'));
+  }, []);
 
   useEffect(() => {
     loadSystemComponents();
@@ -650,7 +656,7 @@ const IntegrationPanel: React.FC = () => {
                     
                     <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Последняя проверка: {new Date(component.lastCheck).toLocaleTimeString('ru-RU')}
+                        Последняя проверка: {clientTime ? new Date(component.lastCheck).toLocaleTimeString('ru-RU') : '...'}
                       </p>
                     </div>
                   </div>
@@ -743,7 +749,7 @@ const IntegrationPanel: React.FC = () => {
                         Компоненты: {test.components.join(', ')}
                       </span>
                       <span>
-                        Последний запуск: {new Date(test.lastRun).toLocaleString('ru-RU')}
+                        Последний запуск: {clientTime ? new Date(test.lastRun).toLocaleString('ru-RU') : '...'}
                       </span>
                     </div>
                   </div>

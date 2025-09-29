@@ -62,11 +62,11 @@ const settingsSections: SettingsSection[] = [
 
 const ToggleSwitch = ({ enabled, onChange, label }: any) => (
   <div className="flex items-center justify-between py-2">
-    <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
+    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
     <button
       onClick={() => onChange(!enabled)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        enabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
+        enabled ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-600'
       }`}
     >
       <span
@@ -138,25 +138,25 @@ export default function SettingsPage() {
   const renderGeneralSettings = () => (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Название компании
         </label>
         <input
           type="text"
           value={settings.companyName}
           onChange={(e) => handleSettingChange('companyName', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 shadow-sm hover:bg-white/90 dark:hover:bg-gray-800/90 focus:bg-white dark:focus:bg-gray-800"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Часовой пояс
         </label>
         <select
           value={settings.timezone}
           onChange={(e) => handleSettingChange('timezone', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 shadow-sm"
         >
           <option value="Europe/Moscow">Москва (UTC+3)</option>
           <option value="Europe/Kaliningrad">Калининград (UTC+2)</option>
@@ -367,12 +367,12 @@ export default function SettingsPage() {
         />
       </div>
 
-      <div className="flex gap-2">
-        <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+      <div className="flex gap-3">
+        <button className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm">
           <Check className="w-4 h-4" />
           Тест соединения
         </button>
-        <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2">
+        <button className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm">
           <RefreshCw className="w-4 h-4" />
           Сброс пула
         </button>
@@ -468,10 +468,17 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50/50 via-white to-gray-50/50 dark:from-gray-900/50 dark:via-gray-950 dark:to-gray-900/50 relative overflow-hidden">
+      {/* Subtle animated background elements for settings */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-200/20 dark:bg-indigo-800/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-emerald-200/20 dark:bg-emerald-800/20 rounded-full blur-3xl animate-pulse delay-1500"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-indigo-200/10 to-emerald-200/10 dark:from-indigo-700/10 dark:to-emerald-700/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+      
       <NavigationHeader 
         title="Настройки"
-        subtitle="Конфигурация системы и параметры"
+        subtitle="Управление параметрами системы"
         showBackButton={true}
       />
       
@@ -486,10 +493,10 @@ export default function SettingsPage() {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                    className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 ${
                       activeSection === section.id
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -509,7 +516,7 @@ export default function SettingsPage() {
 
           {/* Основной контент */}
           <div className="lg:col-span-3">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-sm">
               <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {settingsSections.find(s => s.id === activeSection)?.title}
@@ -526,14 +533,14 @@ export default function SettingsPage() {
               <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  className="px-6 py-3 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Сбросить
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-sm"
                 >
                   <Save className="w-4 h-4" />
                   Сохранить

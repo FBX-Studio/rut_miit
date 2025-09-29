@@ -56,22 +56,25 @@ const routeDistribution = [
 ];
 
 const StatCard = ({ title, value, change, icon: Icon, trend }: any) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-    <div className="flex items-center justify-between">
+  <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl p-6 shadow-sm border border-gray-200/50 dark:border-gray-700/50 group hover:shadow-lg transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+    {/* Subtle gradient overlay on hover */}
+    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-green-50/30 dark:from-blue-900/20 dark:to-green-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+    
+    <div className="flex items-center justify-between relative z-10">
       <div>
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-        <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
-        <div className={`flex items-center mt-2 text-sm ${
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">{title}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-white group-hover:scale-105 transition-transform duration-300">{value}</p>
+        <div className={`flex items-center mt-2 text-sm transition-all duration-300 ${
           trend === 'up' ? 'text-green-600' : 'text-red-600'
         }`}>
-          {trend === 'up' ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+          {trend === 'up' ? <TrendingUp className="w-4 h-4 mr-1 transition-transform duration-300 group-hover:scale-110" /> : <TrendingDown className="w-4 h-4 mr-1 transition-transform duration-300 group-hover:scale-110" />}
           {change}
         </div>
       </div>
-      <div className={`p-3 rounded-full ${
+      <div className={`p-3 rounded-full transition-all duration-300 group-hover:scale-110 group-hover:rotate-12 ${
         trend === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
       }`}>
-        <Icon className="w-6 h-6" />
+        <Icon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
       </div>
     </div>
   </div>
@@ -82,7 +85,14 @@ export default function AnalyticsPage() {
   const [selectedMetric, setSelectedMetric] = useState('deliveries');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+      {/* Subtle animated background elements for analytics */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/6 right-1/6 w-72 h-72 bg-blue-200/20 dark:bg-blue-800/20 rounded-full blur-3xl animate-pulse delay-300"></div>
+        <div className="absolute bottom-1/5 left-1/5 w-96 h-96 bg-green-200/20 dark:bg-green-800/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-purple-200/20 dark:bg-purple-800/20 rounded-full blur-3xl animate-pulse delay-1100"></div>
+      </div>
+      
       <NavigationHeader 
         title="Аналитика"
         subtitle="Анализ производительности и метрики системы"

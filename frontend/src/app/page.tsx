@@ -79,133 +79,149 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Subtle animated background elements */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50/30 via-transparent to-emerald-50/30 dark:from-indigo-900/20 dark:via-transparent dark:to-emerald-900/20"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-200/20 dark:bg-indigo-800/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-emerald-200/20 dark:bg-emerald-800/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+      
       <NavigationHeader
-        title="Панель управления оптимизацией маршрутов"
-        subtitle="Мониторинг и управление маршрутами доставки в реальном времени"
+        title="Маршруты"
+        subtitle="Мониторинг доставки в реальном времени"
         actions={
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {isConnected ? 'Подключено' : 'Отключено'}
+          <div className="flex items-center space-x-3">
+            <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-rose-500'} ${isConnected ? 'animate-pulse' : ''}`}></div>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {isConnected ? 'В сети' : 'Не в сети'}
             </span>
           </div>
         }
       />
       
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-12">
+        {/* Stats Cards - Minimalist Design */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           <StatsCard
-            title="Всего маршрутов"
+            title="Маршруты"
             value={stats?.total_routes || 0}
             icon={MapPin}
-            change={{ value: 12, type: 'increase', period: 'за прошлый месяц' }}
-            className="bg-white dark:bg-gray-800"
+            change={{ value: 12, type: 'increase', period: 'за месяц' }}
+            className="card-minimal"
           />
           <StatsCard
-            title="Активные доставки"
+            title="Активные"
             value={stats?.active_routes || 0}
             icon={Truck}
-            change={{ value: 8, type: 'increase', period: 'за прошлый месяц' }}
-            className="bg-white dark:bg-gray-800"
+            change={{ value: 8, type: 'increase', period: 'за месяц' }}
+            className="card-minimal"
           />
           <StatsCard
-            title="Ожидающие заказы"
+            title="В ожидании"
             value={stats?.pending_orders || 0}
             icon={Package}
-            change={{ value: 5, type: 'decrease', period: 'за прошлый месяц' }}
-            className="bg-white dark:bg-gray-800"
+            change={{ value: 5, type: 'decrease', period: 'за месяц' }}
+            className="card-minimal"
           />
           <StatsCard
-            title="Доставка в срок"
+            title="В срок"
             value={`${stats?.on_time_delivery_rate || 0}%`}
             icon={Clock}
-            change={{ value: 3, type: 'increase', period: 'за прошлый месяц' }}
-            className="bg-white dark:bg-gray-800"
+            change={{ value: 3, type: 'increase', period: 'за месяц' }}
+            className="card-minimal"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Analytics Blocks - Clean Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           <ActiveRoutesBlock 
-            className="lg:col-span-1"
+            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
           <RecentEventsBlock 
-            className="lg:col-span-1"
+            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
           <DeliveryPerformanceBlock 
-            className="lg:col-span-1"
+            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
           <RouteEfficiencyBlock 
-            className="lg:col-span-1"
+            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Map Section - Minimalist */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Карта маршрутов в реальном времени
+            <div className="card-minimal">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
+                  Карта маршрутов
                 </h2>
-                <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  Полноэкранный режим
+                <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 transition-colors">
+                  Развернуть
                 </button>
               </div>
               <RouteMap
                 routes={[]}
                 selectedRouteId={selectedRouteId ?? undefined}
                 onRouteSelect={setSelectedRouteId}
-                className="h-96"
+                className="h-96 rounded-xl"
               />
             </div>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-8">
             <SimulationLauncher />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Быстрые действия
+        {/* Actions Section - Minimalist */}
+        <div className="card-minimal">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight mb-6">
+            Действия
           </h2>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <button 
               onClick={() => {
                 setRouteModalMode('create');
                 setShowRouteModal(true);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
-              Создать новый маршрут
+              Новый маршрут
             </button>
             <button 
               onClick={() => {
                 setRouteModalMode('optimize');
                 setShowRouteModal(true);
               }}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-6 py-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
-              Оптимизировать маршруты
+              Оптимизировать
             </button>
             <button 
               onClick={() => setShowDriverModal(true)}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+              className="px-6 py-3 bg-amber-600 text-white rounded-2xl hover:bg-amber-700 
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
-              Управление водителями
+              Водители
             </button>
             <button 
               onClick={() => setShowAnalyticsModal(true)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="px-6 py-3 bg-violet-600 text-white rounded-2xl hover:bg-violet-700 
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
-              Просмотр аналитики
+              Аналитика
             </button>
             <button 
               onClick={() => window.location.href = '/testing'}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="px-6 py-3 bg-slate-600 text-white rounded-2xl hover:bg-slate-700 
+                       transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
               Система тестирования
             </button>

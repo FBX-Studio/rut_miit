@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -29,6 +29,8 @@ export const StatsCard = ({
   className = '',
   children,
 }: StatsCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   const getChangeColor = (type: 'increase' | 'decrease' | 'neutral') => {
     switch (type) {
       case 'increase':
@@ -74,44 +76,51 @@ export const StatsCard = ({
   }
 
   return (
-    <div className={`card hover:shadow-lg transition-shadow duration-200 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-          {title}
-        </h3>
-        {Icon && (
-          <div className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-800 ${iconColor}`}>
-            <Icon className="h-5 w-5" />
-          </div>
-        )}
-      </div>
+    <div 
+      className={cn(
+        'bg-white/80 dark:bg-gray-800/80 rounded-xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50',
+        'hover:shadow-xl transition-all duration-500 hover:-translate-y-1 hover:bg-white dark:hover:bg-gray-800',
+        'group relative overflow-hidden',
+        className
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Subtle gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 to-emerald-50/30 dark:from-indigo-900/20 dark:to-emerald-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
       
-      <div className="flex items-baseline justify-between">
-        <div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between relative z-10">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 sm:mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+            {title}
+          </p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight group-hover:scale-105 transition-transform duration-300">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
-          
           {change && (
-            <div className="flex items-center mt-1">
-              <span className={`text-sm font-medium ${getChangeColor(change.type)}`}>
+            <div className="flex items-center mt-1 sm:mt-2">
+              <span className={`text-xs sm:text-sm font-medium ${getChangeColor(change.type)} transition-all duration-300`}>
                 {getChangeIcon(change.type)} {Math.abs(change.value)}%
               </span>
               {change.period && (
-                <span className="text-xs text-gray-500 ml-1">
+                <span className="text-xs sm:text-sm text-gray-500 ml-2">
                   {change.period}
                 </span>
               )}
             </div>
           )}
         </div>
-        
-        {children && (
-          <div className="ml-4">
-            {children}
+        {Icon && (
+          <div className={`p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-2xl ml-3 sm:ml-4 flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${iconColor}`}>
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-300 group-hover:scale-110" />
           </div>
         )}
       </div>
+      {children && (
+        <div className="mt-4">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
