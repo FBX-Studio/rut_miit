@@ -1,6 +1,3 @@
-"""
-Сервис для построения геометрии маршрутов через Yandex Maps API
-"""
 import httpx
 import logging
 from typing import List, Tuple, Optional
@@ -12,12 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class RouteGeometryService:
-    """Сервис для построения маршрутов по дорогам"""
-    
     def __init__(self):
         self.api_key = settings.yandex_maps_api_key or ""
-        # Yandex Routes API (альтернатива Router API v2)
-        # Router API v2 требует коммерческий аккаунт
         self.router_url = "https://api.routing.yandex.net/v2/route"
         
         logger.info(f"RouteGeometryService initialized with API key: {self.api_key[:10]}...")

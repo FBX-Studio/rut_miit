@@ -1,7 +1,3 @@
-"""
-Main FastAPI application entry point for the VRPTW optimization system.
-"""
-
 import os
 import logging
 from contextlib import asynccontextmanager
@@ -43,7 +39,6 @@ eta_predictor = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan manager."""
     global vrptw_solver, adaptive_optimizer, yandex_maps_service, eta_predictor
     
     logger.info("Starting VRPTW optimization system...")

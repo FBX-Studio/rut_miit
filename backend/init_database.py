@@ -1,14 +1,8 @@
-"""
-Standalone database initialization script.
-Creates all tables and optionally seeds with sample data.
-"""
-
 import logging
 import sys
 import os
 from datetime import datetime, date, time
 
-# Add the app directory to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
 
 from app.database import Base, engine, SessionLocal
@@ -24,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 
 def create_tables():
-    """Create all database tables."""
     try:
         logger.info("Creating database tables...")
         Base.metadata.create_all(bind=engine)
@@ -36,18 +29,15 @@ def create_tables():
 
 
 def seed_sample_data():
-    """Seed database with sample data for development."""
     db = SessionLocal()
     
     try:
         logger.info("Seeding sample data...")
         
-        # Check if data already exists
         if db.query(Customer).first():
             logger.info("Sample data already exists, skipping seeding")
             return True
         
-        # Create sample customers
         customers = [
             Customer(
                 name="John Smith",
@@ -93,7 +83,6 @@ def seed_sample_data():
         for customer in customers:
             db.add(customer)
         
-        # Create sample vehicles
         vehicles = [
             Vehicle(
                 license_plate="ABC123",
@@ -130,7 +119,6 @@ def seed_sample_data():
         for vehicle in vehicles:
             db.add(vehicle)
         
-        # Create sample drivers
         drivers = [
             Driver(
                 employee_id="EMP001",
@@ -169,10 +157,8 @@ def seed_sample_data():
         
         db.commit()
         
-        # Get the created records for foreign keys
         customer_ids = [c.id for c in db.query(Customer).all()]
         
-        # Create sample orders
         orders = [
             Order(
                 customer_id=customer_ids[0],
@@ -234,14 +220,11 @@ def seed_sample_data():
 
 
 def init_database(seed_data: bool = True):
-    """Initialize database with tables and optionally seed data."""
     logger.info("Initializing database...")
     
-    # Create tables
     if not create_tables():
         return False
     
-    # Seed sample data if requested
     if seed_data:
         if not seed_sample_data():
             logger.warning("Failed to seed sample data, but tables were created")
@@ -251,5 +234,4 @@ def init_database(seed_data: bool = True):
 
 
 if __name__ == "__main__":
-    # Run database initialization
     init_database(seed_data=True)

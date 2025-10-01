@@ -1,8 +1,3 @@
-"""
-Скрипт для генерации тестовых данных для системы RUT MIIT
-Создает 50 клиентов, 10 транспортных средств и 200 заказов
-"""
-
 import random
 from datetime import datetime, timedelta
 from typing import List, Tuple
@@ -19,7 +14,6 @@ from app.models.driver import DriverStatus, ExperienceLevel
 
 fake = Faker('ru_RU')
 
-# Координаты Москвы и области для генерации адресов
 MOSCOW_BOUNDS = {
     'lat_min': 55.5,
     'lat_max': 56.0,
@@ -27,7 +21,6 @@ MOSCOW_BOUNDS = {
     'lon_max': 37.9
 }
 
-# Типы транспортных средств
 VEHICLE_TYPES = [
     {'type': VehicleType.VAN, 'capacity': 1500, 'volume': 9.0},
     {'type': VehicleType.TRUCK, 'capacity': 5000, 'volume': 20.0},
@@ -35,7 +28,6 @@ VEHICLE_TYPES = [
     {'type': VehicleType.VAN, 'capacity': 2000, 'volume': 12.0},
 ]
 
-# Категории товаров
 PRODUCT_CATEGORIES = [
     'Продукты питания',
     'Бытовая техника',
@@ -48,17 +40,14 @@ PRODUCT_CATEGORIES = [
 ]
 
 def generate_moscow_coordinates() -> Tuple[float, float]:
-    """Генерирует случайные координаты в пределах Москвы"""
     lat = random.uniform(MOSCOW_BOUNDS['lat_min'], MOSCOW_BOUNDS['lat_max'])
     lon = random.uniform(MOSCOW_BOUNDS['lon_min'], MOSCOW_BOUNDS['lon_max'])
     return lat, lon
 
 def generate_phone_number() -> str:
-    """Генерирует российский номер телефона"""
     return f"+7{random.randint(900, 999)}{random.randint(1000000, 9999999)}"
 
 def create_customers(session: Session, count: int = 50) -> List[Customer]:
-    """Создает тестовых клиентов"""
     customers = []
     
     for i in range(count):
@@ -87,7 +76,6 @@ def create_customers(session: Session, count: int = 50) -> List[Customer]:
     return customers
 
 def create_drivers(session: Session, count: int = 15) -> List[Driver]:
-    """Создает тестовых водителей"""
     drivers = []
     
     for i in range(count):
@@ -115,7 +103,6 @@ def create_drivers(session: Session, count: int = 15) -> List[Driver]:
     return drivers
 
 def create_vehicles(session: Session, drivers: List[Driver], count: int = 10) -> List[Vehicle]:
-    """Создает тестовые транспортные средства"""
     vehicles = []
     
     for i in range(count):
@@ -138,7 +125,7 @@ def create_vehicles(session: Session, drivers: List[Driver], count: int = 10) ->
             status=random.choice([VehicleStatus.AVAILABLE, VehicleStatus.IN_USE]),
             current_latitude=lat,
             current_longitude=lon,
-            depot_latitude=55.7558,  # Москва центр
+            depot_latitude=55.7558,
             depot_longitude=37.6176,
             has_gps=True,
             has_temperature_control=random.choice([True, False]),
@@ -153,14 +140,12 @@ def create_vehicles(session: Session, drivers: List[Driver], count: int = 10) ->
     return vehicles
 
 def create_orders(session: Session, customers: List[Customer], count: int = 200) -> List[Order]:
-    """Создает тестовые заказы"""
     orders = []
     
     for i in range(count):
         customer = random.choice(customers)
         delivery_lat, delivery_lon = generate_moscow_coordinates()
         
-        # Генерируем временные окна
         order_date = fake.date_between(start_date='-7d', end_date='+14d')
         start_hour = random.randint(8, 18)
         start_minute = random.choice([0, 15, 30, 45])
@@ -210,10 +195,8 @@ def create_orders(session: Session, customers: List[Customer], count: int = 200)
     return orders
 
 def clear_existing_data(session: Session):
-    """Очищает существующие тестовые данные"""
     print("🧹 Очистка существующих данных...")
     
-    # Удаляем в правильном порядке (учитывая внешние ключи)
     session.query(Order).delete()
     session.query(Vehicle).delete()
     session.query(Driver).delete()
@@ -223,7 +206,6 @@ def clear_existing_data(session: Session):
     print("✅ Существующие данные очищены")
 
 def main():
-    """Основная функция для генерации всех тестовых данных"""
     print("🚀 Начинаем генерацию тестовых данных...")
     
     session = SessionLocal()
@@ -238,7 +220,6 @@ def main():
             print(f"⚠️  Найдены существующие данные: {existing_customers} клиентов, {existing_drivers} водителей, {existing_vehicles} ТС, {existing_orders} заказов")
             clear_existing_data(session)
         
-        # Создаем тестовые данные
         print("\n1. Создание клиентов...")
         customers = create_customers(session, 50)
         

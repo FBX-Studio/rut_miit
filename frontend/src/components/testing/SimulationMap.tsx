@@ -45,7 +45,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
   const [driver, setDriver] = useState<SimulationDriver>(initialDriver || mockSimulationData);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  // Обновляем водителя при изменении initialDriver
   useEffect(() => {
     if (initialDriver) {
       setDriver(initialDriver);
@@ -57,15 +56,14 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       setTotalTimeSaved(0);
       setDelays([]);
       
-      // Если есть готовая геометрия маршрута, используем её
       if (initialDriver.routeGeometry && initialDriver.routeGeometry.length > 0) {
         setRouteGeometry(initialDriver.routeGeometry);
         console.log('Using pre-built route geometry with', initialDriver.routeGeometry.length, 'points');
       }
     }
   }, [initialDriver]);
-  const [simulationSpeed, setSimulationSpeed] = useState(1); // 1x, 2x, 4x скорость
-  const [elapsedTime, setElapsedTime] = useState(0); // в секундах
+  const [simulationSpeed, setSimulationSpeed] = useState(1);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [mapCenter, setMapCenter] = useState<[number, number]>([55.7558, 37.6176]);
   const [mapZoom, setMapZoom] = useState(12);
   const [followDriver, setFollowDriver] = useState(true);
@@ -75,14 +73,13 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [originalRoute, setOriginalRoute] = useState<SimulationRoutePoint[]>([]);
   const [routeGeometry, setRouteGeometry] = useState<[number, number][]>([]);
-  const [detailedRouteGeometry, setDetailedRouteGeometry] = useState<[number, number][]>([]); // Детальная геометрия от MultiRoute
+  const [detailedRouteGeometry, setDetailedRouteGeometry] = useState<[number, number][]>([]);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
-  const [currentRoutePosition, setCurrentRoutePosition] = useState(0); // Текущая позиция по маршруту (0-1)
-  const [totalTimeLost, setTotalTimeLost] = useState(0); // Потерянное время в минутах
-  const [totalTimeSaved, setTotalTimeSaved] = useState(0); // Сэкономленное время
+  const [currentRoutePosition, setCurrentRoutePosition] = useState(0);
+  const [totalTimeLost, setTotalTimeLost] = useState(0);
+  const [totalTimeSaved, setTotalTimeSaved] = useState(0);
   const [delays, setDelays] = useState<Array<{time: number, reason: string}>>([]);
   
-  // Real-time прогресс оптимизации
   const [optimizationProgress, setOptimizationProgress] = useState({
     isOptimizing: false,
     currentMetric: '',
@@ -95,7 +92,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
   const simulationService = useRef<any>(null);
   const startTimeRef = useRef<number>(Date.now());
 
-  // Обработчик событий симуляции
   useEffect(() => {
     const handleSimulationEvent = (event: any) => {
       if (event.driver_id === driver.id && event.location) {
@@ -105,7 +101,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
           status: event.type === 'delivery_complete' ? 'delivering' : 'driving'
         }));
         
-        // Следование за водителем
         if (followDriver) {
           setMapCenter(event.location.coordinates);
         }
@@ -124,13 +119,11 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     };
   }, [driver.id, followDriver]);
 
-  // Построение маршрута через серверный API
   const buildRouteGeometry = useCallback(async () => {
     if (driver.route.length < 2) {
       return;
     }
     
-    // Если у водителя уже есть геометрия маршрута, используем её
     if (driver.routeGeometry && driver.routeGeometry.length > 0) {
       setRouteGeometry(driver.routeGeometry);
       console.log('Using existing route geometry with', driver.routeGeometry.length, 'points');
@@ -138,7 +131,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     }
 
     try {
-      // Отправляем запрос на бэкенд для построения маршрута
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/route-geometry/build-simple`, {
         method: 'POST',
         headers: {
@@ -216,16 +208,14 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     }
   };
 
-  // Callback для получения детальной геометрии от MultiRoute
   const handleRouteBuilt = useCallback((geometry: [number, number][]) => {
     setDetailedRouteGeometry(geometry);
     setCurrentRoutePosition(0);
     console.log('✅ Received detailed route geometry:', geometry.length, 'points for movement simulation');
   }, []);
 
-  // Функция расчета расстояния между двумя точками (Haversine formula)
   const calculateDistance = useCallback((lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Радиус Земли в км
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -233,13 +223,11 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Расстояние в км
+    return R * c;
   }, []);
 
-  // Обновление симуляции с плавным движением по геометрии маршрута
   useEffect(() => {
     if (isPlaying && detailedRouteGeometry.length > 1) {
-      // Рассчитываем длину каждого сегмента
       const segmentDistances: number[] = [];
       let totalDistance = 0;
       
@@ -251,9 +239,9 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         totalDistance += dist;
       }
       
-      const speedKmH = averageSpeed * simulationSpeed; // Учитываем скорость симуляции
-      const updateIntervalMs = 50; // Обновление каждые 50мс для плавности
-      const distancePerUpdate = (speedKmH / 3600) * (updateIntervalMs / 1000); // км за 50мс
+      const speedKmH = averageSpeed * simulationSpeed;
+      const updateIntervalMs = 50;
+      const distancePerUpdate = (speedKmH / 3600) * (updateIntervalMs / 1000);
       
       console.log(`🚗 Starting smooth movement: ${totalDistance.toFixed(2)} km at ${averageSpeed} km/h (${speedKmH} km/h simulated)`);
       console.log(`📍 Movement steps: ${distancePerUpdate * 1000} meters per update`);
@@ -266,13 +254,11 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         distanceTraveled += distancePerUpdate;
         distanceInSegment += distancePerUpdate;
         
-        // Переходим к следующему сегменту если нужно
         while (currentSegment < segmentDistances.length && distanceInSegment >= segmentDistances[currentSegment]) {
           distanceInSegment -= segmentDistances[currentSegment];
           currentSegment++;
         }
         
-        // Проверка завершения маршрута
         if (currentSegment >= detailedRouteGeometry.length - 1) {
           const finalLocation = detailedRouteGeometry[detailedRouteGeometry.length - 1];
           setDriver(prev => ({
@@ -285,15 +271,12 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
           return;
         }
         
-        // Интерполяция между точками для плавного движения
         const [lat1, lon1] = detailedRouteGeometry[currentSegment];
         const [lat2, lon2] = detailedRouteGeometry[currentSegment + 1];
         const segmentLength = segmentDistances[currentSegment];
         
-        // Прогресс внутри текущего сегмента (0 to 1)
         const progress = segmentLength > 0 ? Math.min(distanceInSegment / segmentLength, 1) : 1;
         
-        // Линейная интерполяция координат
         const interpolatedLat = lat1 + (lat2 - lat1) * progress;
         const interpolatedLon = lon1 + (lon2 - lon1) * progress;
         
@@ -307,12 +290,10 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         setCurrentSegmentIndex(currentSegment);
         setCurrentRoutePosition(distanceTraveled / totalDistance);
         
-        // Следование за водителем
         if (followDriver) {
           setMapCenter(newLocation);
         }
         
-        // Обновляем статус остановок
         const completedStops = Math.floor((distanceTraveled / totalDistance) * driver.totalStops);
         if (completedStops > driver.completedStops) {
           setDriver(prev => ({

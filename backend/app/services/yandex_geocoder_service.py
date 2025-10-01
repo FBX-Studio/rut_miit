@@ -1,7 +1,3 @@
-"""
-Сервис для работы с Yandex Geocoder API
-Генерация случайных адресов доставки в Москве
-"""
 import httpx
 import logging
 import random
@@ -12,13 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 class YandexGeocoderService:
-    """Сервис для геокодирования и генерации случайных адресов"""
-    
     def __init__(self):
         self.api_key = settings.yandex_maps_api_key or ""
         self.geocoder_url = "https://geocode-maps.yandex.ru/1.x/"
         
-        # Популярные районы Москвы для генерации адресов
         self.moscow_districts = [
             "Арбат",
             "Тверской район",
@@ -37,7 +30,6 @@ class YandexGeocoderService:
             "Черёмушки",
         ]
         
-        # Типичные названия улиц
         self.street_names = [
             "улица Тверская",
             "Ленинский проспект",
@@ -62,15 +54,6 @@ class YandexGeocoderService:
         ]
     
     async def geocode_address(self, address: str) -> Optional[Tuple[float, float]]:
-        """
-        Получить координаты по адресу
-        
-        Args:
-            address: Адрес для геокодирования
-            
-        Returns:
-            Кортеж (lat, lon) или None если адрес не найден
-        """
         try:
             params = {
                 "apikey": self.api_key,
@@ -85,7 +68,6 @@ class YandexGeocoderService:
                 if response.status_code == 200:
                     data = response.json()
                     
-                    # Извлекаем координаты
                     try:
                         geo_object = data["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
                         pos = geo_object["Point"]["pos"]
@@ -105,16 +87,6 @@ class YandexGeocoderService:
             return None
     
     async def reverse_geocode(self, lat: float, lon: float) -> Optional[str]:
-        """
-        Получить адрес по координатам
-        
-        Args:
-            lat: Широта
-            lon: Долгота
-            
-        Returns:
-            Адрес или None
-        """
         try:
             params = {
                 "apikey": self.api_key,
@@ -147,20 +119,11 @@ class YandexGeocoderService:
             return None
     
     async def generate_random_moscow_address(self) -> Optional[Dict[str, any]]:
-        """
-        Сгенерировать случайный адрес в Москве
-        
-        Returns:
-            Словарь с адресом и координатами
-        """
-        # Выбираем случайную улицу и дом
         street = random.choice(self.street_names)
         house_number = random.randint(1, 100)
         
-        # Формируем полный адрес
         address = f"Москва, {street}, дом {house_number}"
         
-        # Получаем координаты
         coordinates = await self.geocode_address(address)
         
         if coordinates:
@@ -193,18 +156,8 @@ class YandexGeocoderService:
             }
     
     async def generate_delivery_route(self, num_stops: int = 5) -> List[Dict[str, any]]:
-        """
-        Сгенерировать маршрут доставки со случайными адресами
-        
-        Args:
-            num_stops: Количество остановок (по умолчанию 5)
-            
-        Returns:
-            Список остановок с адресами и координатами
-        """
         stops = []
         
-        # Первая точка - склад (фиксированный адрес)
         depot = await self.geocode_address("Москва, Ленинградский проспект, 39")
         if depot:
             stops.append({
@@ -218,7 +171,6 @@ class YandexGeocoderService:
                 }
             })
         
-        # Генерируем случайные точки доставки
         for i in range(num_stops):
             delivery_address = await self.generate_random_moscow_address()
             
@@ -231,7 +183,6 @@ class YandexGeocoderService:
                     "coordinates": delivery_address["coordinates"]
                 })
         
-        # Возврат на склад
         if depot:
             stops.append({
                 "id": "depot_return",
