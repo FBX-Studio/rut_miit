@@ -173,7 +173,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Управление водителями
@@ -195,7 +195,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
           </div>
         </div>
 
-        {/* Content */}
+        {}
         <div className="p-6">
           {loading && (
             <div className="text-center py-8">
@@ -204,7 +204,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
             </div>
           )}
 
-          {/* Create Driver Form */}
+          {}
           {showForm && (
             <div className="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -282,7 +282,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
             </div>
           )}
 
-          {/* Drivers List */}
+          {}
           {!loading && drivers.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {drivers.map((driver) => (
@@ -339,7 +339,7 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
                     )}
                   </div>
 
-                  {/* Quick Actions */}
+                  {}
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex space-x-2">
                       <button
@@ -356,7 +356,6 @@ export const DriverManagementModal: React.FC<DriverManagementModalProps> = ({
                       </button>
                       <button
                         onClick={() => {
-                          // Open driver location on map (placeholder)
                           toast('Функция просмотра на карте в разработке');
                         }}
                         className="flex-1 px-3 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md transition-colors"

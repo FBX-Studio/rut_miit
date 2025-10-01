@@ -74,7 +74,7 @@ export function RouteCard({ route, onViewDetails, className }: RouteCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Progress Bar */}
+        {}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Прогресс</span>
@@ -98,7 +98,7 @@ export function RouteCard({ route, onViewDetails, className }: RouteCardProps) {
 
         <Separator />
 
-        {/* Details */}
+        {}
         <div className="grid grid-cols-2 gap-3">
           {route.driver && (
             <div className="flex items-center gap-2 text-sm">

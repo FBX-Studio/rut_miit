@@ -79,13 +79,11 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
 
-  // Initialize app
   useEffect(() => {
     fetchDriverData();
     startLocationTracking();
     checkBatteryStatus();
     
-    // Network status monitoring
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     
@@ -114,7 +112,6 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
         const routeData = await routeResponse.json();
         setCurrentRoute(routeData);
         
-        // Find current stop
         const activeStop = routeData.stops.find((stop: RouteStop) => 
           stop.status === 'in_progress'
         );
@@ -142,7 +139,6 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
           };
           setLocation(newLocation);
           
-          // Send location to server
           sendLocationUpdate(newLocation);
         },
         (error) => {
@@ -302,14 +298,12 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
       });
 
       if (response.ok) {
-        // Move to next stop
         const nextStopIndex = currentRoute.stops.findIndex(stop => stop.id === currentStop.id) + 1;
         const nextStop = nextStopIndex < currentRoute.stops.length ? currentRoute.stops[nextStopIndex] : null;
         
         setCurrentStop(nextStop);
         toast.success(success ? 'Доставка завершена' : 'Остановка отмечена как неуспешная');
         
-        // Refresh route data
         fetchDriverData();
       } else {
         toast.error('Не удалось завершить остановку');
@@ -324,7 +318,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
     if (!currentStop) return;
 
     const address = encodeURIComponent(currentStop.delivery_address);
-    const url = `https://yandex.ru/maps/?text=${address}&rtext=~${address}`;
+    const url = `https:
     window.open(url, '_blank');
   };
 
@@ -378,7 +372,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
 
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
-      {/* Status Bar */}
+      {}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -394,7 +388,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
           </div>
           
           <div className="flex items-center space-x-2">
-            {/* Battery Level */}
+            {}
             {batteryLevel !== null && (
               <div className="flex items-center space-x-1">
                 <Battery className={`h-4 w-4 ${batteryLevel < 20 ? 'text-red-500' : 'text-gray-400'}`} />
@@ -402,7 +396,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
               </div>
             )}
             
-            {/* Network Status */}
+            {}
             <div className="flex items-center space-x-1">
               <Signal className={`h-4 w-4 ${isOnline ? 'text-green-500' : 'text-red-500'}`} />
               <span className="text-xs text-gray-600 dark:text-gray-400">
@@ -413,7 +407,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
         </div>
       </div>
 
-      {/* Route Overview */}
+      {}
       {currentRoute && (
         <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-3">
@@ -442,7 +436,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
             </div>
           </div>
 
-          {/* Route Controls */}
+          {}
           <div className="flex space-x-2 mt-4">
             {currentRoute.status === 'pending' && (
               <button
@@ -477,7 +471,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
         </div>
       )}
 
-      {/* Current Stop */}
+      {}
       {currentStop && (
         <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-3">
@@ -527,7 +521,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
             )}
           </div>
 
-          {/* Stop Actions */}
+          {}
           <div className="grid grid-cols-2 gap-2 mt-4">
             <button
               onClick={openNavigation}
@@ -546,7 +540,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
             </button>
           </div>
 
-          {/* Delivery Actions */}
+          {}
           {currentStop.status === 'pending' && (
             <button
               onClick={arriveAtStop}
@@ -579,7 +573,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
         </div>
       )}
 
-      {/* Upcoming Stops */}
+      {}
       {currentRoute && currentRoute.stops.length > 0 && (
         <div className="bg-white dark:bg-gray-800 p-4">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
@@ -615,7 +609,7 @@ export const DriverApp = ({ driverId, className = '' }: DriverAppProps) => {
         </div>
       )}
 
-      {/* No Route */}
+      {}
       {!currentRoute && (
         <div className="flex flex-col items-center justify-center p-8 text-center">
           <Route className="h-16 w-16 text-gray-400 mb-4" />

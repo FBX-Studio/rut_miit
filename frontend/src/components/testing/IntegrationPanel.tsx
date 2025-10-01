@@ -32,7 +32,7 @@ interface SystemComponent {
   name: string;
   type: 'api' | 'database' | 'websocket' | 'service' | 'frontend' | 'monitoring';
   status: 'online' | 'offline' | 'warning' | 'error';
-  health: number; // 0-100
+  health: number;
   lastCheck: string;
   dependencies: string[];
   metrics: {
@@ -87,12 +87,10 @@ const IntegrationPanel: React.FC = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [clientTime, setClientTime] = useState<string>('');
 
-  // Функция для форматирования чисел с округлением до 2 знаков после точки
   const formatNumber = (num: number): string => {
     return Number(num.toFixed(2)).toString();
   };
 
-  // Initialize client time to avoid hydration mismatch
   useEffect(() => {
     setClientTime(new Date().toLocaleTimeString('ru-RU'));
   }, []);
@@ -102,7 +100,6 @@ const IntegrationPanel: React.FC = () => {
     loadIntegrationTests();
     loadSystemHealth();
 
-    // Автообновление каждые 30 секунд
     const interval = setInterval(() => {
       if (autoRefresh) {
         refreshSystemStatus();
@@ -110,11 +107,9 @@ const IntegrationPanel: React.FC = () => {
     }, 30000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoRefresh]);
 
   const loadSystemComponents = () => {
-    // Загружаем компоненты системы
     const systemComponents: SystemComponent[] = [
       {
         id: 'api_main',
@@ -212,7 +207,6 @@ const IntegrationPanel: React.FC = () => {
   };
 
   const loadIntegrationTests = () => {
-    // Загружаем интеграционные тесты
     const tests: IntegrationTest[] = [
       {
         id: 'test_api_db',
@@ -290,7 +284,6 @@ const IntegrationPanel: React.FC = () => {
   };
 
   const loadSystemHealth = () => {
-    // Загружаем общее состояние системы
     const health: SystemHealth = {
       overall: 92,
       components: {
@@ -333,7 +326,6 @@ const IntegrationPanel: React.FC = () => {
   const refreshSystemStatus = async () => {
     setLoading(true);
     try {
-      // Имитируем обновление статуса компонентов
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setComponents(prev => prev.map(component => ({
@@ -358,15 +350,12 @@ const IntegrationPanel: React.FC = () => {
   const runIntegrationTest = async (testId: string) => {
     setLoading(true);
     try {
-      // Обновляем статус теста на "running"
       setIntegrationTests(prev => prev.map(test => 
         test.id === testId ? { ...test, status: 'running', lastRun: new Date().toISOString() } : test
       ));
 
-      // Имитируем выполнение теста
       await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Случайный результат теста
       const success = Math.random() > 0.2;
       const results = {
         passed: Math.floor(Math.random() * 15) + 5,
@@ -454,7 +443,7 @@ const IntegrationPanel: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -485,7 +474,7 @@ const IntegrationPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* System Health Overview */}
+      {}
       {systemHealth && (
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
           <h2 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 flex items-center">
@@ -540,7 +529,7 @@ const IntegrationPanel: React.FC = () => {
             </div>
           </div>
 
-          {/* Active Alerts */}
+          {}
           {systemHealth.alerts.filter(alert => !alert.resolved).length > 0 && (
             <div className="mt-6">
               <h3 className="text-md font-medium text-gray-900 dark:text-white mb-3">
@@ -579,7 +568,7 @@ const IntegrationPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Tabs */}
+      {}
       <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] overflow-hidden">
         <div className="border-b border-indigo-500/20">
           <nav className="flex space-x-8 px-6 overflow-x-auto">
@@ -606,7 +595,7 @@ const IntegrationPanel: React.FC = () => {
         </div>
 
         <div className="p-6">
-          {/* Components Tab */}
+          {}
           {activeTab === 'components' && (
             <div className="space-y-6">
               <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -671,7 +660,7 @@ const IntegrationPanel: React.FC = () => {
             </div>
           )}
 
-          {/* Integration Tests Tab */}
+          {}
           {activeTab === 'tests' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -764,14 +753,14 @@ const IntegrationPanel: React.FC = () => {
             </div>
           )}
 
-          {/* Health Tab */}
+          {}
           {activeTab === 'health' && (
             <div className="space-y-6">
               <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 Детальное состояние системы
               </h2>
               
-              {/* System Resources */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-blue-900/30 backdrop-blur-sm border border-blue-500/30 rounded-xl p-5 hover:border-blue-500/50 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
@@ -814,7 +803,7 @@ const IntegrationPanel: React.FC = () => {
                 </div>
               </div>
 
-              {/* Component Dependencies */}
+              {}
               <div className="bg-gray-800/50 backdrop-blur-sm border border-indigo-500/20 rounded-xl p-5">
                 <h3 className="text-md font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-4">
                   Зависимости компонентов
@@ -849,7 +838,7 @@ const IntegrationPanel: React.FC = () => {
             </div>
           )}
 
-          {/* Monitoring Tab */}
+          {}
           {activeTab === 'monitoring' && (
             <div className="space-y-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -857,7 +846,7 @@ const IntegrationPanel: React.FC = () => {
               </h2>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Response Times */}
+                {}
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/20 rounded-xl p-5">
                   <h3 className="text-md font-medium bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-4">
                     Время отклика компонентов
@@ -892,7 +881,7 @@ const IntegrationPanel: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Error Rates */}
+                {}
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-purple-500/20 rounded-xl p-5">
                   <h3 className="text-md font-medium bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
                     Уровень ошибок
@@ -928,7 +917,7 @@ const IntegrationPanel: React.FC = () => {
                 </div>
               </div>
 
-              {/* Real-time Metrics */}
+              {}
               <div className="bg-gray-800/50 backdrop-blur-sm border border-indigo-500/20 rounded-xl p-5">
                 <h3 className="text-md font-medium bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
                   Метрики в реальном времени

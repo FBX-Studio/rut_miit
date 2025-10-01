@@ -25,7 +25,7 @@ export interface Order {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'cancelled' | 'failed';
   special_instructions?: string;
-  service_time: number; // minutes
+  service_time: number;
   route_id?: number;
   route_stop_id?: number;
   estimated_pickup?: string;
@@ -100,7 +100,6 @@ const initialState: OrdersState = {
   },
 };
 
-// Async thunks
 export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (params?: {
@@ -295,30 +294,25 @@ const ordersSlice = createSlice({
     updateOrderRealtime: (state, action: PayloadAction<Partial<Order> & { id: number }>) => {
       const { id, ...updates } = action.payload;
       
-      // Update in orders array
       const orderIndex = state.orders.findIndex(order => order.id === id);
       if (orderIndex !== -1) {
         state.orders[orderIndex] = { ...state.orders[orderIndex], ...updates };
       }
       
-      // Update in unassignedOrders array
       const unassignedIndex = state.unassignedOrders.findIndex(order => order.id === id);
       if (unassignedIndex !== -1) {
         if (updates.status === 'assigned') {
-          // Remove from unassigned if now assigned
           state.unassignedOrders.splice(unassignedIndex, 1);
         } else {
           state.unassignedOrders[unassignedIndex] = { ...state.unassignedOrders[unassignedIndex], ...updates };
         }
       } else if (updates.status === 'pending') {
-        // Add to unassigned if status changed to pending
         const fullOrder = state.orders.find(order => order.id === id);
         if (fullOrder) {
           state.unassignedOrders.push({ ...fullOrder, ...updates });
         }
       }
       
-      // Update selected order if it matches
       if (state.selectedOrder?.id === id) {
         state.selectedOrder = { ...state.selectedOrder, ...updates };
       }
@@ -345,7 +339,6 @@ const ordersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch orders
       .addCase(fetchOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -363,7 +356,6 @@ const ordersSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch orders';
       })
       
-      // Fetch unassigned orders
       .addCase(fetchUnassignedOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -377,7 +369,6 @@ const ordersSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch unassigned orders';
       })
       
-      // Fetch order by ID
       .addCase(fetchOrderById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -386,7 +377,6 @@ const ordersSlice = createSlice({
         state.loading = false;
         state.selectedOrder = action.payload;
         
-        // Update in orders array if exists
         const orderIndex = state.orders.findIndex(order => order.id === action.payload.id);
         if (orderIndex !== -1) {
           state.orders[orderIndex] = action.payload;
@@ -397,7 +387,6 @@ const ordersSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch order';
       })
       
-      // Create order
       .addCase(createOrder.pending, (state) => {
         state.creating = true;
         state.error = null;
@@ -417,7 +406,6 @@ const ordersSlice = createSlice({
         state.error = action.error.message || 'Failed to create order';
       })
       
-      // Update order
       .addCase(updateOrder.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -448,7 +436,6 @@ const ordersSlice = createSlice({
         state.error = action.error.message || 'Failed to update order';
       })
       
-      // Update order time window
       .addCase(updateOrderTimeWindow.fulfilled, (state, action) => {
         const orderIndex = state.orders.findIndex(order => order.id === action.payload.id);
         if (orderIndex !== -1) {
@@ -465,14 +452,12 @@ const ordersSlice = createSlice({
         }
       })
       
-      // Cancel order
       .addCase(cancelOrder.fulfilled, (state, action) => {
         const orderIndex = state.orders.findIndex(order => order.id === action.payload.id);
         if (orderIndex !== -1) {
           state.orders[orderIndex] = action.payload;
         }
         
-        // Remove from unassigned orders
         state.unassignedOrders = state.unassignedOrders.filter(order => order.id !== action.payload.id);
         
         if (state.selectedOrder?.id === action.payload.id) {
@@ -480,7 +465,6 @@ const ordersSlice = createSlice({
         }
       })
       
-      // Bulk update orders
       .addCase(bulkUpdateOrders.fulfilled, (state, action) => {
         const updatedOrders = action.payload;
         

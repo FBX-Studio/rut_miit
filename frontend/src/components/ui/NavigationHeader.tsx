@@ -58,7 +58,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
     <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Left side - Back button and title */}
+          {}
           <div className="flex items-center space-x-6">
             {showBackButton && (
               <button
@@ -83,7 +83,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
             </div>
           </div>
 
-          {/* Center - Navigation items */}
+          {}
           <nav className="hidden md:flex items-center space-x-2">
             {navigationItems.map((item) => (
               <button
@@ -99,7 +99,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 onMouseEnter={() => setHoveredNav(item.href)}
                 onMouseLeave={() => setHoveredNav(null)}
               >
-                {/* Subtle glow effect on hover */}
+                {}
                 <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-indigo-100/20 to-transparent opacity-0 transition-opacity duration-300
                                  ${hoveredNav === item.href ? 'opacity-100' : ''}`}></div>
                 <item.icon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
@@ -108,11 +108,11 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
             ))}
           </nav>
 
-          {/* Right side - Actions */}
+          {}
           <div className="flex items-center space-x-3">
             {actions}
             
-            {/* Mobile menu button */}
+            {}
             <div className="md:hidden">
               <select
                 value={pathname}

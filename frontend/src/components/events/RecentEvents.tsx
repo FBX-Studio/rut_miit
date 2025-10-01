@@ -54,16 +54,13 @@ export const RecentEvents = ({
 }: RecentEventsProps) => {
   const [localEvents, setLocalEvents] = useState<EventData[]>(events);
 
-  // Update local events when props change
   useEffect(() => {
     const newEvents = events.slice(0, maxEvents);
-    // Only update if the events actually changed
     if (JSON.stringify(localEvents) !== JSON.stringify(newEvents)) {
       setLocalEvents(newEvents);
     }
   }, [events, maxEvents, localEvents]);
 
-  // Listen for real-time event notifications
   const handleEventNotification = useCallback((data: any) => {
     setLocalEvents(prev => {
       const newEvents = [data, ...prev];
@@ -219,12 +216,12 @@ export const RecentEvents = ({
             onClick={() => onEventClick?.(event.id)}
           >
             <div className="flex items-start space-x-3">
-              {/* Event icon */}
+              {}
               <div className="flex-shrink-0 mt-0.5">
                 {getEventIcon(event.type, event.severity)}
               </div>
 
-              {/* Event content */}
+              {}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
@@ -251,7 +248,7 @@ export const RecentEvents = ({
                   </p>
                 )}
 
-                {/* Event metadata */}
+                {}
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <div className="flex items-center space-x-3">
                     <span>{formatTime(event.timestamp)}</span>
@@ -277,7 +274,7 @@ export const RecentEvents = ({
                   <span>{formatTimeAgo(event.timestamp)}</span>
                 </div>
 
-                {/* Impact information */}
+                {}
                 {event.estimated_impact && (
                   <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-xs">
                     <div className="flex items-center justify-between">
@@ -300,7 +297,7 @@ export const RecentEvents = ({
                   </div>
                 )}
 
-                {/* Action buttons */}
+                {}
                 {onEventAction && event.status === 'active' && (
                   <div className="flex space-x-2 mt-2">
                     <button
@@ -331,7 +328,7 @@ export const RecentEvents = ({
         ))}
       </div>
 
-      {/* View all events link */}
+      {}
       {localEvents.length >= maxEvents && (
         <div className="mt-4 text-center">
           <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">

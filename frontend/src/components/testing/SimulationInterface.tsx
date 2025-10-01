@@ -27,7 +27,6 @@ import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 
-// Динамический импорт карты симуляции для избежания SSR проблем
 const SimulationMap = dynamic(() => import('./SimulationMap'), {
   ssr: false,
   loading: () => (
@@ -40,7 +39,6 @@ const SimulationMap = dynamic(() => import('./SimulationMap'), {
   )
 });
 
-// Импорт данных симуляции
 import { SimulationDriver, mockSimulationData, startRouteAnimation, stopRouteAnimation } from './SimulationData';
 import { SimulationIntegrationService } from '@/services/simulationIntegration';
 import { generateSimulationWithRealAddresses } from '@/services/simulationGenerator';
@@ -129,7 +127,6 @@ const SimulationInterface: React.FC = () => {
   useEffect(() => {
     loadScenarios();
     
-    // Обновляем метрики в реальном времени каждые 5 секунд
     const interval = setInterval(() => {
       if (activeSimulation?.status === 'running') {
         updateRealTimeMetrics();
@@ -140,7 +137,6 @@ const SimulationInterface: React.FC = () => {
   }, [activeSimulation]);
 
   const loadScenarios = () => {
-    // Загружаем предустановленные сценарии
     const defaultScenarios: SimulationScenario[] = [
       {
         id: 'scenario_1',
@@ -203,14 +199,12 @@ const SimulationInterface: React.FC = () => {
     toast.loading('Генерация маршрута с реальными адресами...', { id: 'sim-start' });
     
     try {
-      // Генерируем маршрут с реальными адресами
       const numStops = Math.min(scenario.parameters.order_count / scenario.parameters.vehicle_count, 10);
       const driver = await generateSimulationWithRealAddresses(Math.floor(numStops));
       
       setGeneratedDriver(driver);
       toast.success('Маршрут сгенерирован!', { id: 'sim-start' });
       
-      // Имитируем запуск симуляции
       const result: SimulationResult = {
         scenario_id: scenario.id,
         start_time: new Date().toISOString(),
@@ -232,20 +226,16 @@ const SimulationInterface: React.FC = () => {
 
       setActiveSimulation(result);
       
-      // Обновляем статус сценария
       setScenarios(prev => prev.map(s => 
         s.id === scenario.id ? { ...s, status: 'running' } : s
       ));
 
       toast.success(`Симуляция "${scenario.name}" запущена`);
       
-      // Запускаем симуляцию событий
       simulateEvents(scenario);
       
-      // Запускаем анимацию маршрута
       startRouteAnimation(driver);
       
-      // Синхронизируем данные с основной системой
       await SimulationIntegrationService.syncSimulationWithMainSystem(driver);
       
     } catch (error) {
@@ -258,8 +248,8 @@ const SimulationInterface: React.FC = () => {
 
   const simulateEvents = (scenario: SimulationScenario) => {
     const events: SimulationEvent[] = [];
-    const totalDuration = scenario.duration_minutes * 60 * 1000; // в миллисекундах
-    const eventInterval = totalDuration / (scenario.parameters.order_count * 2); // примерно 2 события на заказ
+    const totalDuration = scenario.duration_minutes * 60 * 1000;
+    const eventInterval = totalDuration / (scenario.parameters.order_count * 2);
 
     let eventCount = 0;
     const maxEvents = scenario.parameters.order_count * 3;
@@ -291,7 +281,7 @@ const SimulationInterface: React.FC = () => {
       } : null);
 
       eventCount++;
-    }, Math.max(eventInterval / 10, 1000)); // минимум 1 секунда между событиями для демонстрации
+    }, Math.max(eventInterval / 10, 1000));
   };
 
   const getEventDescription = (type: SimulationEvent['type']): string => {
@@ -320,7 +310,7 @@ const SimulationInterface: React.FC = () => {
 
   const getEventSeverity = (): SimulationEvent['severity'] => {
     const severities = ['low', 'medium', 'high'];
-    const weights = [0.6, 0.3, 0.1]; // больше низких, меньше высоких
+    const weights = [0.6, 0.3, 0.1];
     const random = Math.random();
     
     if (random < weights[0]) return 'low';
@@ -338,20 +328,19 @@ const SimulationInterface: React.FC = () => {
     switch (event.type) {
       case 'delivery_complete':
         updated.successful_deliveries++;
-        updated.average_delivery_time = Math.random() * 60 + 20; // 20-80 минут
-        updated.total_distance += Math.random() * 50 + 10; // 10-60 км
+        updated.average_delivery_time = Math.random() * 60 + 20;
+        updated.total_distance += Math.random() * 50 + 10;
         updated.customer_satisfaction = Math.min(0.95, updated.customer_satisfaction + 0.02);
         break;
       case 'traffic_delay':
-        updated.average_delivery_time += Math.random() * 20 + 5; // +5-25 минут
-        updated.fuel_consumption += Math.random() * 2 + 1; // +1-3 литра
+        updated.average_delivery_time += Math.random() * 20 + 5;
+        updated.fuel_consumption += Math.random() * 2 + 1;
         break;
       case 'route_optimization':
         updated.cost_efficiency = Math.min(0.95, updated.cost_efficiency + 0.05);
         break;
     }
 
-    // Обновляем общие метрики
     updated.driver_utilization = Math.min(0.95, (updated.successful_deliveries / scenario.parameters.order_count) * 1.2);
     updated.vehicle_utilization = Math.min(0.9, (updated.successful_deliveries / scenario.parameters.order_count) * 1.1);
     
@@ -374,10 +363,8 @@ const SimulationInterface: React.FC = () => {
 
   const stopSimulation = async () => {
     if (activeSimulation) {
-      // Останавливаем анимацию маршрута
       stopRouteAnimation();
       
-      // Уведомляем основную систему об остановке симуляции
       if (typeof window !== 'undefined' && (window as any).simulationSync) {
         (window as any).simulationSync({
           type: 'simulation_stopped',
@@ -484,7 +471,7 @@ const SimulationInterface: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -514,7 +501,7 @@ const SimulationInterface: React.FC = () => {
         </div>
       </div>
 
-      {/* Real-time Metrics */}
+      {}
       {activeSimulation?.status === 'running' && realTimeMetrics && (
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
@@ -606,7 +593,7 @@ const SimulationInterface: React.FC = () => {
         </div>
       )}
 
-      {/* Simulation Map */}
+      {}
       {activeSimulation?.status === 'running' && generatedDriver && (
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
           <div className="p-4 border-b border-indigo-500/20">
@@ -620,12 +607,12 @@ const SimulationInterface: React.FC = () => {
           </div>
           <SimulationMap 
             initialDriver={generatedDriver} 
-            averageSpeed={40} // средняя скорость 40 км/ч
+            averageSpeed={40}
           />
         </div>
       )}
 
-      {/* Scenarios List */}
+      {}
       <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
         <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6">
           Сценарии симуляции
@@ -689,7 +676,7 @@ const SimulationInterface: React.FC = () => {
         </div>
       </div>
 
-      {/* Active Simulation Events */}
+      {}
       {activeSimulation && (
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
@@ -737,7 +724,7 @@ const SimulationInterface: React.FC = () => {
         </div>
       )}
 
-      {/* Create Scenario Modal */}
+      {}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">

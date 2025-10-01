@@ -34,7 +34,6 @@ interface RecentEventsBlockProps {
   onEventDetails?: (eventId: number) => void;
 }
 
-// Mock data for demonstration
 const mockEvents: EventData[] = [
   {
     id: 1,
@@ -189,7 +188,7 @@ export const RecentEventsBlock = ({
 
   return (
     <div className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm border border-gray-200 dark:border-gray-700 ${className}`}>
-      {/* Header */}
+      {}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -222,7 +221,7 @@ export const RecentEventsBlock = ({
           </div>
         </div>
 
-        {/* Filters */}
+        {}
         {showFilters && (
           <div className="mt-4 flex flex-wrap gap-2">
             {eventTypeFilters.map((filter) => {
@@ -246,12 +245,12 @@ export const RecentEventsBlock = ({
         )}
       </div>
 
-      {/* Events Timeline */}
+      {}
       <div className="divide-y divide-gray-700/30">
         {filteredEvents.map((event, index) => (
           <div key={event.id} className="p-6 hover:bg-gray-800/30 transition-colors">
             <div className="flex items-start space-x-4">
-              {/* Timeline indicator */}
+              {}
               <div className="flex-shrink-0 relative">
                 <div className={`p-2 rounded-full border-2 ${getEventColor(event.type, event.severity)}`}>
                   {getEventIcon(event.type)}
@@ -261,7 +260,7 @@ export const RecentEventsBlock = ({
                 )}
               </div>
 
-              {/* Event content */}
+              {}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -279,7 +278,7 @@ export const RecentEventsBlock = ({
                       {event.description}
                     </p>
                     
-                    {/* Event details */}
+                    {}
                     <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400">
                       <span className="flex items-center space-x-1">
                         <Clock className="h-3 w-3" />
@@ -330,7 +329,7 @@ export const RecentEventsBlock = ({
         ))}
       </div>
 
-      {/* Empty State */}
+      {}
       {filteredEvents.length === 0 && (
         <div className="p-12 text-center">
           <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />

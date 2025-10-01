@@ -7,7 +7,7 @@ export interface Vehicle {
   capacity: number;
   max_volume: number;
   fuel_type: 'gasoline' | 'diesel' | 'electric' | 'hybrid';
-  fuel_consumption: number; // L/100km or kWh/100km
+  fuel_consumption: number;
   status: 'available' | 'in_use' | 'maintenance' | 'out_of_service';
   current_location?: {
     latitude: number;
@@ -99,7 +99,6 @@ const initialState: VehiclesState = {
   realTimeLocations: {},
 };
 
-// Async thunks
 export const fetchVehicles = createAsyncThunk(
   'vehicles/fetchVehicles',
   async (params?: {
@@ -296,30 +295,25 @@ const vehiclesSlice = createSlice({
     updateVehicleRealtime: (state, action: PayloadAction<Partial<Vehicle> & { id: number }>) => {
       const { id, ...updates } = action.payload;
       
-      // Update in vehicles array
       const vehicleIndex = state.vehicles.findIndex(vehicle => vehicle.id === id);
       if (vehicleIndex !== -1) {
         state.vehicles[vehicleIndex] = { ...state.vehicles[vehicleIndex], ...updates };
       }
       
-      // Update in availableVehicles array
       const availableIndex = state.availableVehicles.findIndex(vehicle => vehicle.id === id);
       if (availableIndex !== -1) {
         if (updates.status === 'available') {
           state.availableVehicles[availableIndex] = { ...state.availableVehicles[availableIndex], ...updates };
         } else {
-          // Remove from available if status changed
           state.availableVehicles.splice(availableIndex, 1);
         }
       } else if (updates.status === 'available') {
-        // Add to available if status changed to available
         const fullVehicle = state.vehicles.find(vehicle => vehicle.id === id);
         if (fullVehicle) {
           state.availableVehicles.push({ ...fullVehicle, ...updates });
         }
       }
       
-      // Update selected vehicle if it matches
       if (state.selectedVehicle?.id === id) {
         state.selectedVehicle = { ...state.selectedVehicle, ...updates };
       }
@@ -327,10 +321,8 @@ const vehiclesSlice = createSlice({
     updateVehicleLocationRealtime: (state, action: PayloadAction<VehicleLocation>) => {
       const locationData = action.payload;
       
-      // Update real-time locations
       state.realTimeLocations[locationData.vehicle_id] = locationData;
       
-      // Update vehicle current_location
       const vehicleIndex = state.vehicles.findIndex(vehicle => vehicle.id === locationData.vehicle_id);
       if (vehicleIndex !== -1) {
         state.vehicles[vehicleIndex].current_location = {
@@ -341,7 +333,6 @@ const vehiclesSlice = createSlice({
         };
       }
       
-      // Update selected vehicle if it matches
       if (state.selectedVehicle?.id === locationData.vehicle_id) {
         state.selectedVehicle.current_location = {
           latitude: locationData.latitude,
@@ -372,7 +363,6 @@ const vehiclesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch vehicles
       .addCase(fetchVehicles.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -386,7 +376,6 @@ const vehiclesSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch vehicles';
       })
       
-      // Fetch available vehicles
       .addCase(fetchAvailableVehicles.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -400,7 +389,6 @@ const vehiclesSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch available vehicles';
       })
       
-      // Fetch vehicle by ID
       .addCase(fetchVehicleById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -409,7 +397,6 @@ const vehiclesSlice = createSlice({
         state.loading = false;
         state.selectedVehicle = action.payload;
         
-        // Update in vehicles array if exists
         const vehicleIndex = state.vehicles.findIndex(vehicle => vehicle.id === action.payload.id);
         if (vehicleIndex !== -1) {
           state.vehicles[vehicleIndex] = action.payload;
@@ -420,7 +407,6 @@ const vehiclesSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch vehicle';
       })
       
-      // Create vehicle
       .addCase(createVehicle.pending, (state) => {
         state.creating = true;
         state.error = null;
@@ -438,7 +424,6 @@ const vehiclesSlice = createSlice({
         state.error = action.error.message || 'Failed to create vehicle';
       })
       
-      // Update vehicle
       .addCase(updateVehicle.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -471,7 +456,6 @@ const vehiclesSlice = createSlice({
         state.error = action.error.message || 'Failed to update vehicle';
       })
       
-      // Update vehicle location
       .addCase(updateVehicleLocation.fulfilled, (state, action) => {
         const { vehicle_id, ...locationData } = action.payload;
         
@@ -497,7 +481,6 @@ const vehiclesSlice = createSlice({
         }
       })
       
-      // Schedule maintenance
       .addCase(scheduleVehicleMaintenance.fulfilled, (state, action) => {
         const vehicleIndex = state.vehicles.findIndex(vehicle => vehicle.id === action.payload.id);
         if (vehicleIndex !== -1) {
@@ -509,14 +492,12 @@ const vehiclesSlice = createSlice({
         }
       })
       
-      // Complete maintenance
       .addCase(completeVehicleMaintenance.fulfilled, (state, action) => {
         const vehicleIndex = state.vehicles.findIndex(vehicle => vehicle.id === action.payload.id);
         if (vehicleIndex !== -1) {
           state.vehicles[vehicleIndex] = action.payload;
         }
         
-        // Add back to available if status changed
         if (action.payload.status === 'available') {
           const availableIndex = state.availableVehicles.findIndex(vehicle => vehicle.id === action.payload.id);
           if (availableIndex === -1) {
@@ -529,7 +510,6 @@ const vehiclesSlice = createSlice({
         }
       })
       
-      // Delete vehicle
       .addCase(deleteVehicle.fulfilled, (state, action) => {
         const vehicleId = action.payload;
         

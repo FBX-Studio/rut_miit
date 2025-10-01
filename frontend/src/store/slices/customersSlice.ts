@@ -131,7 +131,6 @@ const initialState: CustomersState = {
   customerFeedback: {},
 };
 
-// Async thunks
 export const fetchCustomers = createAsyncThunk(
   'customers/fetchCustomers',
   async (params?: {
@@ -334,13 +333,11 @@ const customersSlice = createSlice({
     updateCustomerRealtime: (state, action: PayloadAction<Partial<Customer> & { id: number }>) => {
       const { id, ...updates } = action.payload;
       
-      // Update in customers array
       const customerIndex = state.customers.findIndex(customer => customer.id === id);
       if (customerIndex !== -1) {
         state.customers[customerIndex] = { ...state.customers[customerIndex], ...updates };
       }
       
-      // Update selected customer if it matches
       if (state.selectedCustomer?.id === id) {
         state.selectedCustomer = { ...state.selectedCustomer, ...updates };
       }
@@ -371,7 +368,6 @@ const customersSlice = createSlice({
         state.customerStats[customerId] = stats as CustomerStats;
       }
       
-      // Update customer totals if available
       const customerIndex = state.customers.findIndex(customer => customer.id === customerId);
       if (customerIndex !== -1 && stats.total_orders !== undefined) {
         state.customers[customerIndex].total_orders = stats.total_orders;
@@ -387,7 +383,6 @@ const customersSlice = createSlice({
       
       state.customerFeedback[feedback.customer_id].unshift(feedback);
       
-      // Update customer rating
       const customerIndex = state.customers.findIndex(customer => customer.id === feedback.customer_id);
       if (customerIndex !== -1) {
         const allFeedback = state.customerFeedback[feedback.customer_id];
@@ -398,7 +393,6 @@ const customersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch customers
       .addCase(fetchCustomers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -416,7 +410,6 @@ const customersSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch customers';
       })
       
-      // Fetch customer by ID
       .addCase(fetchCustomerById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -425,7 +418,6 @@ const customersSlice = createSlice({
         state.loading = false;
         state.selectedCustomer = action.payload;
         
-        // Update in customers array if exists
         const customerIndex = state.customers.findIndex(customer => customer.id === action.payload.id);
         if (customerIndex !== -1) {
           state.customers[customerIndex] = action.payload;
@@ -436,7 +428,6 @@ const customersSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch customer';
       })
       
-      // Create customer
       .addCase(createCustomer.pending, (state) => {
         state.creating = true;
         state.error = null;
@@ -451,7 +442,6 @@ const customersSlice = createSlice({
         state.error = action.error.message || 'Failed to create customer';
       })
       
-      // Update customer
       .addCase(updateCustomer.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -473,7 +463,6 @@ const customersSlice = createSlice({
         state.error = action.error.message || 'Failed to update customer';
       })
       
-      // Delete customer
       .addCase(deleteCustomer.fulfilled, (state, action) => {
         const customerId = action.payload;
         
@@ -488,19 +477,16 @@ const customersSlice = createSlice({
         delete state.customerFeedback[customerId];
       })
       
-      // Fetch customer stats
       .addCase(fetchCustomerStats.fulfilled, (state, action) => {
         const { customerId, stats } = action.payload;
         state.customerStats[customerId] = stats;
       })
       
-      // Fetch customer feedback
       .addCase(fetchCustomerFeedback.fulfilled, (state, action) => {
         const { customerId, feedback } = action.payload;
         state.customerFeedback[customerId] = feedback;
       })
       
-      // Submit customer feedback
       .addCase(submitCustomerFeedback.fulfilled, (state, action) => {
         const feedback = action.payload;
         
@@ -510,7 +496,6 @@ const customersSlice = createSlice({
         
         state.customerFeedback[feedback.customer_id].unshift(feedback);
         
-        // Update customer rating
         const customerIndex = state.customers.findIndex(customer => customer.id === feedback.customer_id);
         if (customerIndex !== -1) {
           const allFeedback = state.customerFeedback[feedback.customer_id];
@@ -519,10 +504,7 @@ const customersSlice = createSlice({
         }
       })
       
-      // Search customers
       .addCase(searchCustomers.fulfilled, (state, action) => {
-        // For search results, we might want to handle them differently
-        // For now, we'll just update the customers array
         state.customers = action.payload;
       });
   },

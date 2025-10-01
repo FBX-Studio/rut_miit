@@ -39,12 +39,11 @@ interface DashboardStats {
 }
 
 export const EnhancedDashboard: React.FC = () => {
-  // Fetch данных
   const { data: stats, isLoading: statsLoading } = useOptimizedQuery<DashboardStats>(
     'dashboard-stats',
     () => fetch('/api/v1/monitoring/stats').then(res => res.json()),
     {
-      refetchInterval: 30000, // Обновление каждые 30 секунд
+      refetchInterval: 30000,
       cacheTime: 60000,
     }
   );
@@ -53,11 +52,10 @@ export const EnhancedDashboard: React.FC = () => {
     'active-routes',
     () => fetch('/api/v1/routes?status=in_progress').then(res => res.json()),
     {
-      refetchInterval: 10000, // Обновление каждые 10 секунд
+      refetchInterval: 10000,
     }
   );
 
-  // Демо данные для графиков (замените на реальные данные из API)
   const deliveryTrendData = [
     { name: 'Пн', delivered: 45, planned: 50, optimized: 48 },
     { name: 'Вт', delivered: 52, planned: 55, optimized: 54 },
@@ -111,7 +109,7 @@ export const EnhancedDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto space-y-6"
       >
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -130,7 +128,7 @@ export const EnhancedDashboard: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Stats Cards */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <AnimatedStatCard
             title="Всего маршрутов"
@@ -170,7 +168,7 @@ export const EnhancedDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Performance Metrics */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <AnimatedStatCard
             title="Среднее время доставки"
@@ -210,9 +208,9 @@ export const EnhancedDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Map and Charts Row */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Map */}
+          {}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -236,7 +234,7 @@ export const EnhancedDashboard: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Performance Radar */}
+          {}
           <div className="space-y-6">
             <AnimatedRadarChart
               data={performanceData}
@@ -251,7 +249,7 @@ export const EnhancedDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Charts Grid */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <AnimatedLineChart
             data={deliveryTrendData}
@@ -267,7 +265,7 @@ export const EnhancedDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Driver Performance */}
+        {}
         <AnimatedBarChart
           data={driverPerformanceData}
           dataKeys={['deliveries', 'onTime']}
@@ -276,7 +274,7 @@ export const EnhancedDashboard: React.FC = () => {
           horizontal={true}
         />
 
-        {/* Real-time Activity Feed */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

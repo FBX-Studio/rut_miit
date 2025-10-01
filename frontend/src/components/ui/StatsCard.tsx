@@ -91,7 +91,7 @@ export const StatsCard = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Gradient overlay on hover */}
+        {}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5" />
         </div>
@@ -125,7 +125,7 @@ export const StatsCard = ({
               transition={{ type: "spring", stiffness: 400 }}
             >
               <Icon className="h-5 w-5 relative z-10" />
-              {/* Glow effect */}
+              {}
               <div className="absolute inset-0 blur-xl opacity-30 bg-current" />
             </motion.div>
           )}

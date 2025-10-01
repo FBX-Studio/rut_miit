@@ -77,7 +77,6 @@ const initialState: RoutesState = {
   reoptimizationTriggers: [],
 };
 
-// Async thunks
 export const fetchRoutes = createAsyncThunk(
   'routes/fetchRoutes',
   async (params?: { status?: string; date?: string }) => {
@@ -224,7 +223,6 @@ const routesSlice = createSlice({
     },
     addReoptimizationTrigger: (state, action) => {
       state.reoptimizationTriggers.unshift(action.payload);
-      // Keep only last 50 triggers
       if (state.reoptimizationTriggers.length > 50) {
         state.reoptimizationTriggers = state.reoptimizationTriggers.slice(0, 50);
       }
@@ -232,19 +230,16 @@ const routesSlice = createSlice({
     updateRouteRealtime: (state, action: PayloadAction<Partial<Route> & { id: number }>) => {
       const { id, ...updates } = action.payload;
       
-      // Update in routes array
       const routeIndex = state.routes.findIndex(route => route.id === id);
       if (routeIndex !== -1) {
         state.routes[routeIndex] = { ...state.routes[routeIndex], ...updates };
       }
       
-      // Update in activeRoutes array
       const activeRouteIndex = state.activeRoutes.findIndex(route => route.id === id);
       if (activeRouteIndex !== -1) {
         state.activeRoutes[activeRouteIndex] = { ...state.activeRoutes[activeRouteIndex], ...updates };
       }
       
-      // Update selected route if it matches
       if (state.selectedRoute?.id === id) {
         state.selectedRoute = { ...state.selectedRoute, ...updates };
       }
@@ -257,24 +252,20 @@ const routesSlice = createSlice({
         if (stopIndex !== -1) {
           route.stops[stopIndex] = { ...route.stops[stopIndex], ...updates };
           
-          // Update route completed_stops count
           route.completed_stops = route.stops.filter(stop => stop.status === 'completed').length;
         }
       };
       
-      // Update in routes array
       const routeIndex = state.routes.findIndex(route => route.id === routeId);
       if (routeIndex !== -1) {
         updateStopInRoute(state.routes[routeIndex]);
       }
       
-      // Update in activeRoutes array
       const activeRouteIndex = state.activeRoutes.findIndex(route => route.id === routeId);
       if (activeRouteIndex !== -1) {
         updateStopInRoute(state.activeRoutes[activeRouteIndex]);
       }
       
-      // Update selected route if it matches
       if (state.selectedRoute?.id === routeId) {
         updateStopInRoute(state.selectedRoute);
       }
@@ -282,7 +273,6 @@ const routesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch routes
       .addCase(fetchRoutes.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -296,7 +286,6 @@ const routesSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch routes';
       })
       
-      // Fetch active routes
       .addCase(fetchActiveRoutes.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -310,7 +299,6 @@ const routesSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch active routes';
       })
       
-      // Fetch route by ID
       .addCase(fetchRouteById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -319,7 +307,6 @@ const routesSlice = createSlice({
         state.loading = false;
         state.selectedRoute = action.payload;
         
-        // Update in routes array if exists
         const routeIndex = state.routes.findIndex(route => route.id === action.payload.id);
         if (routeIndex !== -1) {
           state.routes[routeIndex] = action.payload;
@@ -330,7 +317,6 @@ const routesSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch route';
       })
       
-      // Optimize routes
       .addCase(optimizeRoutes.pending, (state) => {
         state.optimizing = true;
         state.error = null;
@@ -345,7 +331,6 @@ const routesSlice = createSlice({
         state.error = action.error.message || 'Failed to optimize routes';
       })
       
-      // Reoptimize route
       .addCase(reoptimizeRoute.pending, (state) => {
         state.optimizing = true;
         state.error = null;
@@ -353,7 +338,6 @@ const routesSlice = createSlice({
       .addCase(reoptimizeRoute.fulfilled, (state, action) => {
         state.optimizing = false;
         
-        // Update the reoptimized route
         const routeIndex = state.routes.findIndex(route => route.id === action.payload.id);
         if (routeIndex !== -1) {
           state.routes[routeIndex] = action.payload;
@@ -373,7 +357,6 @@ const routesSlice = createSlice({
         state.error = action.error.message || 'Failed to reoptimize route';
       })
       
-      // Update route status
       .addCase(updateRouteStatus.fulfilled, (state, action) => {
         const routeIndex = state.routes.findIndex(route => route.id === action.payload.id);
         if (routeIndex !== -1) {
@@ -390,7 +373,6 @@ const routesSlice = createSlice({
         }
       })
       
-      // Update stop status
       .addCase(updateStopStatus.fulfilled, (state, action) => {
         const { route_id, ...stopData } = action.payload;
         
@@ -402,7 +384,6 @@ const routesSlice = createSlice({
           }
         };
         
-        // Update in all route arrays
         const routeIndex = state.routes.findIndex(route => route.id === route_id);
         if (routeIndex !== -1) {
           updateStopInRoute(state.routes[routeIndex]);

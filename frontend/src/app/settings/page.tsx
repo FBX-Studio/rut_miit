@@ -82,27 +82,23 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('general');
   const [showPassword, setShowPassword] = useState(false);
   const [settings, setSettings] = useState({
-    // Общие настройки
     companyName: 'РУТ МИИТ Логистика',
     timezone: 'Europe/Moscow',
     language: 'ru',
     theme: 'auto',
     autoSave: true,
     
-    // Уведомления
     emailNotifications: true,
     pushNotifications: true,
     smsNotifications: false,
     alertsEnabled: true,
     criticalAlertsOnly: false,
     
-    // Безопасность
     twoFactorAuth: false,
     sessionTimeout: 30,
     passwordExpiry: 90,
     loginAttempts: 5,
     
-    // База данных
     dbHost: 'localhost',
     dbPort: '5432',
     dbName: 'logistics_db',
@@ -110,7 +106,6 @@ export default function SettingsPage() {
     dbPassword: '••••••••',
     connectionPoolSize: 10,
     
-    // Интеграции
     mapsApiKey: '••••••••••••••••',
     weatherApi: true,
     trafficApi: true,
@@ -126,12 +121,10 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    // Здесь будет логика сохранения настроек
     toast.success('Настройки сохранены успешно!');
   };
 
   const handleReset = () => {
-    // Здесь будет логика сброса настроек
     toast.success('Настройки сброшены к значениям по умолчанию');
   };
 
@@ -469,7 +462,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50/50 via-white to-gray-50/50 dark:from-gray-900/50 dark:via-gray-950 dark:to-gray-900/50 relative overflow-hidden">
-      {/* Subtle animated background elements for settings */}
+      {}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-200/20 dark:bg-indigo-800/20 rounded-full blur-3xl animate-pulse delay-500"></div>
         <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-emerald-200/20 dark:bg-emerald-800/20 rounded-full blur-3xl animate-pulse delay-1500"></div>
@@ -484,7 +477,7 @@ export default function SettingsPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Боковое меню */}
+          {}
           <div className="lg:col-span-1">
             <nav className="space-y-2">
               {settingsSections.map((section) => {
@@ -514,7 +507,7 @@ export default function SettingsPage() {
             </nav>
           </div>
 
-          {/* Основной контент */}
+          {}
           <div className="lg:col-span-3">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-sm">
               <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">

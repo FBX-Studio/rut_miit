@@ -27,7 +27,6 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
-// Simple in-memory cache
 const queryCache = new Map<string, CacheEntry<any>>();
 
 export function useOptimizedQuery<T = any>(
@@ -38,7 +37,7 @@ export function useOptimizedQuery<T = any>(
   const {
     enabled = true,
     refetchInterval,
-    cacheTime = 5 * 60 * 1000, // 5 minutes
+    cacheTime = 5 * 60 * 1000,
     staleTime = 0,
     retry = 3,
     retryDelay = 1000,
@@ -60,7 +59,6 @@ export function useOptimizedQuery<T = any>(
   const cacheKey = Array.isArray(queryKey) ? queryKey.join(':') : queryKey;
 
   const fetchData = useCallback(async () => {
-    // Check cache first
     const cached = queryCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < staleTime) {
       setData(cached.data);
@@ -69,7 +67,6 @@ export function useOptimizedQuery<T = any>(
       return;
     }
 
-    // Cancel previous request if any
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -82,13 +79,11 @@ export function useOptimizedQuery<T = any>(
     try {
       const result = await queryFn();
       
-      // Update cache
       queryCache.set(cacheKey, {
         data: result,
         timestamp: Date.now(),
       });
 
-      // Clean old cache entries
       setTimeout(() => {
         const now = Date.now();
         for (const [key, value] of queryCache.entries()) {
@@ -109,12 +104,11 @@ export function useOptimizedQuery<T = any>(
       }
     } catch (err) {
       if (axios.isCancel(err)) {
-        return; // Request was cancelled, don't update state
+        return;
       }
 
       const error = err as Error;
       
-      // Retry logic
       if (retryCountRef.current < retry) {
         retryCountRef.current++;
         setTimeout(() => {
@@ -135,7 +129,6 @@ export function useOptimizedQuery<T = any>(
   }, [cacheKey, queryFn, staleTime, cacheTime, retry, retryDelay, onSuccess, onError]);
 
   const refetch = useCallback(async () => {
-    // Clear cache for this query
     queryCache.delete(cacheKey);
     await fetchData();
   }, [cacheKey, fetchData]);
@@ -147,14 +140,12 @@ export function useOptimizedQuery<T = any>(
 
     fetchData();
 
-    // Setup refetch interval if specified
     if (refetchInterval && refetchInterval > 0) {
       refetchIntervalRef.current = setInterval(() => {
         fetchData();
       }, refetchInterval);
     }
 
-    // Cleanup
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -176,7 +167,6 @@ export function useOptimizedQuery<T = any>(
   };
 }
 
-// Optimized mutation hook
 export function useOptimizedMutation<TData = any, TVariables = any>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options: {
@@ -252,13 +242,11 @@ export function useOptimizedMutation<TData = any, TVariables = any>(
   };
 }
 
-// Helper to invalidate cache
 export function invalidateQuery(queryKey: string | string[]) {
   const key = Array.isArray(queryKey) ? queryKey.join(':') : queryKey;
   queryCache.delete(key);
 }
 
-// Helper to invalidate all queries matching a pattern
 export function invalidateQueries(pattern: RegExp) {
   for (const key of queryCache.keys()) {
     if (pattern.test(key)) {
@@ -267,7 +255,6 @@ export function invalidateQueries(pattern: RegExp) {
   }
 }
 
-// Helper to clear all cache
 export function clearAllCache() {
   queryCache.clear();
 }

@@ -15,7 +15,7 @@ export const Providers = ({ children }: ProvidersProps) => {
     <SWRConfig
       value={{
         fetcher,
-        refreshInterval: 30000, // Refresh every 30 seconds
+        refreshInterval: 30000,
         revalidateOnFocus: true,
         revalidateOnReconnect: true,
         dedupingInterval: 2000,

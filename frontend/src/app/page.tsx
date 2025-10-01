@@ -80,7 +80,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30 relative overflow-hidden">
-      {/* Animated background effects */}
+      {}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -101,7 +101,7 @@ const Dashboard = () => {
       />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-12">
-        {/* Stats Cards with animations */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           <div className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(99,102,241,0.25)] transition-all duration-300 hover:scale-105 animate-fadeIn">
             <div className="flex items-center justify-between mb-4">
@@ -148,7 +148,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Analytics Blocks */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ActiveRoutesBlock 
             onDetailedView={() => setShowAnalyticsModal(true)}
@@ -164,9 +164,9 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Map Section with animated gradient border */}
+        {}
         <div className="relative group animate-fadeIn" style={{ animationDelay: '0.5s' }}>
-          {/* Animated gradient border effect */}
+          {}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 blur-sm animate-gradient" />
           <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
             <div className="flex items-center justify-between mb-4">
@@ -188,10 +188,10 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* Simulation Launcher */}
+        {}
         <SimulationLauncher />
 
-        {/* Actions Section with animations */}
+        {}
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] animate-fadeIn" style={{ animationDelay: '0.6s' }}>
           <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
             Быстрые действия
@@ -247,7 +247,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Модальные окна вне основного контейнера */}
+      {}
       <RouteOptimizationModal
         isOpen={showRouteModal}
         onClose={() => setShowRouteModal(false)}

@@ -45,7 +45,6 @@ export const CustomerPortal = ({
   const [searchQuery, setSearchQuery] = useState(orderNumber || '');
   const [loading, setLoading] = useState(false);
 
-  // Fetch orders
   useEffect(() => {
     if (customerId || orderNumber) {
       fetchOrders();
@@ -201,7 +200,7 @@ export const CustomerPortal = ({
   return (
     <div className={`max-w-4xl mx-auto p-6 ${className}`}>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        {/* Header */}
+        {}
         <div className="border-b border-gray-200 dark:border-gray-700 p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Портал клиента
@@ -211,7 +210,7 @@ export const CustomerPortal = ({
           </p>
         </div>
 
-        {/* Search Section */}
+        {}
         {!customerId && (
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex space-x-4">
@@ -241,7 +240,7 @@ export const CustomerPortal = ({
           </div>
         )}
 
-        {/* Orders List */}
+        {}
         {orders.length > 1 && (
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -280,11 +279,11 @@ export const CustomerPortal = ({
           </div>
         )}
 
-        {/* Selected Order Details */}
+        {}
         {selectedOrder && (
           <div className="p-6">
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Order Information */}
+              {}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Информация о заказе
@@ -347,14 +346,14 @@ export const CustomerPortal = ({
                 </div>
               </div>
 
-              {/* Time Window Management */}
+              {}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Временное окно доставки
                 </h2>
 
                 <div className="space-y-4">
-                  {/* Current Time Window */}
+                  {}
                   <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <h3 className="font-medium text-gray-900 dark:text-white mb-2">
                       Текущее временное окно
@@ -367,7 +366,7 @@ export const CustomerPortal = ({
                     </div>
                   </div>
 
-                  {/* Update Time Window */}
+                  {}
                   {selectedOrder.status === 'pending' || selectedOrder.status === 'confirmed' ? (
                     <div className="space-y-4">
                       <h3 className="font-medium text-gray-900 dark:text-white">
@@ -441,7 +440,7 @@ export const CustomerPortal = ({
           </div>
         )}
 
-        {/* No Orders Found */}
+        {}
         {!loading && orders.length === 0 && searchQuery && (
           <div className="p-6 text-center">
             <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />

@@ -82,7 +82,6 @@ const TestingDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'scenarios' | 'analytics' | 'simulation'>('scenarios');
 
-  // Новые состояния для управления параметрами и отслеживания времени
   const [deliveryTrackers, setDeliveryTrackers] = useState<Record<string, DeliveryTimeTracker>>({});
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [manualParameter, setManualParameter] = useState<ManualParameterChange>({
@@ -93,7 +92,6 @@ const TestingDashboard: React.FC = () => {
   });
   const [showParameterModal, setShowParameterModal] = useState(false);
 
-  // Состояние для создания нового сценария
   const [newScenario, setNewScenario] = useState<TestScenario>({
     name: '',
     description: '',
@@ -104,13 +102,11 @@ const TestingDashboard: React.FC = () => {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Fetch data on component mount and set up intervals
   useEffect(() => {
     fetchActiveScenarios();
     fetchAnalytics();
     fetchDeliveryTrackers();
     
-    // Set up intervals for real-time updates
     const scenarioInterval = setInterval(fetchActiveScenarios, 5000);
     const trackerInterval = setInterval(fetchDeliveryTrackers, 2000);
     
@@ -120,7 +116,6 @@ const TestingDashboard: React.FC = () => {
     };
   }, []);
 
-  // Новые функции для работы с отслеживанием времени и ручными параметрами
   const fetchDeliveryTrackers = async () => {
     try {
       const trackerPromises = activeScenarios
@@ -335,7 +330,7 @@ const TestingDashboard: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -366,7 +361,7 @@ const TestingDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabs */}
+      {}
       <div className="border-b border-indigo-500/20 bg-gray-900/30 backdrop-blur-sm rounded-t-2xl overflow-hidden">
         <nav className="flex space-x-1 px-2 pt-2">
           {[
@@ -390,10 +385,10 @@ const TestingDashboard: React.FC = () => {
         </nav>
       </div>
 
-       {/* Content */}
+       {}
        {selectedTab === 'scenarios' && (
          <div className="space-y-6">
-           {/* Active Scenarios */}
+           {}
            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
              <div className="flex items-center justify-between mb-4">
                <h2 className="text-lg font-semibold text-white">
@@ -460,7 +455,7 @@ const TestingDashboard: React.FC = () => {
                          </div>
                        </div>
 
-                       {/* Delivery Time Tracking */}
+                       {}
                        {tracker && scenario.status === 'running' && (
                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                            <div className="flex items-center justify-between mb-3">
@@ -475,7 +470,7 @@ const TestingDashboard: React.FC = () => {
                                <p className="text-xs text-blue-600 dark:text-blue-400">
                                  Изначально: {formatTime(tracker.initial_delivery_time)}
                                </p>
-                               {/* Time Difference Display */}
+                               {}
                                {(() => {
                                  const timeDiff = tracker.current_delivery_time - tracker.initial_delivery_time;
                                  const isPositive = timeDiff > 0;
@@ -524,7 +519,7 @@ const TestingDashboard: React.FC = () => {
                          </div>
                        )}
                        
-                       {/* Metrics */}
+                       {}
                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                          <div className="text-center">
                            <p className="text-sm text-gray-500 dark:text-gray-400">Изменений</p>
@@ -562,7 +557,7 @@ const TestingDashboard: React.FC = () => {
 
       {selectedTab === 'analytics' && (
         <div className="space-y-6">
-          {/* Driver Load Analysis */}
+          {}
           <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Users className="h-5 w-5 mr-2" />
@@ -656,7 +651,7 @@ const TestingDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Vehicle Distribution Analysis */}
+          {}
           {vehicleAnalysis && (
             <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
@@ -717,7 +712,7 @@ const TestingDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Create Scenario Modal */}
+      {}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -728,7 +723,7 @@ const TestingDashboard: React.FC = () => {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Basic Info */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -782,7 +777,7 @@ const TestingDashboard: React.FC = () => {
                 </label>
               </div>
 
-              {/* Parameters */}
+              {}
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium text-white">
@@ -874,7 +869,7 @@ const TestingDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
+            {}
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -895,7 +890,7 @@ const TestingDashboard: React.FC = () => {
         </div>
       )}
 
-       {/* Manual Parameter Modal */}
+       {}
        {showParameterModal && (
          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">

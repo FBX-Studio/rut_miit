@@ -90,7 +90,6 @@ const VisualizationPanel: React.FC = () => {
   useEffect(() => {
     fetchVisualizationData();
     
-    // Обновляем данные каждые 2 минуты
     const interval = setInterval(fetchVisualizationData, 120000);
     return () => clearInterval(interval);
   }, [selectedTimeRange]);
@@ -98,7 +97,6 @@ const VisualizationPanel: React.FC = () => {
   const fetchVisualizationData = async () => {
     setLoading(true);
     try {
-      // Генерируем демонстрационные данные
       generateDemoData();
     } catch (error) {
       console.error('Error fetching visualization data:', error);
@@ -108,7 +106,6 @@ const VisualizationPanel: React.FC = () => {
   };
 
   const generateDemoData = () => {
-    // Генерация данных маршрутов
     const routes: RouteMetrics[] = [];
     const algorithms = ['nearest_neighbor', 'genetic', 'simulated_annealing'];
     
@@ -126,7 +123,6 @@ const VisualizationPanel: React.FC = () => {
     }
     setRouteMetrics(routes);
 
-    // Генерация данных сравнения
     const comparison: ComparisonData[] = [
       {
         metric: 'Общее расстояние',
@@ -173,7 +169,6 @@ const VisualizationPanel: React.FC = () => {
     ];
     setComparisonData(comparison);
 
-    // Генерация данных тепловой карты
     const heatmap: HeatmapData[] = [];
     const zones = ['Центр', 'Север', 'Юг', 'Восток', 'Запад'];
     
@@ -189,7 +184,6 @@ const VisualizationPanel: React.FC = () => {
     }
     setHeatmapData(heatmap);
 
-    // Генерация данных производительности
     const performance: PerformanceMetrics[] = [];
     const now = new Date();
     
@@ -248,7 +242,7 @@ const VisualizationPanel: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -283,9 +277,9 @@ const VisualizationPanel: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Performance Overview */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Route Performance Chart */}
+        {}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -380,7 +374,7 @@ const VisualizationPanel: React.FC = () => {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Algorithm Comparison */}
+        {}
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -430,7 +424,7 @@ const VisualizationPanel: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Comparison Table */}
+      {}
       <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
         <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6 flex items-center">
           <Activity className="h-5 w-5 mr-2 text-indigo-400" />
@@ -503,9 +497,9 @@ const VisualizationPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Heatmap and Distribution */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Zone Distribution */}
+        {}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -555,7 +549,7 @@ const VisualizationPanel: React.FC = () => {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Delivery Time Heatmap */}
+        {}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -609,7 +603,7 @@ const VisualizationPanel: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Route Efficiency Trends */}
+      {}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -671,7 +665,7 @@ const VisualizationPanel: React.FC = () => {
         </ResponsiveContainer>
       </motion.div>
 
-      {/* Summary Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <div className="flex items-center">

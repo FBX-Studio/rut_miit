@@ -14,19 +14,15 @@ interface TimeWindowData {
   customerId: number;
   customerName: string;
   
-  // Заявленное время из заявки
   declaredStart: string;
   declaredEnd: string;
   
-  // Реальное время работы
   actualStart: string;
   actualEnd: string;
   
-  // Время обеда
   lunchStart?: string;
   lunchEnd?: string;
   
-  // Метаданные
   lastUpdated?: string;
   updatedBy?: string;
   discrepancyDetected: boolean;
@@ -125,7 +121,7 @@ export const TimeWindowEditor: React.FC<TimeWindowEditorProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Alert о расхождении */}
+        {}
         {hasDiscrepancy() && (
           <Alert variant="warning">
             <AlertTriangle className="h-4 w-4" />
@@ -137,7 +133,7 @@ export const TimeWindowEditor: React.FC<TimeWindowEditorProps> = ({
           </Alert>
         )}
 
-        {/* Заявленное время */}
+        {}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-blue-500"></div>
@@ -171,7 +167,7 @@ export const TimeWindowEditor: React.FC<TimeWindowEditorProps> = ({
 
         <Separator />
 
-        {/* Реальное время */}
+        {}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
@@ -207,7 +203,7 @@ export const TimeWindowEditor: React.FC<TimeWindowEditorProps> = ({
 
         <Separator />
 
-        {/* Время обеда */}
+        {}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-amber-500"></div>
@@ -241,7 +237,7 @@ export const TimeWindowEditor: React.FC<TimeWindowEditorProps> = ({
           </div>
         </div>
 
-        {/* Информация о последнем обновлении */}
+        {}
         {customer.lastUpdated && (
           <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

@@ -1,13 +1,12 @@
-// Тестовые данные для симуляции маршрута водителя
 export interface SimulationRoutePoint {
   id: string;
   name: string;
-  coordinates: [number, number]; // [latitude, longitude]
+  coordinates: [number, number];
   type: 'depot' | 'pickup' | 'delivery' | 'waypoint';
   address: string;
   estimatedArrival?: string;
   actualArrival?: string;
-  serviceTime: number; // в минутах
+  serviceTime: number;
   status: 'pending' | 'in_progress' | 'completed' | 'delayed';
   orderInfo?: {
     orderId: string;
@@ -25,7 +24,7 @@ export interface SimulationDriver {
   currentLocation: [number, number];
   status: 'idle' | 'driving' | 'loading' | 'delivering' | 'break';
   route: SimulationRoutePoint[];
-  routeGeometry?: [number, number][]; // Геометрия маршрута по дорогам
+  routeGeometry?: [number, number][];
   completedStops: number;
   totalStops: number;
   startTime: string;
@@ -33,23 +32,22 @@ export interface SimulationDriver {
 }
 
 export interface SimulationMetrics {
-  totalDistance: number; // в км
-  totalTime: number; // в минутах
-  averageSpeed: number; // км/ч
-  fuelConsumption: number; // литры
+  totalDistance: number;
+  totalTime: number;
+  averageSpeed: number;
+  fuelConsumption: number;
   deliveriesCompleted: number;
   deliveriesTotal: number;
-  efficiency: number; // процент
-  customerSatisfaction: number; // процент
+  efficiency: number;
+  customerSatisfaction: number;
 }
 
-// Тестовые данные для симуляции в Москве
 export const mockSimulationData: SimulationDriver = {
   id: 'driver_001',
   name: 'Иван Петров',
   vehicleId: 'vehicle_001',
   vehicleType: 'Газель Next',
-  currentLocation: [55.7558, 37.6176], // Красная площадь (начальная точка)
+  currentLocation: [55.7558, 37.6176],
   status: 'driving',
   startTime: '09:00',
   estimatedEndTime: '17:30',
@@ -59,7 +57,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'depot',
       name: 'Склад-депо',
-      coordinates: [55.7558, 37.6176], // Красная площадь
+      coordinates: [55.7558, 37.6176],
       type: 'depot',
       address: 'Красная площадь, 1, Москва',
       estimatedArrival: '09:00',
@@ -70,7 +68,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'pickup_001',
       name: 'Забор товара',
-      coordinates: [55.7522, 37.6156], // Большой театр
+      coordinates: [55.7522, 37.6156],
       type: 'pickup',
       address: 'Театральная площадь, 1, Москва',
       estimatedArrival: '09:45',
@@ -87,7 +85,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'delivery_001',
       name: 'Доставка №1',
-      coordinates: [55.7539, 37.6208], // ГУМ
+      coordinates: [55.7539, 37.6208],
       type: 'delivery',
       address: 'Красная площадь, 3, ГУМ, Москва',
       estimatedArrival: '10:15',
@@ -104,7 +102,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'delivery_002',
       name: 'Доставка №2',
-      coordinates: [55.7617, 37.6063], // Тверская улица
+      coordinates: [55.7617, 37.6063],
       type: 'delivery',
       address: 'Тверская улица, 15, Москва',
       estimatedArrival: '11:00',
@@ -121,7 +119,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'delivery_003',
       name: 'Доставка №3',
-      coordinates: [55.7504, 37.6174], // Манежная площадь
+      coordinates: [55.7504, 37.6174],
       type: 'delivery',
       address: 'Манежная площадь, 1, Москва',
       estimatedArrival: '11:45',
@@ -138,7 +136,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'delivery_004',
       name: 'Доставка №4',
-      coordinates: [55.7423, 37.6156], // Замоскворечье
+      coordinates: [55.7423, 37.6156],
       type: 'delivery',
       address: 'Пятницкая улица, 25, Москва',
       estimatedArrival: '12:30',
@@ -155,7 +153,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'delivery_005',
       name: 'Доставка №5',
-      coordinates: [55.7687, 37.6947], // Сокольники
+      coordinates: [55.7687, 37.6947],
       type: 'delivery',
       address: 'Сокольническая площадь, 4, Москва',
       estimatedArrival: '13:45',
@@ -172,7 +170,7 @@ export const mockSimulationData: SimulationDriver = {
     {
       id: 'return_depot',
       name: 'Возврат на склад',
-      coordinates: [55.7558, 37.6176], // Красная площадь
+      coordinates: [55.7558, 37.6176],
       type: 'depot',
       address: 'Красная площадь, 1, Москва',
       estimatedArrival: '15:30',
@@ -185,7 +183,7 @@ export const mockSimulationData: SimulationDriver = {
 
 export const mockSimulationMetrics: SimulationMetrics = {
   totalDistance: 45.2,
-  totalTime: 510, // 8.5 часов
+  totalTime: 510,
   averageSpeed: 28.5,
   fuelConsumption: 12.8,
   deliveriesCompleted: 2,
@@ -194,7 +192,6 @@ export const mockSimulationMetrics: SimulationMetrics = {
   customerSatisfaction: 92.3
 };
 
-// Функция для генерации промежуточных точек маршрута (для анимации)
 export const generateRouteAnimation = (
   start: [number, number],
   end: [number, number],
@@ -212,12 +209,11 @@ export const generateRouteAnimation = (
   return points;
 };
 
-// Функция для расчета реального расстояния между точками (формула гаверсинусов)
 export const calculateDistance = (
   point1: [number, number],
   point2: [number, number]
 ): number => {
-  const R = 6371; // Радиус Земли в км
+  const R = 6371;
   const dLat = toRadians(point2[0] - point1[0]);
   const dLon = toRadians(point2[1] - point1[1]);
   
@@ -235,14 +231,12 @@ const toRadians = (degrees: number): number => {
   return degrees * (Math.PI / 180);
 };
 
-// Функция для обновления позиции водителя в реальном времени
 export const updateDriverPosition = (
   driver: SimulationDriver,
-  elapsedTime: number // в секундах
+  elapsedTime: number
 ): SimulationDriver => {
   const updatedDriver = { ...driver };
   
-  // Найти текущий сегмент маршрута
   const currentStopIndex = driver.completedStops;
   const nextStop = driver.route[currentStopIndex + 1];
   
@@ -250,7 +244,6 @@ export const updateDriverPosition = (
     const currentStop = driver.route[currentStopIndex];
     const progress = Math.min(elapsedTime / (nextStop.serviceTime * 60), 1);
     
-    // Интерполяция позиции между текущей и следующей точкой
     const lat = currentStop.coordinates[0] + 
       (nextStop.coordinates[0] - currentStop.coordinates[0]) * progress;
     const lng = currentStop.coordinates[1] + 
@@ -258,7 +251,6 @@ export const updateDriverPosition = (
     
     updatedDriver.currentLocation = [lat, lng];
     
-    // Если достиг следующей точки
     if (progress >= 1) {
       updatedDriver.completedStops += 1;
       updatedDriver.status = 'delivering';
@@ -273,12 +265,9 @@ export const updateDriverPosition = (
   return updatedDriver;
 };
 
-// Глобальная переменная для хранения ID интервала анимации
 let animationInterval: NodeJS.Timeout | null = null;
 
-// Функция для запуска анимации маршрута
 export const startRouteAnimation = (driver: SimulationDriver): void => {
-  // Останавливаем предыдущую анимацию если она была
   if (animationInterval) {
     clearInterval(animationInterval);
   }
@@ -286,10 +275,8 @@ export const startRouteAnimation = (driver: SimulationDriver): void => {
   let currentIndex = 0;
   const totalPoints = driver.route.length;
   
-  // Обновляем позицию каждые 2 секунды
   animationInterval = setInterval(() => {
     if (currentIndex >= totalPoints) {
-      // Анимация завершена
       clearInterval(animationInterval!);
       animationInterval = null;
       return;
@@ -297,11 +284,9 @@ export const startRouteAnimation = (driver: SimulationDriver): void => {
 
     const currentPoint = driver.route[currentIndex];
     
-    // Обновляем текущую позицию водителя
     driver.currentLocation = currentPoint.coordinates;
     driver.status = currentPoint.type === 'delivery' ? 'delivering' : 'driving';
     
-    // Создаем событие для системы
     const event = {
       timestamp: new Date().toISOString(),
       type: currentPoint.type === 'delivery' ? 'delivery_complete' : 'route_progress',
@@ -312,16 +297,14 @@ export const startRouteAnimation = (driver: SimulationDriver): void => {
       location: currentPoint
     };
 
-    // Отправляем событие в глобальный обработчик (если есть)
     if (typeof window !== 'undefined' && (window as any).simulationEventHandler) {
       (window as any).simulationEventHandler(event);
     }
 
     currentIndex++;
-  }, 2000); // Обновление каждые 2 секунды
+  }, 2000);
 };
 
-// Функция для остановки анимации маршрута
 export const stopRouteAnimation = (): void => {
   if (animationInterval) {
     clearInterval(animationInterval);

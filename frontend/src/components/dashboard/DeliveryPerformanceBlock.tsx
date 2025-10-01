@@ -20,7 +20,7 @@ interface PerformanceData {
   successful_deliveries: number;
   delayed_deliveries: number;
   cancelled_deliveries: number;
-  average_delivery_time: number; // в минутах
+  average_delivery_time: number;
   on_time_percentage: number;
   customer_satisfaction: number;
 }
@@ -30,7 +30,6 @@ interface DeliveryPerformanceBlockProps {
   onDetailedView?: () => void;
 }
 
-// Mock data for demonstration
 const mockPerformanceData: { [key: string]: PerformanceData } = {
   'day': {
     period: 'Сегодня',
@@ -114,7 +113,7 @@ export const DeliveryPerformanceBlock = ({
 
   return (
     <div className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm border border-gray-200 dark:border-gray-700 ${className}`}>
-      {/* Header */}
+      {}
       <div className="p-6 border-b border-indigo-500/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -151,7 +150,7 @@ export const DeliveryPerformanceBlock = ({
       </div>
 
       <div className="p-6">
-        {/* Key Metrics */}
+        {}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
@@ -202,9 +201,9 @@ export const DeliveryPerformanceBlock = ({
           </div>
         </div>
 
-        {/* Charts Section */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Trend Chart */}
+          {}
           <div>
             <h3 className="text-sm font-semibold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-4">
               Динамика доставок
@@ -264,7 +263,7 @@ export const DeliveryPerformanceBlock = ({
             </div>
           </div>
 
-          {/* Performance Distribution */}
+          {}
           <div>
             <h3 className="text-sm font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
               Распределение результатов
@@ -331,7 +330,7 @@ export const DeliveryPerformanceBlock = ({
           </div>
         </div>
 
-        {/* Performance Indicators */}
+        {}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <Target className="h-6 w-6 text-green-400" />

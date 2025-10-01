@@ -32,8 +32,8 @@ export interface Event {
     longitude: number;
     address?: string;
   };
-  estimated_delay?: number; // minutes
-  actual_delay?: number; // minutes
+  estimated_delay?: number;
+  actual_delay?: number;
   resolution_notes?: string;
   resolved_by?: string;
   resolved_at?: string;
@@ -85,7 +85,7 @@ export interface EventStats {
   recent_events_count: number;
   critical_events_count: number;
   unresolved_events_count: number;
-  average_resolution_time: number; // minutes
+  average_resolution_time: number;
 }
 
 interface EventsState {
@@ -137,7 +137,6 @@ const initialState: EventsState = {
   },
 };
 
-// Async thunks
 export const fetchEvents = createAsyncThunk(
   'events/fetchEvents',
   async (params?: EventFilter & { page?: number; limit?: number }) => {
@@ -358,22 +357,18 @@ const eventsSlice = createSlice({
     addRealTimeEvent: (state, action: PayloadAction<Event>) => {
       const newEvent = action.payload;
       
-      // Add to real-time events (keep only last 100)
       state.realTimeEvents.unshift(newEvent);
       if (state.realTimeEvents.length > 100) {
         state.realTimeEvents = state.realTimeEvents.slice(0, 100);
       }
       
-      // Add to main events list if it matches current filters
       state.events.unshift(newEvent);
       
-      // Add to recent events (keep only last 20)
       state.recentEvents.unshift(newEvent);
       if (state.recentEvents.length > 20) {
         state.recentEvents = state.recentEvents.slice(0, 20);
       }
       
-      // Add to critical events if critical
       if (newEvent.severity === 'critical' || newEvent.severity === 'error') {
         state.criticalEvents.unshift(newEvent);
         if (state.criticalEvents.length > 50) {
@@ -381,22 +376,18 @@ const eventsSlice = createSlice({
         }
       }
       
-      // Update notifications
       state.notifications.count += 1;
       state.notifications.lastEventId = newEvent.id;
       
-      // Auto-show notifications for critical events
       if (newEvent.severity === 'critical') {
         state.notifications.show = true;
       }
       
-      // Update pagination total
       state.pagination.total += 1;
     },
     updateEventRealtime: (state, action: PayloadAction<Partial<Event> & { id: number }>) => {
       const { id, ...updates } = action.payload;
       
-      // Update in all arrays
       const updateEventInArray = (events: Event[]) => {
         const eventIndex = events.findIndex(event => event.id === id);
         if (eventIndex !== -1) {
@@ -409,12 +400,10 @@ const eventsSlice = createSlice({
       updateEventInArray(state.criticalEvents);
       updateEventInArray(state.realTimeEvents);
       
-      // Update selected event if it matches
       if (state.selectedEvent?.id === id) {
         state.selectedEvent = { ...state.selectedEvent, ...updates };
       }
       
-      // Remove from critical events if resolved
       if (updates.status === 'resolved' || updates.status === 'ignored') {
         state.criticalEvents = state.criticalEvents.filter(event => event.id !== id);
       }
@@ -487,7 +476,6 @@ const eventsSlice = createSlice({
       updateStatus(state.recentEvents);
       updateStatus(state.realTimeEvents);
       
-      // Remove from critical events
       state.criticalEvents = state.criticalEvents.filter(event => !eventIds.includes(event.id));
       
       if (state.selectedEvent && eventIds.includes(state.selectedEvent.id)) {
@@ -500,7 +488,6 @@ const eventsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch events
       .addCase(fetchEvents.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -518,17 +505,14 @@ const eventsSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch events';
       })
       
-      // Fetch recent events
       .addCase(fetchRecentEvents.fulfilled, (state, action) => {
         state.recentEvents = action.payload;
       })
       
-      // Fetch critical events
       .addCase(fetchCriticalEvents.fulfilled, (state, action) => {
         state.criticalEvents = action.payload.items || action.payload;
       })
       
-      // Fetch event by ID
       .addCase(fetchEventById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -537,7 +521,6 @@ const eventsSlice = createSlice({
         state.loading = false;
         state.selectedEvent = action.payload;
         
-        // Update in events array if exists
         const eventIndex = state.events.findIndex(event => event.id === action.payload.id);
         if (eventIndex !== -1) {
           state.events[eventIndex] = action.payload;
@@ -548,7 +531,6 @@ const eventsSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch event';
       })
       
-      // Create event
       .addCase(createEvent.pending, (state) => {
         state.creating = true;
         state.error = null;
@@ -572,7 +554,6 @@ const eventsSlice = createSlice({
         state.error = action.error.message || 'Failed to create event';
       })
       
-      // Update event
       .addCase(updateEvent.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -582,7 +563,6 @@ const eventsSlice = createSlice({
         
         const updatedEvent = action.payload;
         
-        // Update in all arrays
         const updateEventInArray = (events: Event[]) => {
           const eventIndex = events.findIndex(event => event.id === updatedEvent.id);
           if (eventIndex !== -1) {
@@ -599,7 +579,6 @@ const eventsSlice = createSlice({
           state.selectedEvent = updatedEvent;
         }
         
-        // Remove from critical events if resolved
         if (updatedEvent.status === 'resolved' || updatedEvent.status === 'ignored') {
           state.criticalEvents = state.criticalEvents.filter(event => event.id !== updatedEvent.id);
         }
@@ -609,7 +588,6 @@ const eventsSlice = createSlice({
         state.error = action.error.message || 'Failed to update event';
       })
       
-      // Acknowledge event
       .addCase(acknowledgeEvent.fulfilled, (state, action) => {
         const updatedEvent = action.payload;
         
@@ -630,7 +608,6 @@ const eventsSlice = createSlice({
         }
       })
       
-      // Resolve event
       .addCase(resolveEvent.fulfilled, (state, action) => {
         const resolvedEvent = action.payload;
         
@@ -645,7 +622,6 @@ const eventsSlice = createSlice({
         updateEventInArray(state.recentEvents);
         updateEventInArray(state.realTimeEvents);
         
-        // Remove from critical events
         state.criticalEvents = state.criticalEvents.filter(event => event.id !== resolvedEvent.id);
         
         if (state.selectedEvent?.id === resolvedEvent.id) {
@@ -653,7 +629,6 @@ const eventsSlice = createSlice({
         }
       })
       
-      // Bulk update events
       .addCase(bulkUpdateEvents.fulfilled, (state, action) => {
         const updatedEvents = action.payload;
         
@@ -676,12 +651,10 @@ const eventsSlice = createSlice({
         });
       })
       
-      // Fetch event stats
       .addCase(fetchEventStats.fulfilled, (state, action) => {
         state.stats = action.payload;
       })
       
-      // Delete event
       .addCase(deleteEvent.fulfilled, (state, action) => {
         const eventId = action.payload;
         

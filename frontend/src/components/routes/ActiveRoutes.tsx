@@ -47,14 +47,12 @@ export const ActiveRoutes = ({
 }: ActiveRoutesProps) => {
   const [localRoutes, setLocalRoutes] = useState<RouteData[]>(routes);
 
-  // Update local routes when props change
   useEffect(() => {
     if (JSON.stringify(localRoutes) !== JSON.stringify(routes)) {
       setLocalRoutes(routes);
     }
   }, [routes, localRoutes]);
 
-  // Listen for real-time route updates
   useRouteUpdates(useCallback((data) => {
     setLocalRoutes(prev => 
       prev.map(route => 
@@ -166,7 +164,7 @@ export const ActiveRoutes = ({
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
             onClick={() => onRouteSelect?.(route.id)}
           >
-            {/* Route header */}
+            {}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
@@ -195,7 +193,7 @@ export const ActiveRoutes = ({
               )}
             </div>
 
-            {/* Vehicle and driver info */}
+            {}
             <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center space-x-1">
                 <Truck className="h-4 w-4" />
@@ -207,7 +205,7 @@ export const ActiveRoutes = ({
               </div>
             </div>
 
-            {/* Progress bar */}
+            {}
             <div className="mb-3">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-600 dark:text-gray-400">
@@ -229,7 +227,7 @@ export const ActiveRoutes = ({
               </div>
             </div>
 
-            {/* Next stop info */}
+            {}
             {route.next_stop && route.status === 'active' && (
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 mb-3">
                 <div className="flex items-center justify-between mb-1">
@@ -252,7 +250,7 @@ export const ActiveRoutes = ({
               </div>
             )}
 
-            {/* Route metrics */}
+            {}
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-600 dark:text-gray-400">Расстояние:</span>

@@ -22,7 +22,6 @@ import { SimulationDriver, SimulationRoutePoint, mockSimulationData, updateDrive
 import { getSimulationService } from '@/services/realTimeSimulation';
 import { toast } from 'react-hot-toast';
 
-// Declare global ymaps type
 declare global {
   interface Window {
     ymaps: any;
@@ -33,14 +32,14 @@ interface SimulationMapProps {
   className?: string;
   initialDriver?: SimulationDriver;
   onDriverUpdate?: (driver: SimulationDriver) => void;
-  averageSpeed?: number; // км/ч - средняя скорость из сценария
+  averageSpeed?: number;
 }
 
 const SimulationMap: React.FC<SimulationMapProps> = ({ 
   className = '', 
   initialDriver,
   onDriverUpdate,
-  averageSpeed = 40 // по умолчанию 40 км/ч
+  averageSpeed = 40
 }) => {
   const [driver, setDriver] = useState<SimulationDriver>(initialDriver || mockSimulationData);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +47,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
   useEffect(() => {
     if (initialDriver) {
       setDriver(initialDriver);
-      // Сбрасываем симуляцию
       setIsPlaying(false);
       setElapsedTime(0);
       setCurrentSegmentIndex(0);
@@ -107,7 +105,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       }
     };
 
-    // Регистрируем глобальный обработчик
     if (typeof window !== 'undefined') {
       (window as any).simulationEventHandler = handleSimulationEvent;
     }
@@ -148,12 +145,10 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         const data = await response.json();
         
         if (data.geometry && data.geometry.length > 0) {
-          // Конвертируем в формат [lat, lng]
           const coords: [number, number][] = data.geometry.map((coord: number[]) => [coord[0], coord[1]]);
           setRouteGeometry(coords);
           console.log('Route geometry built via API with', coords.length, 'points');
           
-          // Показываем информацию о маршруте если доступна
           if (data.distance > 0) {
             console.log('Route distance:', data.distance, 'km');
             console.log('Route duration:', data.duration, 'min');
@@ -162,34 +157,29 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
             }
           }
         } else {
-          // Fallback на прямые линии
           const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
           setRouteGeometry(coords);
           console.log('Using direct lines (API returned empty geometry)');
         }
       } else {
-        // Fallback при ошибке API
         const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
         setRouteGeometry(coords);
         console.log('Using direct lines (API error)');
       }
     } catch (error) {
-      // Fallback при ошибке сети
       console.warn('Failed to build route via API, using direct lines:', error);
       const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
       setRouteGeometry(coords);
     }
   }, [driver.route, driver.routeGeometry]);
 
-  // Построить маршрут при загрузке
   useEffect(() => {
     buildRouteGeometry();
   }, [buildRouteGeometry]);
 
-  // Симуляция случайных задержек
   const simulateRandomDelay = () => {
-    if (Math.random() < 0.15) { // 15% шанс задержки
-      const delayMinutes = Math.floor(Math.random() * 10) + 5; // 5-15 минут
+    if (Math.random() < 0.15) {
+      const delayMinutes = Math.floor(Math.random() * 10) + 5;
       const reasons = [
         'Пробка на дороге',
         'Ожидание клиента',
@@ -321,7 +311,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
 
   const handlePlayPause = () => {
     if (!isPlaying && elapsedTime === 0) {
-      // Начинаем новую симуляцию
       startTimeRef.current = Date.now();
     }
     setIsPlaying(!isPlaying);
@@ -354,7 +343,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     setIsOptimizing(true);
     setOriginalRoute([...driver.route]);
     
-    // Запускаем симуляцию прогресса оптимизации
     setOptimizationProgress({
       isOptimizing: true,
       currentMetric: 'Анализ маршрута...',
@@ -362,7 +350,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       estimatedTimeRemaining: 15
     });
 
-    // Симулируем этапы оптимизации
     const optimizationSteps = [
       { metric: 'Анализ маршрута...', duration: 2000, progress: 20 },
       { metric: 'Расчет расстояний...', duration: 2000, progress: 40 },
@@ -371,7 +358,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       { metric: 'Финализация...', duration: 1000, progress: 100 }
     ];
 
-    // Запускаем последовательность этапов
     for (const step of optimizationSteps) {
       await new Promise(resolve => setTimeout(resolve, step.duration));
       setOptimizationProgress({
@@ -383,7 +369,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     }
 
     try {
-      // Симуляция вызова API оптимизации
       const response = await fetch('/api/v1/routes/optimize-simulation', {
         method: 'POST',
         headers: {
@@ -404,13 +389,10 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         })
       });
 
-      // Если API не доступен, создаем симуляцию оптимизации
       let optimizedData;
       if (!response.ok) {
-        // Симулируем оптимизацию локально
         const remainingStops = driver.route.slice(driver.completedStops + 1);
         const optimizedStops = [...remainingStops].sort((a, b) => {
-          // Простая эвристика: сортировка по близости
           const distA = Math.abs(a.coordinates[0] - driver.currentLocation[0]) + 
                        Math.abs(a.coordinates[1] - driver.currentLocation[1]);
           const distB = Math.abs(b.coordinates[0] - driver.currentLocation[0]) + 
@@ -419,7 +401,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         });
 
         const originalTime = remainingStops.reduce((acc, stop) => acc + stop.serviceTime + 15, 0);
-        const optimizedTime = originalTime * 0.75; // 25% экономии
+        const optimizedTime = originalTime * 0.75;
         
         optimizedData = {
           optimized_route: optimizedStops,
@@ -440,7 +422,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       setOptimizationResult(optimizedData);
       setShowOptimization(true);
       
-      // Сбрасываем прогресс
       setOptimizationProgress({
         isOptimizing: false,
         currentMetric: '',
@@ -454,7 +435,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     } catch (error) {
       console.error('Optimization error:', error);
       
-      // Сбрасываем прогресс при ошибке
       setOptimizationProgress({
         isOptimizing: false,
         currentMetric: '',
@@ -471,7 +451,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
   const handleApplyOptimization = () => {
     if (!optimizationResult) return;
 
-    // Применяем оптимизированный маршрут
     const newRoute = [
       ...driver.route.slice(0, driver.completedStops + 1),
       ...optimizationResult.optimized_route
@@ -482,11 +461,9 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
       route: newRoute
     });
 
-    // Добавляем сэкономленное время
     const timeSaved = optimizationResult.time_saved || 0;
     setTotalTimeSaved(prev => prev + timeSaved);
 
-    // Перестраиваем маршрут
     buildRouteGeometry();
 
     toast.success(`✅ Оптимизация применена! Экономия: ${Math.round(timeSaved)} мин`, {
@@ -533,12 +510,11 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
     }
   };
 
-  // Создание маршрутной линии
   const routeCoordinates = driver.route.map(stop => stop.coordinates);
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg ${className}`}>
-      {/* Панель управления */}
+      {}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -551,7 +527,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
           </div>
         </div>
 
-        {/* Кнопки управления */}
+        {}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <button
@@ -592,7 +568,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
             </button>
           </div>
 
-          {/* Скорость симуляции */}
+          {}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">Скорость:</span>
             {[1, 2, 4].map(speed => (
@@ -610,7 +586,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
             ))}
           </div>
 
-          {/* Следование за водителем */}
+          {}
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -624,7 +600,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
           </label>
         </div>
 
-        {/* Прогресс */}
+        {}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -643,7 +619,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         </div>
       </div>
 
-      {/* Карта */}
+      {}
       <div className="h-96 relative">
         <YandexMapWrapper
           center={mapCenter}
@@ -656,7 +632,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
           }] : []}
           onRouteBuilt={handleRouteBuilt}
           markers={[
-            // Остановки маршрута
             ...driver.route.map((stop, index) => ({
               coordinates: stop.coordinates as [number, number],
               color: getStopColor(stop.status),
@@ -677,7 +652,6 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
                 </div>
               `
             })),
-            // Текущая позиция водителя
             {
               coordinates: driver.currentLocation as [number, number],
               color: '#10B981',
@@ -702,7 +676,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         />
       </div>
 
-      {/* Модальное окно оптимизации */}
+      {}
       {showOptimization && optimizationResult && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -725,7 +699,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Ключевые показатели экономии */}
+              {}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border-2 border-green-200 dark:border-green-800">
                   <div className="flex items-center justify-center mb-2">
@@ -764,7 +738,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
                 </div>
               </div>
 
-              {/* Детальное сравнение */}
+              {}
               <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                   <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
@@ -812,7 +786,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
                 </div>
               </div>
 
-              {/* Список остановок */}
+              {}
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
                   Новый порядок остановок
@@ -842,7 +816,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
               </div>
             </div>
 
-            {/* Кнопки действий */}
+            {}
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex space-x-3">
               <button
                 onClick={handleRejectOptimization}
@@ -862,7 +836,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         </div>
       )}
 
-      {/* Прогресс оптимизации (overlay поверх карты) */}
+      {}
       {optimizationProgress.isOptimizing && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-20">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
@@ -878,7 +852,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
               </p>
             </div>
 
-            {/* Прогресс-бар */}
+            {}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -898,7 +872,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
               </div>
             </div>
 
-            {/* Оставшееся время */}
+            {}
             <div className="flex items-center justify-center text-sm text-gray-600 dark:text-gray-400">
               <Clock className="w-4 h-4 mr-2" />
               <span>
@@ -909,7 +883,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
         </div>
       )}
 
-      {/* Информационная панель */}
+      {}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center">
@@ -924,7 +898,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
             </div>
           </div>
 
-          {/* Потерянное время */}
+          {}
           {totalTimeLost > 0 && (
             <div className="text-center bg-red-50 dark:bg-red-900/20 rounded-lg p-2">
               <div className="flex items-center justify-center mb-1">
@@ -942,7 +916,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
             </div>
           )}
 
-          {/* Сэкономленное время */}
+          {}
           {totalTimeSaved > 0 && (
             <div className="text-center bg-green-50 dark:bg-green-900/20 rounded-lg p-2">
               <div className="flex items-center justify-center mb-1">
@@ -997,7 +971,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({
           </div>
         </div>
 
-        {/* Последние события (задержки) */}
+        {}
         {delays.length > 0 && (
           <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
             <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">

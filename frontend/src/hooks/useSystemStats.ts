@@ -33,7 +33,7 @@ export const useSystemStats = () => {
     `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/monitoring/stats`,
     fetcher,
     {
-      refreshInterval: 30000, // Refresh every 30 seconds
+      refreshInterval: 30000,
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
       errorRetryCount: 3,

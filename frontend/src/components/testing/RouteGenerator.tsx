@@ -70,7 +70,7 @@ const RouteGenerator: React.FC = () => {
       const firstStop = routeData.stops[0];
       return [firstStop.coordinates.lat, firstStop.coordinates.lng];
     }
-    return [55.7558, 37.6176]; // Москва по умолчанию
+    return [55.7558, 37.6176];
   };
 
   const getStopIcon = (type: string) => {
@@ -101,7 +101,7 @@ const RouteGenerator: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Заголовок */}
+      {}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
         <div className="flex items-center space-x-3">
           <div className="p-3 bg-white/20 rounded-lg">
@@ -116,7 +116,7 @@ const RouteGenerator: React.FC = () => {
         </div>
       </div>
 
-      {/* Управление */}
+      {}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
         <div className="flex items-end space-x-4">
           <div className="flex-1">
@@ -162,7 +162,7 @@ const RouteGenerator: React.FC = () => {
         )}
       </div>
 
-      {/* Карта */}
+      {}
       {routeData && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
           <div className="h-[600px]">
@@ -206,7 +206,7 @@ const RouteGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Информация о маршруте */}
+      {}
       {routeData && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
@@ -260,7 +260,7 @@ const RouteGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Список остановок */}
+      {}
       {routeData && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">

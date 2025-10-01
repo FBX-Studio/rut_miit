@@ -41,7 +41,6 @@ interface EnhancedYandexMapProps {
   realTimeUpdates?: boolean;
 }
 
-// Цвета для маршрутов
 const ROUTE_COLORS = [
   '#3B82F6', // blue
   '#10B981', // green
@@ -51,7 +50,6 @@ const ROUTE_COLORS = [
   '#06B6D4', // cyan
 ];
 
-// Цвета статусов
 const STATUS_COLORS = {
   pending: '#9CA3AF',
   in_progress: '#3B82F6',
@@ -59,7 +57,6 @@ const STATUS_COLORS = {
   failed: '#EF4444',
 };
 
-// Иконки для остановок
 const STOP_ICONS = {
   depot: '🏢',
   delivery: '📦',
@@ -68,7 +65,7 @@ const STOP_ICONS = {
 
 export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
   routes,
-  center = [55.7558, 37.6176], // Moscow
+  center = [55.7558, 37.6176],
   zoom = 11,
   showTraffic = true,
   showDriverLocation = true,
@@ -82,7 +79,6 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
   const [trafficControl, setTrafficControl] = useState<any>(null);
   const mapRef = useRef<any>(null);
 
-  // Обработка клика на остановку
   const handleStopClick = useCallback((stop: RouteStop) => {
     setSelectedStop(stop);
     if (onStopClick) {
@@ -90,7 +86,6 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
     }
   }, [onStopClick]);
 
-  // Переход к маршруту
   const focusOnRoute = useCallback((route: DriverRoute) => {
     if (!mapInstance) return;
 
@@ -111,12 +106,10 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
     setSelectedRoute(route.id);
   }, [mapInstance]);
 
-  // Получение координат маршрута для линии
   const getRouteCoordinates = (route: DriverRoute): [number, number][] => {
     return route.stops.map(stop => [stop.location.latitude, stop.location.longitude]);
   };
 
-  // Создание контента для балуна остановки
   const createStopBalloonContent = (stop: RouteStop, route: DriverRoute) => {
     return `
       <div style="padding: 12px; min-width: 250px;">
@@ -167,7 +160,6 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
     `;
   };
 
-  // Управление отображением пробок
   useEffect(() => {
     if (!mapInstance || !trafficControl) return;
 
@@ -178,14 +170,12 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
     }
   }, [trafficVisible, mapInstance, trafficControl]);
 
-  // Real-time обновления позиций
   useEffect(() => {
     if (!realTimeUpdates) return;
 
     const interval = setInterval(() => {
-      // Здесь должна быть логика получения real-time позиций от backend
       console.log('Updating driver positions...');
-    }, 5000); // Обновление каждые 5 секунд
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [realTimeUpdates]);
@@ -199,7 +189,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
         }}
       >
         <div className="relative w-full h-full">
-          {/* Карта */}
+          {}
           <Map
             defaultState={{
               center,
@@ -215,7 +205,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
               suppressMapOpenBlock: true,
             }}
           >
-            {/* Контролы */}
+            {}
             <ZoomControl options={{ float: 'right' }} />
             <GeolocationControl options={{ float: 'left' }} />
             <TrafficControl 
@@ -230,10 +220,10 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
               }}
             />
 
-            {/* Маршруты */}
+            {}
             {routes.map((route, index) => (
               <React.Fragment key={route.id}>
-                {/* Линия маршрута */}
+                {}
                 <Polyline
                   geometry={getRouteCoordinates(route)}
                   options={{
@@ -247,7 +237,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
                   onClick={() => setSelectedRoute(route.id)}
                 />
 
-                {/* Остановки */}
+                {}
                 {route.stops.map((stop, stopIndex) => (
                   <Placemark
                     key={`${route.id}-${stop.id}`}
@@ -271,7 +261,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
                   />
                 ))}
 
-                {/* Текущая позиция водителя */}
+                {}
                 {showDriverLocation && route.currentLocation && route.status === 'in_progress' && (
                   <Placemark
                     geometry={[
@@ -292,7 +282,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
             ))}
           </Map>
 
-          {/* Панель управления картой */}
+          {}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -303,7 +293,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
               Управление картой
             </h3>
 
-            {/* Переключатель пробок */}
+            {}
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -316,7 +306,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
               </span>
             </label>
 
-            {/* Список маршрутов */}
+            {}
             <div className="space-y-2">
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Маршруты
@@ -356,7 +346,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
             </div>
           </motion.div>
 
-          {/* Информационная панель выбранной остановки */}
+          {}
           <AnimatePresence>
             {selectedStop && (
               <motion.div
@@ -444,7 +434,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Индикатор пробок */}
+          {}
           {trafficVisible && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}

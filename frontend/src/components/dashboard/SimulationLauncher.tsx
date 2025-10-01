@@ -50,12 +50,10 @@ export default function SimulationLauncher({ onLaunch }: QuickSimulationProps) {
     setIsLaunching(true);
     
     try {
-      // Сохраняем выбранный сценарий в localStorage для передачи в систему тестирования
       localStorage.setItem('quickSimulationScenario', scenarioId);
       
       toast.success('Запуск симуляции...');
       
-      // Переходим к системе тестирования с автозапуском
       router.push(`/testing?autostart=${scenarioId}`);
       
       onLaunch?.();

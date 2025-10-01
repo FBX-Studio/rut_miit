@@ -20,12 +20,12 @@ interface RouteEfficiencyData {
   route_name: string;
   planned_distance: number;
   actual_distance: number;
-  planned_time: number; // в минутах
-  actual_time: number; // в минутах
-  planned_fuel: number; // в литрах
-  actual_fuel: number; // в литрах
-  efficiency_score: number; // 0-100
-  cost_savings: number; // в рублях
+  planned_time: number;
+  actual_time: number;
+  planned_fuel: number;
+  actual_fuel: number;
+  efficiency_score: number;
+  cost_savings: number;
   deviation_percentage: number;
 }
 
@@ -34,7 +34,6 @@ interface RouteEfficiencyBlockProps {
   onDetailedView?: () => void;
 }
 
-// Mock data for demonstration
 const mockRouteData: RouteEfficiencyData[] = [
   {
     route_id: 1001,
@@ -153,7 +152,7 @@ export const RouteEfficiencyBlock = ({
 
   return (
     <div className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm border border-gray-200 dark:border-gray-700 ${className}`}>
-      {/* Header */}
+      {}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -190,7 +189,7 @@ export const RouteEfficiencyBlock = ({
       </div>
 
       <div className="p-6">
-        {/* Summary Metrics */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
@@ -233,7 +232,7 @@ export const RouteEfficiencyBlock = ({
           </div>
         </div>
 
-        {/* Efficiency Chart */}
+        {}
         <div className="mb-6">
           <h3 className="text-sm font-medium text-white mb-4">
             Динамика эффективности за неделю
@@ -296,7 +295,7 @@ export const RouteEfficiencyBlock = ({
           </div>
         </div>
 
-        {/* Routes Table */}
+        {}
         <div>
           <h3 className="text-sm font-medium text-white mb-4">
             Детализация по маршрутам

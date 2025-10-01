@@ -38,7 +38,6 @@ interface ChartData {
   [key: string]: any;
 }
 
-// Neon tooltip with glow
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -65,7 +64,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-// Анимированная линейная диаграмма
 export const AnimatedLineChart: React.FC<{
   data: ChartData[];
   dataKeys: string[];
@@ -133,7 +131,6 @@ export const AnimatedLineChart: React.FC<{
   );
 };
 
-// Анимированная Area диаграмма с градиентом
 export const AnimatedAreaChart: React.FC<{
   data: ChartData[];
   dataKeys: string[];
@@ -203,7 +200,6 @@ export const AnimatedAreaChart: React.FC<{
   );
 };
 
-// Анимированная Bar диаграмма
 export const AnimatedBarChart: React.FC<{
   data: ChartData[];
   dataKeys: string[];
@@ -274,7 +270,6 @@ export const AnimatedBarChart: React.FC<{
   );
 };
 
-// Анимированная Pie диаграмма
 export const AnimatedPieChart: React.FC<{
   data: ChartData[];
   title?: string;
@@ -345,7 +340,6 @@ export const AnimatedPieChart: React.FC<{
   );
 };
 
-// Radar Chart для сравнения показателей
 export const AnimatedRadarChart: React.FC<{
   data: ChartData[];
   title?: string;
@@ -389,7 +383,6 @@ export const AnimatedRadarChart: React.FC<{
   );
 };
 
-// Статистическая карточка с анимацией
 export const AnimatedStatCard: React.FC<{
   title: string;
   value: string | number;
@@ -421,7 +414,7 @@ export const AnimatedStatCard: React.FC<{
       transition={{ duration: 0.3 }}
       className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 overflow-hidden"
     >
-      {/* Gradient background */}
+      {}
       <div
         className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${colorClasses[color]} opacity-10 rounded-full -mr-16 -mt-16`}
       />

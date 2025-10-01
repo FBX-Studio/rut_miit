@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
-// Notification types
 export interface Notification {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
@@ -21,7 +20,6 @@ export interface NotificationAction {
   style?: 'primary' | 'secondary' | 'danger';
 }
 
-// Notification context type
 interface NotificationContextType {
   notifications: Notification[];
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => string;
@@ -35,7 +33,6 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | null>(null);
 
-// Notification provider props
 interface NotificationProviderProps {
   children: ReactNode;
 }
@@ -57,7 +54,6 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
 
     setNotifications(prev => [notification, ...prev]);
 
-    // Auto-remove non-persistent notifications
     if (!notification.persistent) {
       const duration = notification.duration || 5000;
       setTimeout(() => {
@@ -165,7 +161,6 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
         containerClassName=""
         containerStyle={{}}
         toastOptions={{
-          // Default options for all toasts
           className: '',
           duration: 4000,
           style: {
@@ -177,7 +172,6 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           },
           
-          // Default options for specific types
           success: {
             duration: 4000,
             style: {
@@ -207,7 +201,6 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
   );
 };
 
-// Custom hook to use notification context
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
   if (!context) {
@@ -216,7 +209,6 @@ export const useNotifications = () => {
   return context;
 };
 
-// Utility hooks for common notification patterns
 export const useApiNotifications = () => {
   const { showSuccess, showError, showWarning } = useNotifications();
   

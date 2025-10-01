@@ -32,7 +32,6 @@ const LogisticsTestingSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [currentTime, setCurrentTime] = useState<string>('');
 
-  // Update time on client side only to avoid hydration mismatch
   useEffect(() => {
     setCurrentTime(new Date().toLocaleTimeString('ru-RU'));
     const interval = setInterval(() => {
@@ -111,7 +110,6 @@ const LogisticsTestingSystem: React.FC = () => {
   };
 
   const getSystemStatusIndicator = () => {
-    // Имитируем статус системы
     const systemStatus = {
       overall: 'healthy',
       components: {
@@ -138,7 +136,7 @@ const LogisticsTestingSystem: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Navigation Header - Minimalist */}
+      {}
       <NavigationHeader
         title="Тестирование"
         subtitle="Оптимизация и анализ маршрутов"
@@ -146,7 +144,7 @@ const LogisticsTestingSystem: React.FC = () => {
         backUrl="/"
         actions={
           <div className="flex items-center space-x-4">
-            {/* System Status - Minimal */}
+            {}
             <div className="flex items-center space-x-2">
               <div className={`w-2.5 h-2.5 rounded-full ${
                 systemStatus.color === 'green' ? 'bg-emerald-500' :
@@ -157,7 +155,7 @@ const LogisticsTestingSystem: React.FC = () => {
               </span>
             </div>
             
-            {/* Quick Actions - Minimal */}
+            {}
             <div className="flex items-center space-x-1">
               <button className="p-3 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 
                            transition-all duration-200 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -176,7 +174,7 @@ const LogisticsTestingSystem: React.FC = () => {
         }
       />
 
-      {/* Navigation Tabs - Minimalist */}
+      {}
       <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto py-4 sm:py-6">
@@ -205,7 +203,7 @@ const LogisticsTestingSystem: React.FC = () => {
         </div>
       </div>
 
-      {/* Tab Description - Minimal */}
+      {}
       <div className="bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-light">
@@ -214,12 +212,12 @@ const LogisticsTestingSystem: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content - Minimal Spacing */}
+      {}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {renderActiveComponent()}
       </div>
 
-      {/* Footer */}
+      {}
       <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-8 sm:mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">

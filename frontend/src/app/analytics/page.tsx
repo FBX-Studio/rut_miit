@@ -34,7 +34,6 @@ import {
 import { motion } from 'framer-motion';
 import { CHART_COLORS, AXIS_STYLES, GRID_STYLES, TOOLTIP_CURSOR } from '@/components/charts/ChartStyles';
 
-// Mock данные для аналитики
 const performanceData = [
   { month: 'Янв', deliveries: 1200, efficiency: 85, costs: 45000 },
   { month: 'Фев', deliveries: 1350, efficiency: 88, costs: 42000 },
@@ -101,7 +100,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30 relative overflow-hidden">
-      {/* Neon animated background */}
+      {}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -115,7 +114,7 @@ export default function AnalyticsPage() {
       />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Фильтры */}
+        {}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,7 +150,7 @@ export default function AnalyticsPage() {
           </button>
         </motion.div>
 
-        {/* Ключевые метрики */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Общие доставки"
@@ -187,9 +186,9 @@ export default function AnalyticsPage() {
           />
         </div>
 
-        {/* Графики */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* График производительности */}
+          {}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -243,7 +242,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </motion.div>
 
-          {/* Распределение по районам */}
+          {}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -289,7 +288,7 @@ export default function AnalyticsPage() {
           </motion.div>
         </div>
 
-        {/* Производительность водителей */}
+        {}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -339,7 +338,7 @@ export default function AnalyticsPage() {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Детальная таблица */}
+        {}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

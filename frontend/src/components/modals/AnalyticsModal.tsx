@@ -173,7 +173,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
         className="bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30 rounded-2xl shadow-[0_0_60px_rgba(99,102,241,0.3)] border border-indigo-500/20 max-w-7xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-indigo-500/20 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-xl bg-indigo-500/20">
@@ -201,7 +201,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
           </div>
         </div>
 
-        {/* Content */}
+        {}
         <div className="p-6 space-y-6">
           {loading && (
             <div className="text-center py-8">
@@ -212,14 +212,14 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
 
           {data && !loading && (
             <>
-              {/* Last Updated */}
+              {}
               {lastUpdated && (
                 <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
                   Последнее обновление: {lastUpdated.toLocaleString('ru-RU')}
                 </div>
               )}
 
-              {/* Main Stats */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                   title="Всего заказов"
@@ -247,7 +247,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
                 />
               </div>
 
-              {/* Status Breakdowns */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatusBreakdown
                   title="Заказы по статусам"
@@ -279,7 +279,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
                 />
               </div>
 
-              {/* API Metrics */}
+              {}
               {data?.api_metrics && (
                 <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
                   <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6 flex items-center">
@@ -307,7 +307,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
                 </div>
               )}
 
-              {/* Performance Stats */}
+              {}
               {data?.performance_stats && (
                 <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
                   <h3 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 flex items-center">
@@ -335,7 +335,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
                 </div>
               )}
 
-              {/* Quick Actions */}
+              {}
               <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
                   Быстрые действия

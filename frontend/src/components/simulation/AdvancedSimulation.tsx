@@ -111,7 +111,6 @@ export const AdvancedSimulation: React.FC = () => {
       currentStep: 0
     }));
     
-    // Здесь будет логика запуска симуляции
     console.log('Starting simulation with scenario:', simulation.selectedScenario);
   };
 
@@ -158,7 +157,7 @@ export const AdvancedSimulation: React.FC = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Выбор сценария */}
+          {}
           <div className="space-y-4">
             <Label className="text-base font-semibold">Выберите сценарий</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -205,7 +204,7 @@ export const AdvancedSimulation: React.FC = () => {
             </div>
           </div>
 
-          {/* Параметры сценария */}
+          {}
           {selectedScenarioData && (
             <Alert variant="default">
               <AlertDescription>
@@ -236,7 +235,7 @@ export const AdvancedSimulation: React.FC = () => {
             </Alert>
           )}
 
-          {/* Конфигурация симуляции */}
+          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="numRoutes">Количество маршрутов</Label>
@@ -294,7 +293,7 @@ export const AdvancedSimulation: React.FC = () => {
             </div>
           </div>
 
-          {/* Прогресс симуляции */}
+          {}
           {simulation.isRunning && (
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
@@ -320,7 +319,7 @@ export const AdvancedSimulation: React.FC = () => {
             </div>
           )}
 
-          {/* Управление */}
+          {}
           <div className="flex items-center gap-3 flex-wrap">
             {!simulation.isRunning ? (
               <Button
@@ -367,7 +366,7 @@ export const AdvancedSimulation: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Результаты симуляции */}
+      {}
       {simulation.results && (
         <Card>
           <CardHeader>

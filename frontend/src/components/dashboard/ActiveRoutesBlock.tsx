@@ -46,7 +46,6 @@ interface ActiveRoutesBlockProps {
   onDetailedView?: () => void;
 }
 
-// Mock data for demonstration
 const mockRoutes: RouteData[] = [
   {
     id: 1001,
@@ -225,7 +224,7 @@ export const ActiveRoutesBlock = ({ className = '', onRouteDetails, onDetailedVi
                 </div>
               </div>
 
-              {/* Progress Bar */}
+              {}
               <div className="mb-4">
                 <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
                   <span className="font-medium">Прогресс</span>
@@ -241,7 +240,7 @@ export const ActiveRoutesBlock = ({ className = '', onRouteDetails, onDetailedVi
                 </div>
               </div>
 
-            {/* Key Metrics */}
+            {}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-gray-400" />
@@ -281,7 +280,7 @@ export const ActiveRoutesBlock = ({ className = '', onRouteDetails, onDetailedVi
               </div>
             </div>
 
-            {/* Detailed Info (Expandable) */}
+            {}
             {showDetails[route.id] && (
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -315,7 +314,7 @@ export const ActiveRoutesBlock = ({ className = '', onRouteDetails, onDetailedVi
             ))}
         </div>
 
-        {/* Empty State */}
+        {}
         {routes.length === 0 && (
           <div className="p-12 text-center">
             <div className="inline-flex p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl mb-4">

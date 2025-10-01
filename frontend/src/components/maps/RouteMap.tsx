@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { YMaps, Map, Placemark, Polyline, TrafficControl, RouteButton, RoutePanel, withYMaps } from '@pbe/react-yandex-maps';
 
-// Route data interface
 interface RouteData {
   id: number;
   vehicle_id: number;
@@ -46,7 +45,6 @@ interface RouteMapProps {
   className?: string;
 }
 
-// Custom placemark options for different stop types and statuses
 const getStopPlacemarkOptions = (type: string, status: string) => {
   const getColor = () => {
     if (status === 'completed') return '#10B981'; // green
@@ -70,7 +68,6 @@ const getStopPlacemarkOptions = (type: string, status: string) => {
   };
 };
 
-// Vehicle placemark options
 const getVehiclePlacemarkOptions = (status: string) => {
   const getColor = () => {
     switch (status) {
@@ -87,7 +84,6 @@ const getVehiclePlacemarkOptions = (status: string) => {
   };
 };
 
-// Route colors for different routes
 const routeColors = [
   '#3B82F6', // blue
   '#10B981', // green
@@ -99,7 +95,6 @@ const routeColors = [
   '#84CC16', // lime
 ];
 
-// Route building component
 const RouteBuilder = withYMaps(({ ymaps, routes, onRouteSelect }: any) => {
   const [mapInstance, setMapInstance] = useState<any>(null);
   const [multiRoutes, setMultiRoutes] = useState<any[]>([]);
@@ -136,12 +131,10 @@ const RouteBuilder = withYMaps(({ ymaps, routes, onRouteSelect }: any) => {
   useEffect(() => {
     if (!ymaps || !mapInstance) return;
 
-    // Clear existing routes
     multiRoutes.forEach(route => {
       mapInstance.geoObjects.remove(route);
     });
 
-    // Build new routes
     const newRoutes = routes.map((route: RouteData) => buildRoute(route)).filter(Boolean);
     setMultiRoutes(newRoutes);
 
@@ -162,7 +155,7 @@ export const RouteMap = ({
   selectedRouteId,
   onRouteSelect,
   onStopSelect,
-  center = [55.7558, 37.6176], // Moscow coordinates
+  center = [55.7558, 37.6176],
   zoom = 10,
   height = '400px',
   showTraffic = true,
@@ -187,7 +180,6 @@ export const RouteMap = ({
   const handleMapLoad = (map: any) => {
     setMapInstance(map);
     
-    // Auto-fit bounds to show all routes
     if (routes.length > 0) {
       const bounds: [number, number][] = [];
       
@@ -276,7 +268,7 @@ export const RouteMap = ({
             suppressMapOpenBlock: true,
           }}
         >
-          {/* Traffic control */}
+          {}
           <TrafficControl 
             options={{ 
               float: 'right',
@@ -292,7 +284,7 @@ export const RouteMap = ({
             }}
           />
 
-          {/* Route button for manual route building */}
+          {}
           <RouteButton 
             options={{ 
               float: 'right',
@@ -300,7 +292,7 @@ export const RouteMap = ({
             }} 
           />
 
-          {/* Route stops */}
+          {}
           {routes.map(route =>
             route.stops.map(stop => (
               <Placemark
@@ -316,7 +308,7 @@ export const RouteMap = ({
             ))
           )}
 
-          {/* Vehicle current locations */}
+          {}
           {routes.map(route =>
             route.current_location && realTimeTracking && (
               <Placemark
@@ -332,7 +324,7 @@ export const RouteMap = ({
             )
           )}
 
-          {/* Route polylines (fallback if multiRouter doesn't work) */}
+          {}
           {routes.map(route => (
             route.route_geometry && (
               <Polyline
@@ -348,7 +340,7 @@ export const RouteMap = ({
             )
           ))}
 
-          {/* Route builder for automatic routing */}
+          {}
           <RouteBuilder 
             routes={routes} 
             onRouteSelect={onRouteSelect}
@@ -356,7 +348,7 @@ export const RouteMap = ({
         </Map>
       </YMaps>
 
-      {/* Map controls overlay */}
+      {}
       <div className="absolute top-4 right-4 z-[1000] space-y-2">
         {selectedRouteId && (
           <button
@@ -368,7 +360,7 @@ export const RouteMap = ({
         )}
       </div>
 
-      {/* Legend */}
+      {}
       <div className="absolute bottom-4 left-4 z-[1000] bg-white dark:bg-gray-800 rounded-lg p-3 shadow-lg">
         <h4 className="text-sm font-semibold mb-2">Легенда</h4>
         <div className="space-y-1 text-xs">
@@ -394,7 +386,6 @@ export const RouteMap = ({
   );
 };
 
-// Export as dynamic component to avoid SSR issues
 export default dynamic(() => Promise.resolve(RouteMap), {
   ssr: false,
   loading: () => (

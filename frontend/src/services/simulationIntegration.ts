@@ -1,11 +1,7 @@
-/**
- * Сервис интеграции симуляции с основной системой
- * Преобразует данные симуляции в формат основного приложения
- */
+
 
 import { SimulationDriver, SimulationRoutePoint, SimulationMetrics } from '@/components/testing/SimulationData';
 
-// Типы данных основного приложения
 export interface MainAppRoute {
   id: number;
   vehicle_id: number;
@@ -67,14 +63,11 @@ export interface MainAppDriver {
 }
 
 export class SimulationIntegrationService {
-  /**
-   * Преобразует данные симуляции в формат маршрута основного приложения
-   */
+
   static convertSimulationToMainRoute(simulation: SimulationDriver): MainAppRoute {
     const currentStopIndex = simulation.completedStops;
     const progressPercentage = (simulation.completedStops / simulation.totalStops) * 100;
     
-    // Находим следующую остановку
     const nextStop = simulation.route.find(stop => stop.status === 'pending');
     
     return {
@@ -102,9 +95,6 @@ export class SimulationIntegrationService {
     };
   }
 
-  /**
-   * Преобразует остановки симуляции в формат основного приложения
-   */
   static convertSimulationStops(simulationRoute: SimulationRoutePoint[]): MainAppRouteStop[] {
     return simulationRoute.map((stop, index) => ({
       id: parseInt(stop.id.replace(/[^0-9]/g, '') || '0'),
@@ -121,9 +111,6 @@ export class SimulationIntegrationService {
     }));
   }
 
-  /**
-   * Создает профиль водителя на основе данных симуляции
-   */
   static createDriverProfile(simulation: SimulationDriver): MainAppDriver {
     return {
       id: parseInt(simulation.id.replace('driver_', '')),
@@ -148,16 +135,12 @@ export class SimulationIntegrationService {
     };
   }
 
-  /**
-   * Отправляет данные симуляции в основную систему
-   */
   static async syncSimulationWithMainSystem(simulation: SimulationDriver): Promise<void> {
     try {
       const route = this.convertSimulationToMainRoute(simulation);
       const stops = this.convertSimulationStops(simulation.route);
       const driver = this.createDriverProfile(simulation);
 
-      // Отправляем данные в основную систему через WebSocket или API
       if (typeof window !== 'undefined' && (window as any).simulationSync) {
         (window as any).simulationSync({
           type: 'route_update',
@@ -165,7 +148,6 @@ export class SimulationIntegrationService {
         });
       }
 
-      // Также можно отправить через API
       await this.sendToAPI('/api/v1/simulation/sync', {
         route,
         stops,
@@ -178,9 +160,6 @@ export class SimulationIntegrationService {
     }
   }
 
-  /**
-   * Получает реальные данные из основной системы для симуляции
-   */
   static async fetchRealDataForSimulation(): Promise<{
     routes: MainAppRoute[];
     drivers: MainAppDriver[];
@@ -202,7 +181,6 @@ export class SimulationIntegrationService {
     }
   }
 
-  // Вспомогательные методы
   private static mapSimulationStatusToMainStatus(status: string): 'planned' | 'active' | 'completed' | 'delayed' | 'cancelled' {
     switch (status) {
       case 'driving':
@@ -249,7 +227,6 @@ export class SimulationIntegrationService {
   }
 
   private static calculateTotalDistance(route: SimulationRoutePoint[]): number {
-    // Примерный расчет расстояния между точками
     let totalDistance = 0;
     for (let i = 1; i < route.length; i++) {
       const prev = route[i - 1];
@@ -274,7 +251,7 @@ export class SimulationIntegrationService {
   }
 
   private static calculateDistance(coord1: [number, number], coord2: [number, number]): number {
-    const R = 6371; // Радиус Земли в км
+    const R = 6371;
     const dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
     const dLon = (coord2[1] - coord1[1]) * Math.PI / 180;
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +

@@ -32,7 +32,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
   const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
   const [selectedVehicles, setSelectedVehicles] = useState<number[]>([]);
   const [selectedDrivers, setSelectedDrivers] = useState<number[]>([]);
-  const [depotLocation, setDepotLocation] = useState<[number, number]>([55.7558, 37.6176]); // Moscow
+  const [depotLocation, setDepotLocation] = useState<[number, number]>([55.7558, 37.6176]);
   const [plannedDate, setPlannedDate] = useState(new Date().toISOString().split('T')[0]);
   const [timeLimit, setTimeLimit] = useState(300);
   const [adaptiveMonitoring, setAdaptiveMonitoring] = useState(true);
@@ -47,7 +47,6 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
     try {
       setLoading(true);
       
-      // Fetch orders, vehicles, and drivers
       const [ordersRes, vehiclesRes, driversRes] = await Promise.all([
         fetch('/api/v1/orders'),
         fetch('/api/v1/vehicles'),
@@ -115,7 +114,6 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
         const result = await response.json();
         toast.success(`Создано ${result.routes_created} оптимизированных маршрутов`);
         onClose();
-        // Refresh the page or update the routes list
         window.location.reload();
       } else {
         const error = await response.json();
@@ -140,7 +138,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {mode === 'create' ? 'Создать новый маршрут' : 'Оптимизировать маршруты'}
@@ -153,7 +151,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
           </button>
         </div>
 
-        {/* Content */}
+        {}
         <div className="p-6 space-y-6">
           {loading && (
             <div className="text-center py-4">
@@ -164,7 +162,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
 
           {!loading && (
             <>
-              {/* Orders Selection */}
+              {}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                   <Package className="h-5 w-5 mr-2" />
@@ -199,7 +197,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
                 </button>
               </div>
 
-              {/* Vehicles Selection */}
+              {}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                   <Truck className="h-5 w-5 mr-2" />
@@ -234,7 +232,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
                 </button>
               </div>
 
-              {/* Drivers Selection */}
+              {}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center">
                   <User className="h-5 w-5 mr-2" />
@@ -269,7 +267,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
                 </button>
               </div>
 
-              {/* Settings */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -318,7 +316,7 @@ export const RouteOptimizationModal: React.FC<RouteOptimizationModalProps> = ({
           )}
         </div>
 
-        {/* Footer */}
+        {}
         <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={onClose}

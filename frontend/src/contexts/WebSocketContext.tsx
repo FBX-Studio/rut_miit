@@ -3,14 +3,12 @@
 import { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import toast from 'react-hot-toast';
 
-// WebSocket message types
 export interface WebSocketMessage {
   type: 'route_update' | 'event_notification' | 'eta_update' | 'reoptimization_complete' | 'system_status';
   data: any;
   timestamp: string;
 }
 
-// WebSocket context type
 interface WebSocketContextType {
   isConnected: boolean;
   lastMessage: WebSocketMessage | null;
@@ -22,7 +20,6 @@ interface WebSocketContextType {
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
-// WebSocket provider props
 interface WebSocketProviderProps {
   children: ReactNode;
 }
@@ -53,7 +50,6 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
         setIsConnected(true);
         reconnectAttemptsRef.current = 0;
         
-        // Clear any existing reconnect timeout
         if (reconnectTimeoutRef.current) {
           clearTimeout(reconnectTimeoutRef.current);
           reconnectTimeoutRef.current = null;
@@ -65,13 +61,11 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
           const message: WebSocketMessage = JSON.parse(event.data);
           setLastMessage(message);
           
-          // Notify subscribers
           const subscribers = subscribersRef.current.get(message.type);
           if (subscribers) {
             subscribers.forEach(callback => callback(message.data));
           }
           
-          // Handle system notifications
     if (message.type === 'event_notification' && message.data.severity === 'high') {
       toast.error(`Предупреждение: ${message.data.title}`);
     } else if (message.type === 'reoptimization_complete') {
@@ -86,7 +80,6 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
         console.log('WebSocket disconnected:', event.code, event.reason);
         setIsConnected(false);
         
-        // Attempt to reconnect if not a normal closure
         if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           console.log(`Attempting to reconnect (${reconnectAttemptsRef.current}/${maxReconnectAttempts})...`);
@@ -139,7 +132,6 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
     
     subscribersRef.current.get(type)!.add(callback);
     
-    // Return unsubscribe function
     return () => {
       const subscribers = subscribersRef.current.get(type);
       if (subscribers) {
@@ -151,7 +143,6 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
     };
   };
 
-  // Auto-connect to monitoring endpoint on mount
   useEffect(() => {
     connect('/ws/monitoring');
     
@@ -160,7 +151,6 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
     };
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       disconnect();
@@ -183,7 +173,6 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
   );
 };
 
-// Custom hook to use WebSocket context
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (!context) {
@@ -192,7 +181,6 @@ export const useWebSocket = () => {
   return context;
 };
 
-// Custom hooks for specific WebSocket subscriptions
 export const useRouteUpdates = (callback: (data: any) => void) => {
   const { subscribe } = useWebSocket();
   

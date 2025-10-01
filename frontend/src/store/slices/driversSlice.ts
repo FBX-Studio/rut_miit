@@ -24,11 +24,11 @@ export interface Driver {
   shift_start?: string;
   shift_end?: string;
   break_start?: string;
-  break_duration?: number; // minutes
+  break_duration?: number;
   rating: number;
   total_deliveries: number;
   successful_deliveries: number;
-  average_delivery_time: number; // minutes
+  average_delivery_time: number;
   fuel_efficiency_score: number;
   customer_rating: number;
   last_active: string;
@@ -136,7 +136,6 @@ const initialState: DriversState = {
   performance: {},
 };
 
-// Async thunks
 export const fetchDrivers = createAsyncThunk(
   'drivers/fetchDrivers',
   async (params?: {
@@ -415,30 +414,25 @@ const driversSlice = createSlice({
     updateDriverRealtime: (state, action: PayloadAction<Partial<Driver> & { id: number }>) => {
       const { id, ...updates } = action.payload;
       
-      // Update in drivers array
       const driverIndex = state.drivers.findIndex(driver => driver.id === id);
       if (driverIndex !== -1) {
         state.drivers[driverIndex] = { ...state.drivers[driverIndex], ...updates };
       }
       
-      // Update in availableDrivers array
       const availableIndex = state.availableDrivers.findIndex(driver => driver.id === id);
       if (availableIndex !== -1) {
         if (updates.status === 'available') {
           state.availableDrivers[availableIndex] = { ...state.availableDrivers[availableIndex], ...updates };
         } else {
-          // Remove from available if status changed
           state.availableDrivers.splice(availableIndex, 1);
         }
       } else if (updates.status === 'available') {
-        // Add to available if status changed to available
         const fullDriver = state.drivers.find(driver => driver.id === id);
         if (fullDriver) {
           state.availableDrivers.push({ ...fullDriver, ...updates });
         }
       }
       
-      // Update selected driver if it matches
       if (state.selectedDriver?.id === id) {
         state.selectedDriver = { ...state.selectedDriver, ...updates };
       }
@@ -446,10 +440,8 @@ const driversSlice = createSlice({
     updateDriverLocationRealtime: (state, action: PayloadAction<DriverLocation>) => {
       const locationData = action.payload;
       
-      // Update real-time locations
       state.realTimeLocations[locationData.driver_id] = locationData;
       
-      // Update driver current_location
       const driverIndex = state.drivers.findIndex(driver => driver.id === locationData.driver_id);
       if (driverIndex !== -1) {
         state.drivers[driverIndex].current_location = {
@@ -461,7 +453,6 @@ const driversSlice = createSlice({
         state.drivers[driverIndex].last_active = locationData.timestamp;
       }
       
-      // Update selected driver if it matches
       if (state.selectedDriver?.id === locationData.driver_id) {
         state.selectedDriver.current_location = {
           latitude: locationData.latitude,
@@ -476,7 +467,6 @@ const driversSlice = createSlice({
       const shiftData = action.payload;
       state.activeShifts[shiftData.driver_id] = shiftData;
       
-      // Update driver shift times
       const driverIndex = state.drivers.findIndex(driver => driver.id === shiftData.driver_id);
       if (driverIndex !== -1) {
         state.drivers[driverIndex].shift_start = shiftData.shift_start;
@@ -487,7 +477,6 @@ const driversSlice = createSlice({
       const driverId = action.payload;
       delete state.activeShifts[driverId];
       
-      // Clear driver shift times
       const driverIndex = state.drivers.findIndex(driver => driver.id === driverId);
       if (driverIndex !== -1) {
         state.drivers[driverIndex].shift_start = undefined;
@@ -498,7 +487,6 @@ const driversSlice = createSlice({
       const breakData = action.payload;
       state.activeBreaks[breakData.driver_id] = breakData;
       
-      // Update driver break times
       const driverIndex = state.drivers.findIndex(driver => driver.id === breakData.driver_id);
       if (driverIndex !== -1) {
         state.drivers[driverIndex].break_start = breakData.break_start;
@@ -508,7 +496,6 @@ const driversSlice = createSlice({
       const driverId = action.payload;
       delete state.activeBreaks[driverId];
       
-      // Clear driver break times
       const driverIndex = state.drivers.findIndex(driver => driver.id === driverId);
       if (driverIndex !== -1) {
         state.drivers[driverIndex].break_start = undefined;
@@ -538,7 +525,6 @@ const driversSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch drivers
       .addCase(fetchDrivers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -552,7 +538,6 @@ const driversSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch drivers';
       })
       
-      // Fetch available drivers
       .addCase(fetchAvailableDrivers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -566,7 +551,6 @@ const driversSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch available drivers';
       })
       
-      // Fetch driver by ID
       .addCase(fetchDriverById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -575,7 +559,6 @@ const driversSlice = createSlice({
         state.loading = false;
         state.selectedDriver = action.payload;
         
-        // Update in drivers array if exists
         const driverIndex = state.drivers.findIndex(driver => driver.id === action.payload.id);
         if (driverIndex !== -1) {
           state.drivers[driverIndex] = action.payload;
@@ -586,7 +569,6 @@ const driversSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch driver';
       })
       
-      // Create driver
       .addCase(createDriver.pending, (state) => {
         state.creating = true;
         state.error = null;
@@ -604,7 +586,6 @@ const driversSlice = createSlice({
         state.error = action.error.message || 'Failed to create driver';
       })
       
-      // Update driver
       .addCase(updateDriver.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -637,7 +618,6 @@ const driversSlice = createSlice({
         state.error = action.error.message || 'Failed to update driver';
       })
       
-      // Start shift
       .addCase(startDriverShift.fulfilled, (state, action) => {
         const { driver_id, ...shiftData } = action.payload;
         state.activeShifts[driver_id] = action.payload;
@@ -649,7 +629,6 @@ const driversSlice = createSlice({
         }
       })
       
-      // End shift
       .addCase(endDriverShift.fulfilled, (state, action) => {
         const { driver_id } = action.payload;
         delete state.activeShifts[driver_id];
@@ -661,7 +640,6 @@ const driversSlice = createSlice({
         }
       })
       
-      // Start break
       .addCase(startDriverBreak.fulfilled, (state, action) => {
         const { driver_id } = action.payload;
         state.activeBreaks[driver_id] = action.payload;
@@ -673,7 +651,6 @@ const driversSlice = createSlice({
         }
       })
       
-      // End break
       .addCase(endDriverBreak.fulfilled, (state, action) => {
         const { driver_id } = action.payload;
         delete state.activeBreaks[driver_id];
@@ -685,13 +662,11 @@ const driversSlice = createSlice({
         }
       })
       
-      // Fetch performance
       .addCase(fetchDriverPerformance.fulfilled, (state, action) => {
         const { driverId, performance } = action.payload;
         state.performance[driverId] = performance;
       })
       
-      // Assign vehicle
       .addCase(assignDriverToVehicle.fulfilled, (state, action) => {
         const driverIndex = state.drivers.findIndex(driver => driver.id === action.payload.id);
         if (driverIndex !== -1) {
@@ -703,7 +678,6 @@ const driversSlice = createSlice({
         }
       })
       
-      // Unassign vehicle
       .addCase(unassignDriverFromVehicle.fulfilled, (state, action) => {
         const driverIndex = state.drivers.findIndex(driver => driver.id === action.payload.id);
         if (driverIndex !== -1) {
@@ -715,7 +689,6 @@ const driversSlice = createSlice({
         }
       })
       
-      // Delete driver
       .addCase(deleteDriver.fulfilled, (state, action) => {
         const driverId = action.payload;
         

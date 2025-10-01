@@ -1,6 +1,4 @@
-/**
- * Генератор симуляций с реальными адресами через Yandex API
- */
+
 
 import { SimulationDriver, SimulationRoutePoint } from '../components/testing/SimulationData';
 
@@ -21,16 +19,12 @@ interface GeneratedRoute {
   duration_in_traffic: number;
 }
 
-/**
- * Генерирует новую симуляцию с реальными адресами в Москве
- */
 export async function generateSimulationWithRealAddresses(
   numStops: number = 5
 ): Promise<SimulationDriver> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     
-    // Запрашиваем генерацию маршрута с реальными адресами
     const response = await fetch(
       `${apiUrl}/api/v1/delivery-generator/generate-route?num_stops=${numStops}`,
       {
@@ -52,40 +46,31 @@ export async function generateSimulationWithRealAddresses(
     console.log(`Route geometry points: ${routeData.route_geometry.length}`);
     console.log('First 5 geometry points:', routeData.route_geometry.slice(0, 5));
     
-    // Преобразуем в формат SimulationDriver
     const now = new Date();
     const startTime = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     
-    // Рассчитываем время окончания
     const endTime = new Date(now.getTime() + routeData.duration_in_traffic * 60000);
     const estimatedEndTime = endTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     
-    // Генерируем точки маршрута
     const route: SimulationRoutePoint[] = routeData.stops.map((stop, index) => {
-      // Рассчитываем примерное время прибытия для каждой точки
       const arrivalMinutes = (routeData.duration_in_traffic / routeData.stops.length) * index;
       const arrivalTime = new Date(now.getTime() + arrivalMinutes * 60000);
       const estimatedArrival = arrivalTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       
-      // Определяем статус
       let status: 'pending' | 'in_progress' | 'completed' | 'delayed';
       let actualArrival: string | undefined;
       
       if (index === 0) {
-        // Первая точка (склад) - завершена
         status = 'completed';
         actualArrival = startTime;
       } else if (index === 1) {
-        // Вторая точка - в процессе
         status = 'in_progress';
         actualArrival = undefined;
       } else {
-        // Остальные - ожидают
         status = 'pending';
         actualArrival = undefined;
       }
       
-      // Генерируем информацию о заказе для доставок
       const orderInfo = stop.type === 'delivery' ? {
         orderId: `ORD-${String(index).padStart(3, '0')}`,
         customerName: generateCustomerName(),
@@ -107,7 +92,6 @@ export async function generateSimulationWithRealAddresses(
       };
     });
     
-    // Создаем объект водителя с геометрией маршрута
     const driver: SimulationDriver = {
       id: 'driver_001',
       name: generateDriverName(),
@@ -117,10 +101,10 @@ export async function generateSimulationWithRealAddresses(
       status: 'driving',
       startTime,
       estimatedEndTime,
-      completedStops: 1, // Склад уже завершен
+      completedStops: 1,
       totalStops: route.length,
       route,
-      routeGeometry: routeData.route_geometry // Сохраняем геометрию маршрута по дорогам
+      routeGeometry: routeData.route_geometry
     };
     
     return driver;
@@ -128,14 +112,10 @@ export async function generateSimulationWithRealAddresses(
   } catch (error) {
     console.error('Error generating simulation:', error);
     
-    // Возвращаем fallback данные если генерация не удалась
     return getFallbackSimulationData();
   }
 }
 
-/**
- * Генерирует имя водителя
- */
 function generateDriverName(): string {
   const names = [
     'Иван Петров',
@@ -150,9 +130,6 @@ function generateDriverName(): string {
   return names[Math.floor(Math.random() * names.length)];
 }
 
-/**
- * Генерирует тип транспорта
- */
 function generateVehicleType(): string {
   const vehicles = [
     'Газель Next',
@@ -165,9 +142,6 @@ function generateVehicleType(): string {
   return vehicles[Math.floor(Math.random() * vehicles.length)];
 }
 
-/**
- * Генерирует имя клиента
- */
 function generateCustomerName(): string {
   const prefixes = ['ООО', 'ИП', 'АО', 'ПАО'];
   const names = [
@@ -187,9 +161,6 @@ function generateCustomerName(): string {
   return `${prefix} ${name}`;
 }
 
-/**
- * Генерирует случайные товары
- */
 function generateRandomItems(): string[] {
   const allItems = [
     'Офисная мебель',
@@ -217,9 +188,6 @@ function generateRandomItems(): string[] {
   return items;
 }
 
-/**
- * Генерирует приоритет
- */
 function generatePriority(): 'low' | 'medium' | 'high' {
   const rand = Math.random();
   if (rand < 0.2) return 'high';
@@ -227,9 +195,6 @@ function generatePriority(): 'low' | 'medium' | 'high' {
   return 'low';
 }
 
-/**
- * Возвращает fallback данные если API недоступен
- */
 function getFallbackSimulationData(): SimulationDriver {
   const now = new Date();
   const startTime = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
