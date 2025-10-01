@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { NavigationHeader } from '@/components/ui/NavigationHeader';
 import { 
   BarChart, 
@@ -15,7 +15,9 @@ import {
   Line,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  AreaChart,
+  Area
 } from 'recharts';
 import { 
   TrendingUp, 
@@ -26,8 +28,11 @@ import {
   Clock,
   MapPin,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Download
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { CHART_COLORS, AXIS_STYLES, GRID_STYLES, TOOLTIP_CURSOR } from '@/components/charts/ChartStyles';
 
 // Mock данные для аналитики
 const performanceData = [
@@ -55,42 +60,52 @@ const routeDistribution = [
   { name: 'Запад', value: 8, color: '#8B5CF6' },
 ];
 
-const StatCard = ({ title, value, change, icon: Icon, trend }: any) => (
-  <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl p-6 shadow-sm border border-gray-200/50 dark:border-gray-700/50 group hover:shadow-lg transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
-    {/* Subtle gradient overlay on hover */}
-    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-green-50/30 dark:from-blue-900/20 dark:to-green-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
-    
-    <div className="flex items-center justify-between relative z-10">
-      <div>
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">{title}</p>
-        <p className="text-2xl font-bold text-gray-900 dark:text-white group-hover:scale-105 transition-transform duration-300">{value}</p>
-        <div className={`flex items-center mt-2 text-sm transition-all duration-300 ${
-          trend === 'up' ? 'text-green-600' : 'text-red-600'
-        }`}>
-          {trend === 'up' ? <TrendingUp className="w-4 h-4 mr-1 transition-transform duration-300 group-hover:scale-110" /> : <TrendingDown className="w-4 h-4 mr-1 transition-transform duration-300 group-hover:scale-110" />}
-          {change}
+const StatCard = ({ title, value, change, icon: Icon, trend, index }: any) => {
+  const colors = {
+    0: { gradient: 'from-indigo-500 to-indigo-600', iconBg: 'bg-indigo-500/20', iconColor: 'text-indigo-400', border: 'border-indigo-500/20', shadow: 'shadow-[0_0_20px_rgba(99,102,241,0.3)]' },
+    1: { gradient: 'from-purple-500 to-purple-600', iconBg: 'bg-purple-500/20', iconColor: 'text-purple-400', border: 'border-purple-500/20', shadow: 'shadow-[0_0_20px_rgba(139,92,246,0.3)]' },
+    2: { gradient: 'from-blue-500 to-blue-600', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', border: 'border-blue-500/20', shadow: 'shadow-[0_0_20px_rgba(59,130,246,0.3)]' },
+    3: { gradient: 'from-green-500 to-green-600', iconBg: 'bg-green-500/20', iconColor: 'text-green-400', border: 'border-green-500/20', shadow: 'shadow-[0_0_20px_rgba(34,197,94,0.3)]' },
+  };
+  const color = colors[index as keyof typeof colors] || colors[0];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+      className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border ${color.border} ${color.shadow} hover:scale-105 transition-all duration-300 group`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-400 mb-2">{title}</p>
+          <p className={`text-3xl font-bold bg-gradient-to-r ${color.gradient} bg-clip-text text-transparent`}>{value}</p>
+          <div className={`flex items-center mt-3 text-sm ${
+            trend === 'up' ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {trend === 'up' ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+            <span className="font-semibold">{change}</span>
+          </div>
+        </div>
+        <div className={`p-4 rounded-xl ${color.iconBg} group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className={`w-7 h-7 ${color.iconColor}`} />
         </div>
       </div>
-      <div className={`p-3 rounded-full transition-all duration-300 group-hover:scale-110 group-hover:rotate-12 ${
-        trend === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-      }`}>
-        <Icon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-      </div>
-    </div>
-  </div>
-);
+    </motion.div>
+  );
+};
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState('6m');
   const [selectedMetric, setSelectedMetric] = useState('deliveries');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
-      {/* Subtle animated background elements for analytics */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30 relative overflow-hidden">
+      {/* Neon animated background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/6 right-1/6 w-72 h-72 bg-blue-200/20 dark:bg-blue-800/20 rounded-full blur-3xl animate-pulse delay-300"></div>
-        <div className="absolute bottom-1/5 left-1/5 w-96 h-96 bg-green-200/20 dark:bg-green-800/20 rounded-full blur-3xl animate-pulse delay-700"></div>
-        <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-purple-200/20 dark:bg-purple-800/20 rounded-full blur-3xl animate-pulse delay-1100"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
       
       <NavigationHeader 
@@ -101,12 +116,17 @@ export default function AnalyticsPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Фильтры */}
-        <div className="mb-8 flex flex-wrap gap-4 items-center justify-between">
-          <div className="flex gap-2">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8 flex flex-wrap gap-4 items-center justify-between"
+        >
+          <div className="flex gap-3">
             <select 
               value={timeRange} 
               onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="px-4 py-2 border border-indigo-500/30 rounded-xl bg-gray-900/50 backdrop-blur-sm text-white hover:border-indigo-500/50 transition-all"
             >
               <option value="1m">Последний месяц</option>
               <option value="3m">Последние 3 месяца</option>
@@ -117,7 +137,7 @@ export default function AnalyticsPage() {
             <select 
               value={selectedMetric} 
               onChange={(e) => setSelectedMetric(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="px-4 py-2 border border-purple-500/30 rounded-xl bg-gray-900/50 backdrop-blur-sm text-white hover:border-purple-500/50 transition-all"
             >
               <option value="deliveries">Доставки</option>
               <option value="efficiency">Эффективность</option>
@@ -125,12 +145,11 @@ export default function AnalyticsPage() {
             </select>
           </div>
           
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors
-                               relative overflow-hidden group">
-            <span className="relative z-10">Экспорт отчета</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <button className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] flex items-center gap-2 hover:scale-105">
+            <Download className="w-4 h-4" />
+            <span>Экспорт отчета</span>
           </button>
-        </div>
+        </motion.div>
 
         {/* Ключевые метрики */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -140,6 +159,7 @@ export default function AnalyticsPage() {
             change="+12.5%"
             icon={Package}
             trend="up"
+            index={0}
           />
           <StatCard
             title="Активные водители"
@@ -147,6 +167,7 @@ export default function AnalyticsPage() {
             change="+3.2%"
             icon={Users}
             trend="up"
+            index={1}
           />
           <StatCard
             title="Средняя эффективность"
@@ -154,6 +175,7 @@ export default function AnalyticsPage() {
             change="+5.1%"
             icon={TrendingUp}
             trend="up"
+            index={2}
           />
           <StatCard
             title="Время доставки"
@@ -161,46 +183,74 @@ export default function AnalyticsPage() {
             change="-8.3%"
             icon={Clock}
             trend="up"
+            index={3}
           />
         </div>
 
         {/* Графики */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* График производительности */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 
-                          hover:shadow-md transition-all duration-300 group">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-indigo-600 transition-colors">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] hover:border-indigo-500/40 transition-all duration-300"
+          >
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6">
               Динамика производительности
             </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line 
+              <AreaChart data={performanceData}>
+                <defs>
+                  <linearGradient id="deliveriesGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="efficiencyGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={CHART_COLORS.primary[1]} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={CHART_COLORS.primary[1]} stopOpacity={0.05} />
+                  </linearGradient>
+                  <filter id="glowDeliveries">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <CartesianGrid {...GRID_STYLES} />
+                <XAxis dataKey="month" {...AXIS_STYLES} />
+                <YAxis {...AXIS_STYLES} />
+                <Tooltip cursor={TOOLTIP_CURSOR} />
+                <Area 
                   type="monotone" 
                   dataKey="deliveries" 
-                  stroke="#3B82F6" 
-                  strokeWidth={2}
+                  stroke={CHART_COLORS.primary[0]}
+                  strokeWidth={3}
+                  fill="url(#deliveriesGradient)"
+                  filter="url(#glowDeliveries)"
                   name="Доставки"
                 />
-                <Line 
+                <Area 
                   type="monotone" 
                   dataKey="efficiency" 
-                  stroke="#10B981" 
-                  strokeWidth={2}
+                  stroke={CHART_COLORS.primary[1]}
+                  strokeWidth={3}
+                  fill="url(#efficiencyGradient)"
                   name="Эффективность (%)"
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
 
           {/* Распределение по районам */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 
-                          hover:shadow-md transition-all duration-300 group">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-emerald-600 transition-colors">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)] hover:border-purple-500/40 transition-all duration-300"
+          >
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6">
               Распределение маршрутов по районам
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -210,95 +260,151 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name.length > 10 ? name.substring(0, 10) + '...' : name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={90}
+                  innerRadius={40}
                   fill="#8884d8"
                   dataKey="value"
+                  strokeWidth={2}
+                  stroke="#1F2937"
                 >
                   {routeDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={CHART_COLORS.pie[index]} 
+                      style={{ filter: 'drop-shadow(0px 0px 8px rgba(99, 102, 241, 0.4))' }}
+                    />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1F2937', 
+                    border: '1px solid rgba(99, 102, 241, 0.3)',
+                    borderRadius: '12px',
+                    color: '#fff'
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
         </div>
 
         {/* Производительность водителей */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8
-                        hover:shadow-md transition-all duration-300 group">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 transition-colors">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:border-blue-500/40 transition-all duration-300 mb-8"
+        >
+          <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-6">
             Топ водителей по производительности
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={driverPerformance}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="deliveries" fill="#3B82F6" name="Доставки" />
-              <Bar dataKey="efficiency" fill="#10B981" name="Эффективность (%)" />
+              <defs>
+                <linearGradient id="barGradient1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.9} />
+                  <stop offset="100%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.6} />
+                </linearGradient>
+                <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={CHART_COLORS.primary[2]} stopOpacity={0.9} />
+                  <stop offset="100%" stopColor={CHART_COLORS.primary[2]} stopOpacity={0.6} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid {...GRID_STYLES} />
+              <XAxis dataKey="name" {...AXIS_STYLES} angle={-15} textAnchor="end" height={80} />
+              <YAxis {...AXIS_STYLES} />
+              <Tooltip 
+                cursor={TOOLTIP_CURSOR}
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  borderRadius: '12px',
+                  color: '#fff'
+                }}
+              />
+              <Bar 
+                dataKey="deliveries" 
+                fill="url(#barGradient1)" 
+                name="Доставки"
+                radius={[8, 8, 0, 0]}
+              />
+              <Bar 
+                dataKey="efficiency" 
+                fill="url(#barGradient2)" 
+                name="Эффективность (%)"
+                radius={[8, 8, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Детальная таблица */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] overflow-hidden"
+        >
+          <div className="px-6 py-4 border-b border-indigo-500/20">
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
               Детальная статистика водителей
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+              <thead className="bg-gray-800/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                     Водитель
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                     Доставки
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                     Рейтинг
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                     Эффективность
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                     Статус
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-gray-700/50">
                 {driverPerformance.map((driver, index) => (
-                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white break-words max-w-xs">
+                  <motion.tr 
+                    key={index}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 + index * 0.05 }}
+                    className="hover:bg-white/5 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium text-white break-words max-w-xs">
                       {driver.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {driver.deliveries}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      <span className="font-semibold text-indigo-400">{driver.deliveries}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      ⭐ {driver.rating}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      <span className="text-yellow-400">⭐</span> {driver.rating}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {driver.efficiency}%
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className="font-semibold text-purple-400">{driver.efficiency}%</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Активен
                       </span>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

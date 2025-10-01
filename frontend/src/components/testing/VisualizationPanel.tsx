@@ -37,6 +37,8 @@ import {
   Calendar,
   MapPin
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { CHART_COLORS, AXIS_STYLES, GRID_STYLES, TOOLTIP_CURSOR } from '@/components/charts/ChartStyles';
 
 interface RouteMetrics {
   route_id: string;
@@ -75,8 +77,6 @@ interface PerformanceMetrics {
   delivery_success_rate: number;
   customer_satisfaction: number;
 }
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 const VisualizationPanel: React.FC = () => {
   const [routeMetrics, setRouteMetrics] = useState<RouteMetrics[]>([]);
@@ -249,12 +249,16 @@ const VisualizationPanel: React.FC = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
             Визуализация и аналитика
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400 mt-1">
             Графики маршрутов, тепловые карты и сравнительный анализ
           </p>
         </div>
@@ -262,7 +266,7 @@ const VisualizationPanel: React.FC = () => {
           <select
             value={selectedTimeRange}
             onChange={(e) => setSelectedTimeRange(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className="px-4 py-2 border border-indigo-500/30 rounded-xl bg-gray-900/50 backdrop-blur-sm text-white hover:border-indigo-500/50 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="1h">Последний час</option>
             <option value="6h">Последние 6 часов</option>
@@ -271,27 +275,32 @@ const VisualizationPanel: React.FC = () => {
           </select>
           <button
             onClick={exportData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] flex items-center gap-2 hover:scale-105"
           >
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4" />
             Экспорт
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Performance Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Route Performance Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-              <BarChart3 className="h-5 w-5 mr-2" />
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent flex items-center">
+              <BarChart3 className="h-5 w-5 mr-2 text-indigo-400" />
               Производительность маршрутов
             </h2>
             <select
               value={selectedMetric}
               onChange={(e) => setSelectedMetric(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+              className="px-3 py-2 border border-purple-500/30 rounded-xl bg-gray-900/50 backdrop-blur-sm text-white text-sm hover:border-purple-500/50 transition-all"
             >
               <option value="efficiency">Эффективность</option>
               <option value="distance">Расстояние</option>
@@ -302,14 +311,22 @@ const VisualizationPanel: React.FC = () => {
           
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={performanceData}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <defs>
+                <linearGradient id="lineGrad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.4} />
+                  <stop offset="100%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid {...GRID_STYLES} />
               <XAxis 
                 dataKey="timestamp" 
                 tickFormatter={formatTime}
-                tick={{ fontSize: 12 }}
+                {...AXIS_STYLES}
               />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis {...AXIS_STYLES} />
               <Tooltip 
+                cursor={TOOLTIP_CURSOR}
+                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(99, 102, 241, 0.3)', borderRadius: '12px', color: '#fff' }}
                 labelFormatter={(value) => formatTime(value as string)}
                 formatter={(value: number, name: string) => [
                   selectedMetric === 'efficiency' || selectedMetric === 'customer_satisfaction' 
@@ -318,22 +335,24 @@ const VisualizationPanel: React.FC = () => {
                   name
                 ]}
               />
-              <Legend />
               {selectedMetric === 'efficiency' && (
                 <Line 
                   type="monotone" 
                   dataKey="delivery_success_rate" 
-                  stroke="#8884d8" 
-                  strokeWidth={2}
+                  stroke={CHART_COLORS.primary[0]}
+                  strokeWidth={3}
+                  dot={false}
                   name="Успешность доставки"
+                  fill="url(#lineGrad1)"
                 />
               )}
               {selectedMetric === 'distance' && (
                 <Line 
                   type="monotone" 
                   dataKey="total_distance" 
-                  stroke="#82ca9d" 
-                  strokeWidth={2}
+                  stroke={CHART_COLORS.primary[1]}
+                  strokeWidth={3}
+                  dot={false}
                   name="Общее расстояние (км)"
                 />
               )}
@@ -341,8 +360,9 @@ const VisualizationPanel: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="total_duration" 
-                  stroke="#ffc658" 
-                  strokeWidth={2}
+                  stroke={CHART_COLORS.primary[2]}
+                  strokeWidth={3}
+                  dot={false}
                   name="Общее время (мин)"
                 />
               )}
@@ -350,34 +370,48 @@ const VisualizationPanel: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="fuel_consumption" 
-                  stroke="#ff7300" 
-                  strokeWidth={2}
+                  stroke={CHART_COLORS.primary[0]}
+                  strokeWidth={3}
+                  dot={false}
                   name="Расход топлива (л)"
                 />
               )}
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Algorithm Comparison */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Target className="h-5 w-5 mr-2" />
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+        >
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 flex items-center">
+            <Target className="h-5 w-5 mr-2 text-purple-400" />
             Сравнение алгоритмов
           </h2>
           
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={routeMetrics.slice(0, 10)}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <defs>
+                <linearGradient id="barGradientEff" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={CHART_COLORS.primary[1]} stopOpacity={0.9} />
+                  <stop offset="100%" stopColor={CHART_COLORS.primary[1]} stopOpacity={0.6} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid {...GRID_STYLES} />
               <XAxis 
                 dataKey="route_id" 
-                tick={{ fontSize: 10 }}
+                {...AXIS_STYLES}
                 angle={-45}
                 textAnchor="end"
-                height={60}
+                height={80}
               />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis {...AXIS_STYLES} />
               <Tooltip 
+                cursor={TOOLTIP_CURSOR}
+                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '12px', color: '#fff' }}
                 formatter={(value: number, name: string) => [
                   name === 'efficiency_score' ? `${Math.round(value * 100)}%` : Math.round(value),
                   name === 'efficiency_score' ? 'Эффективность' : 
@@ -385,11 +419,15 @@ const VisualizationPanel: React.FC = () => {
                   name === 'duration' ? 'Время (мин)' : name
                 ]}
               />
-              <Legend />
-              <Bar dataKey="efficiency_score" fill="#8884d8" name="Эффективность" />
+              <Bar 
+                dataKey="efficiency_score" 
+                fill="url(#barGradientEff)" 
+                name="Эффективность"
+                radius={[8, 8, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       </div>
 
       {/* Comparison Table */}
@@ -468,9 +506,14 @@ const VisualizationPanel: React.FC = () => {
       {/* Heatmap and Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Zone Distribution */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <MapPin className="h-5 w-5 mr-2" />
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]"
+        >
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent mb-6 flex items-center">
+            <MapPin className="h-5 w-5 mr-2 text-indigo-400" />
             Распределение по зонам
           </h2>
           
@@ -488,45 +531,60 @@ const VisualizationPanel: React.FC = () => {
                 }, [] as { zone: string; count: number }[])}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
+                labelLine={true}
                 label={({ zone, percent }) => `${zone} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
+                outerRadius={90}
+                innerRadius={40}
                 fill="#8884d8"
                 dataKey="count"
+                strokeWidth={2}
+                stroke="#1F2937"
               >
                 {heatmapData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={CHART_COLORS.pie[index % CHART_COLORS.pie.length]}
+                    style={{ filter: 'drop-shadow(0px 0px 8px rgba(99, 102, 241, 0.4))' }}
+                  />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(99, 102, 241, 0.3)', borderRadius: '12px', color: '#fff' }}
+              />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Delivery Time Heatmap */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Clock className="h-5 w-5 mr-2" />
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+        >
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent mb-6 flex items-center">
+            <Clock className="h-5 w-5 mr-2 text-purple-400" />
             Время доставки по зонам
           </h2>
           
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart data={heatmapData}>
-              <CartesianGrid />
+              <CartesianGrid {...GRID_STYLES} />
               <XAxis 
                 type="number" 
                 dataKey="delivery_count" 
                 name="Количество доставок"
-                tick={{ fontSize: 12 }}
+                {...AXIS_STYLES}
               />
               <YAxis 
                 type="number" 
                 dataKey="avg_time" 
                 name="Среднее время (мин)"
-                tick={{ fontSize: 12 }}
+                {...AXIS_STYLES}
               />
               <Tooltip 
-                cursor={{ strokeDasharray: '3 3' }}
+                cursor={{ strokeDasharray: '5 5', stroke: '#8B5CF6', opacity: 0.3 }}
+                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '12px', color: '#fff' }}
                 formatter={(value, name) => [
                   name === 'avg_time' ? `${Math.round(value as number)} мин` : value,
                   name === 'avg_time' ? 'Среднее время' : 
@@ -536,58 +594,82 @@ const VisualizationPanel: React.FC = () => {
               <Scatter 
                 name="Зоны доставки" 
                 dataKey="avg_time" 
-                fill="#8884d8"
-              />
+                fill={CHART_COLORS.primary[1]}
+                fillOpacity={0.8}
+              >
+                {heatmapData.map((entry, index) => (
+                  <Cell 
+                    key={`scatter-${index}`} 
+                    fill={CHART_COLORS.primary[index % CHART_COLORS.primary.length]}
+                  />
+                ))}
+              </Scatter>
             </ScatterChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       </div>
 
       {/* Route Efficiency Trends */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <Route className="h-5 w-5 mr-2" />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+      >
+        <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6 flex items-center">
+          <Route className="h-5 w-5 mr-2 text-blue-400" />
           Тренды эффективности маршрутов
         </h2>
         
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <defs>
+              <linearGradient id="areaGrad1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={CHART_COLORS.primary[1]} stopOpacity={0.5} />
+                <stop offset="100%" stopColor={CHART_COLORS.primary[1]} stopOpacity={0.05} />
+              </linearGradient>
+              <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={CHART_COLORS.success} stopOpacity={0.5} />
+                <stop offset="100%" stopColor={CHART_COLORS.success} stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid {...GRID_STYLES} />
             <XAxis 
               dataKey="timestamp" 
               tickFormatter={formatTime}
-              tick={{ fontSize: 12 }}
+              {...AXIS_STYLES}
             />
-            <YAxis tick={{ fontSize: 12 }} />
+            <YAxis {...AXIS_STYLES} />
             <Tooltip 
+              cursor={TOOLTIP_CURSOR}
+              contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '12px', color: '#fff' }}
               labelFormatter={(value) => formatTime(value as string)}
               formatter={(value: number, name: string) => [
                 `${Math.round(value * 100)}%`,
                 name === 'delivery_success_rate' ? 'Успешность доставки' : 'Удовлетворенность клиентов'
               ]}
             />
-            <Legend />
             <Area
               type="monotone"
               dataKey="delivery_success_rate"
               stackId="1"
-              stroke="#8884d8"
-              fill="#8884d8"
-              fillOpacity={0.6}
+              stroke={CHART_COLORS.primary[1]}
+              strokeWidth={3}
+              fill="url(#areaGrad1)"
               name="Успешность доставки"
             />
             <Area
               type="monotone"
               dataKey="customer_satisfaction"
               stackId="2"
-              stroke="#82ca9d"
-              fill="#82ca9d"
-              fillOpacity={0.6}
+              stroke={CHART_COLORS.success}
+              strokeWidth={3}
+              fill="url(#areaGrad2)"
               name="Удовлетворенность клиентов"
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -87,6 +87,11 @@ const IntegrationPanel: React.FC = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [clientTime, setClientTime] = useState<string>('');
 
+  // Функция для форматирования чисел с округлением до 2 знаков после точки
+  const formatNumber = (num: number): string => {
+    return Number(num.toFixed(2)).toString();
+  };
+
   // Initialize client time to avoid hydration mismatch
   useEffect(() => {
     setClientTime(new Date().toLocaleTimeString('ru-RU'));
@@ -105,6 +110,7 @@ const IntegrationPanel: React.FC = () => {
     }, 30000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoRefresh]);
 
   const loadSystemComponents = () => {
@@ -333,11 +339,11 @@ const IntegrationPanel: React.FC = () => {
       setComponents(prev => prev.map(component => ({
         ...component,
         lastCheck: new Date().toISOString(),
-        health: Math.max(70, Math.min(100, component.health + (Math.random() - 0.5) * 10)),
+        health: Number(Math.max(70, Math.min(100, component.health + (Math.random() - 0.5) * 10)).toFixed(2)),
         metrics: {
           ...component.metrics,
-          responseTime: Math.max(10, component.metrics.responseTime + (Math.random() - 0.5) * 100),
-          errorRate: Math.max(0, Math.min(5, component.metrics.errorRate + (Math.random() - 0.5) * 1))
+          responseTime: Number(Math.max(10, component.metrics.responseTime + (Math.random() - 0.5) * 100).toFixed(2)),
+          errorRate: Number(Math.max(0, Math.min(5, component.metrics.errorRate + (Math.random() - 0.5) * 1)).toFixed(2))
         }
       })));
 
@@ -449,31 +455,31 @@ const IntegrationPanel: React.FC = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-white">
             Интеграция системы
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400 mt-1">
             Мониторинг компонентов и тестирование интеграции
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <label className="flex items-center">
+          <label className="flex items-center bg-gray-900/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-indigo-500/30 hover:border-indigo-500/50 transition-all cursor-pointer">
             <input
               type="checkbox"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-600 rounded bg-gray-800"
             />
-            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Автообновление</span>
+            <span className="ml-2 text-sm text-gray-300">Автообновление</span>
           </label>
           <button
             onClick={refreshSystemStatus}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center"
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] disabled:opacity-50 flex items-center gap-2 font-medium hover:scale-105"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Обновить
           </button>
         </div>
@@ -481,55 +487,55 @@ const IntegrationPanel: React.FC = () => {
 
       {/* System Health Overview */}
       {systemHealth && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Shield className="h-5 w-5 mr-2" />
+        <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 flex items-center">
+            <Shield className="h-5 w-5 mr-2 text-purple-400" />
             Общее состояние системы
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="text-center">
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-2">
-                <div className={`text-3xl font-bold ${getHealthColor(systemHealth.overall)}`}>
+              <div className="p-5 bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl mb-2 border border-gray-700/50 shadow-[0_0_15px_rgba(100,100,100,0.1)]">
+                <div className={`text-4xl font-bold ${getHealthColor(systemHealth.overall)}`}>
                   {systemHealth.overall}%
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Общее</p>
+                <p className="text-sm text-gray-400 mt-2">Общее</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg mb-2">
-                <div className={`text-2xl font-bold ${getHealthColor(systemHealth.components.api)}`}>
+              <div className="p-5 bg-gradient-to-br from-blue-900/30 to-indigo-900/30 backdrop-blur-sm rounded-2xl mb-2 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                <div className={`text-3xl font-bold ${getHealthColor(systemHealth.components.api)}`}>
                   {systemHealth.components.api}%
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">API</p>
+                <p className="text-sm text-gray-400 mt-2">API</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="p-4 bg-green-50 dark:bg-green-900 rounded-lg mb-2">
-                <div className={`text-2xl font-bold ${getHealthColor(systemHealth.components.database)}`}>
+              <div className="p-5 bg-gradient-to-br from-green-900/30 to-emerald-900/30 backdrop-blur-sm rounded-2xl mb-2 border border-green-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <div className={`text-3xl font-bold ${getHealthColor(systemHealth.components.database)}`}>
                   {systemHealth.components.database}%
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">БД</p>
+                <p className="text-sm text-gray-400 mt-2">БД</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="p-4 bg-purple-50 dark:bg-purple-900 rounded-lg mb-2">
-                <div className={`text-2xl font-bold ${getHealthColor(systemHealth.components.frontend)}`}>
+              <div className="p-5 bg-gradient-to-br from-purple-900/30 to-fuchsia-900/30 backdrop-blur-sm rounded-2xl mb-2 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                <div className={`text-3xl font-bold ${getHealthColor(systemHealth.components.frontend)}`}>
                   {systemHealth.components.frontend}%
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Фронтенд</p>
+                <p className="text-sm text-gray-400 mt-2">Фронтенд</p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="p-4 bg-orange-50 dark:bg-orange-900 rounded-lg mb-2">
-                <div className={`text-2xl font-bold ${getHealthColor(systemHealth.components.monitoring)}`}>
+              <div className="p-5 bg-gradient-to-br from-orange-900/30 to-red-900/30 backdrop-blur-sm rounded-2xl mb-2 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                <div className={`text-3xl font-bold ${getHealthColor(systemHealth.components.monitoring)}`}>
                   {systemHealth.components.monitoring}%
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Мониторинг</p>
+                <p className="text-sm text-gray-400 mt-2">Мониторинг</p>
               </div>
             </div>
           </div>
@@ -574,9 +580,9 @@ const IntegrationPanel: React.FC = () => {
       )}
 
       {/* Tabs */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="flex space-x-8 px-6">
+      <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] overflow-hidden">
+        <div className="border-b border-indigo-500/20">
+          <nav className="flex space-x-8 px-6 overflow-x-auto">
             {[
               { id: 'components', name: 'Компоненты', icon: Server },
               { id: 'tests', name: 'Тесты интеграции', icon: CheckCircle },
@@ -586,10 +592,10 @@ const IntegrationPanel: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center whitespace-nowrap transition-all duration-300 ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                    ? 'border-blue-500 text-blue-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300'
                 }`}
               >
                 <tab.icon className="h-4 w-4 mr-2" />
@@ -602,60 +608,60 @@ const IntegrationPanel: React.FC = () => {
         <div className="p-6">
           {/* Components Tab */}
           {activeTab === 'components' && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 Компоненты системы
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {components.map((component) => (
                   <div
                     key={component.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="bg-gray-800/50 backdrop-blur-sm border border-indigo-500/20 rounded-xl p-5 hover:border-indigo-500/40 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all duration-300"
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-2">
                         {getComponentIcon(component.type)}
-                        <h3 className="font-medium text-gray-900 dark:text-white">
+                        <h3 className="font-medium text-white">
                           {component.name}
                         </h3>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBg(component.status)}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBg(component.status)}`}>
                         {component.status === 'online' ? 'Онлайн' :
                          component.status === 'offline' ? 'Офлайн' :
                          component.status === 'warning' ? 'Предупреждение' : 'Ошибка'}
                       </span>
                     </div>
                     
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-500 dark:text-gray-400">Здоровье:</span>
+                        <span className="text-gray-400">Здоровье:</span>
                         <span className={`font-medium ${getHealthColor(component.health)}`}>
-                          {component.health}%
+                          {formatNumber(component.health)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500 dark:text-gray-400">Время отклика:</span>
-                        <span className="text-gray-900 dark:text-white">
-                          {component.metrics.responseTime}мс
+                        <span className="text-gray-400">Время отклика:</span>
+                        <span className="text-white font-medium">
+                          {formatNumber(component.metrics.responseTime)}мс
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500 dark:text-gray-400">Uptime:</span>
-                        <span className="text-gray-900 dark:text-white">
-                          {component.metrics.uptime}%
+                        <span className="text-gray-400">Uptime:</span>
+                        <span className="text-white font-medium">
+                          {formatNumber(component.metrics.uptime)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500 dark:text-gray-400">Ошибки:</span>
-                        <span className="text-gray-900 dark:text-white">
-                          {component.metrics.errorRate}%
+                        <span className="text-gray-400">Ошибки:</span>
+                        <span className="text-white font-medium">
+                          {formatNumber(component.metrics.errorRate)}%
                         </span>
                       </div>
                     </div>
                     
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="mt-4 pt-3 border-t border-indigo-500/20">
+                      <p className="text-xs text-gray-400">
                         Последняя проверка: {clientTime ? new Date(component.lastCheck).toLocaleTimeString('ru-RU') : '...'}
                       </p>
                     </div>
@@ -667,9 +673,9 @@ const IntegrationPanel: React.FC = () => {
 
           {/* Integration Tests Tab */}
           {activeTab === 'tests' && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                   Тесты интеграции
                 </h2>
                 <button
@@ -681,9 +687,9 @@ const IntegrationPanel: React.FC = () => {
                     });
                   }}
                   disabled={loading}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center"
+                  className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-500 hover:to-emerald-500 transition-all duration-300 shadow-[0_0_15px_rgba(34,197,94,0.3)] disabled:opacity-50 flex items-center gap-2 font-medium hover:scale-105"
                 >
-                  <Play className="h-4 w-4 mr-2" />
+                  <Play className="h-4 w-4" />
                   Запустить все
                 </button>
               </div>
@@ -692,19 +698,19 @@ const IntegrationPanel: React.FC = () => {
                 {integrationTests.map((test) => (
                   <div
                     key={test.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                    className="bg-gray-800/50 backdrop-blur-sm border border-purple-500/20 rounded-xl p-5 hover:border-purple-500/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-300"
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
+                        <h3 className="font-medium text-white">
                           {test.name}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-gray-400 mt-1">
                           {test.description}
                         </p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBg(test.status)}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBg(test.status)}`}>
                           {test.status === 'passed' ? 'Пройден' :
                            test.status === 'failed' ? 'Провален' :
                            test.status === 'running' ? 'Выполняется' : 'Ожидает'}
@@ -712,7 +718,7 @@ const IntegrationPanel: React.FC = () => {
                         <button
                           onClick={() => runIntegrationTest(test.id)}
                           disabled={loading || test.status === 'running'}
-                          className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+                          className="px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 text-sm disabled:opacity-50 hover:scale-105"
                         >
                           {test.status === 'running' ? (
                             <RefreshCw className="h-3 w-3 animate-spin" />
@@ -724,27 +730,27 @@ const IntegrationPanel: React.FC = () => {
                     </div>
                     
                     <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded">
-                        <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                      <div className="text-center p-3 bg-green-900/30 backdrop-blur-sm rounded-xl border border-green-500/30">
+                        <div className="text-2xl font-bold text-green-400">
                           {test.results.passed}
                         </div>
-                        <div className="text-gray-500 dark:text-gray-400">Пройдено</div>
+                        <div className="text-gray-400 text-xs mt-1">Пройдено</div>
                       </div>
-                      <div className="text-center p-2 bg-red-50 dark:bg-red-900/20 rounded">
-                        <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                      <div className="text-center p-3 bg-red-900/30 backdrop-blur-sm rounded-xl border border-red-500/30">
+                        <div className="text-2xl font-bold text-red-400">
                           {test.results.failed}
                         </div>
-                        <div className="text-gray-500 dark:text-gray-400">Провалено</div>
+                        <div className="text-gray-400 text-xs mt-1">Провалено</div>
                       </div>
-                      <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
-                        <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                      <div className="text-center p-3 bg-yellow-900/30 backdrop-blur-sm rounded-xl border border-yellow-500/30">
+                        <div className="text-2xl font-bold text-yellow-400">
                           {test.results.warnings}
                         </div>
-                        <div className="text-gray-500 dark:text-gray-400">Предупреждений</div>
+                        <div className="text-gray-400 text-xs mt-1">Предупреждений</div>
                       </div>
                     </div>
                     
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                    <div className="mt-4 pt-3 border-t border-purple-500/20 flex justify-between text-xs text-gray-400">
                       <span>
                         Компоненты: {test.components.join(', ')}
                       </span>
@@ -761,77 +767,77 @@ const IntegrationPanel: React.FC = () => {
           {/* Health Tab */}
           {activeTab === 'health' && (
             <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 Детальное состояние системы
               </h2>
               
               {/* System Resources */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Cpu className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="bg-blue-900/30 backdrop-blur-sm border border-blue-500/30 rounded-xl p-5 hover:border-blue-500/50 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3">
+                    <Cpu className="h-6 w-6 text-blue-400" />
+                    <span className="text-3xl font-bold text-blue-400">
                       {Math.floor(Math.random() * 30) + 45}%
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Загрузка CPU</p>
+                  <p className="text-sm text-gray-400 mt-2">Загрузка CPU</p>
                 </div>
                 
-                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <MemoryStick className="h-6 w-6 text-green-600 dark:text-green-400" />
-                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="bg-green-900/30 backdrop-blur-sm border border-green-500/30 rounded-xl p-5 hover:border-green-500/50 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3">
+                    <MemoryStick className="h-6 w-6 text-green-400" />
+                    <span className="text-3xl font-bold text-green-400">
                       {Math.floor(Math.random() * 20) + 60}%
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Использование RAM</p>
+                  <p className="text-sm text-gray-400 mt-2">Использование RAM</p>
                 </div>
                 
-                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <HardDrive className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                    <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <div className="bg-purple-900/30 backdrop-blur-sm border border-purple-500/30 rounded-xl p-5 hover:border-purple-500/50 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3">
+                    <HardDrive className="h-6 w-6 text-purple-400" />
+                    <span className="text-3xl font-bold text-purple-400">
                       {Math.floor(Math.random() * 15) + 25}%
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Диск</p>
+                  <p className="text-sm text-gray-400 mt-2">Диск</p>
                 </div>
                 
-                <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Network className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-                    <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                <div className="bg-orange-900/30 backdrop-blur-sm border border-orange-500/30 rounded-xl p-5 hover:border-orange-500/50 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3">
+                    <Network className="h-6 w-6 text-orange-400" />
+                    <span className="text-3xl font-bold text-orange-400">
                       {Math.floor(Math.random() * 500) + 100} Мб/с
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Сеть</p>
+                  <p className="text-sm text-gray-400 mt-2">Сеть</p>
                 </div>
               </div>
 
               {/* Component Dependencies */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <h3 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-indigo-500/20 rounded-xl p-5">
+                <h3 className="text-md font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-4">
                   Зависимости компонентов
                 </h3>
                 <div className="space-y-3">
                   {components.map((component) => (
-                    <div key={component.id} className="flex items-center space-x-4">
+                    <div key={component.id} className="flex items-center space-x-4 p-3 bg-gray-900/30 rounded-lg hover:bg-gray-900/50 transition-colors">
                       <div className="flex items-center space-x-2 min-w-0 flex-1">
                         {getComponentIcon(component.type)}
-                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <span className="text-sm font-medium text-white truncate">
                           {component.name}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         {component.dependencies.length > 0 ? (
                           <>
-                            <Link className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <Link className="h-4 w-4 text-indigo-400" />
+                            <span className="text-sm text-gray-400">
                               {component.dependencies.length} зависимостей
                             </span>
                           </>
                         ) : (
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-gray-400">
                             Независимый
                           </span>
                         )}
@@ -852,21 +858,21 @@ const IntegrationPanel: React.FC = () => {
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Response Times */}
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <h3 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+                <div className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/20 rounded-xl p-5">
+                  <h3 className="text-md font-medium bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-4">
                     Время отклика компонентов
                   </h3>
                   <div className="space-y-3">
                     {components.map((component) => (
-                      <div key={component.id} className="flex items-center justify-between">
+                      <div key={component.id} className="flex items-center justify-between p-2 hover:bg-gray-900/30 rounded-lg transition-colors">
                         <div className="flex items-center space-x-2">
                           {getComponentIcon(component.type)}
-                          <span className="text-sm text-gray-900 dark:text-white">
+                          <span className="text-sm text-white">
                             {component.name}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                          <div className="w-24 bg-gray-700 rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${
                                 component.metrics.responseTime < 100 ? 'bg-green-500' :
@@ -877,8 +883,8 @@ const IntegrationPanel: React.FC = () => {
                               }}
                             />
                           </div>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 min-w-0">
-                            {component.metrics.responseTime}мс
+                          <span className="text-sm text-gray-400 min-w-0 font-medium">
+                            {formatNumber(component.metrics.responseTime)}мс
                           </span>
                         </div>
                       </div>
@@ -887,21 +893,21 @@ const IntegrationPanel: React.FC = () => {
                 </div>
 
                 {/* Error Rates */}
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <h3 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+                <div className="bg-gray-800/50 backdrop-blur-sm border border-purple-500/20 rounded-xl p-5">
+                  <h3 className="text-md font-medium bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
                     Уровень ошибок
                   </h3>
                   <div className="space-y-3">
                     {components.map((component) => (
-                      <div key={component.id} className="flex items-center justify-between">
+                      <div key={component.id} className="flex items-center justify-between p-2 hover:bg-gray-900/30 rounded-lg transition-colors">
                         <div className="flex items-center space-x-2">
                           {getComponentIcon(component.type)}
-                          <span className="text-sm text-gray-900 dark:text-white">
+                          <span className="text-sm text-white">
                             {component.name}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                          <div className="w-24 bg-gray-700 rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${
                                 component.metrics.errorRate < 1 ? 'bg-green-500' :
@@ -912,8 +918,8 @@ const IntegrationPanel: React.FC = () => {
                               }}
                             />
                           </div>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 min-w-0">
-                            {component.metrics.errorRate}%
+                          <span className="text-sm text-gray-400 min-w-0 font-medium">
+                            {formatNumber(component.metrics.errorRate)}%
                           </span>
                         </div>
                       </div>
@@ -923,34 +929,34 @@ const IntegrationPanel: React.FC = () => {
               </div>
 
               {/* Real-time Metrics */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <h3 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-indigo-500/20 rounded-xl p-5">
+                <h3 className="text-md font-medium bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
                   Метрики в реальном времени
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div>
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="p-4 bg-blue-900/30 backdrop-blur-sm rounded-xl border border-blue-500/30">
+                    <div className="text-3xl font-bold text-blue-400">
                       {components.reduce((sum, c) => sum + c.metrics.throughput, 0)}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Запросов/мин</div>
+                    <div className="text-sm text-gray-400 mt-2">Запросов/мин</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {Math.round(components.reduce((sum, c) => sum + c.metrics.uptime, 0) / components.length * 100) / 100}%
+                  <div className="p-4 bg-green-900/30 backdrop-blur-sm rounded-xl border border-green-500/30">
+                    <div className="text-3xl font-bold text-green-400">
+                      {formatNumber(components.reduce((sum, c) => sum + c.metrics.uptime, 0) / components.length)}%
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Средний Uptime</div>
+                    <div className="text-sm text-gray-400 mt-2">Средний Uptime</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                      {Math.round(components.reduce((sum, c) => sum + c.metrics.responseTime, 0) / components.length)}мс
+                  <div className="p-4 bg-yellow-900/30 backdrop-blur-sm rounded-xl border border-yellow-500/30">
+                    <div className="text-3xl font-bold text-yellow-400">
+                      {formatNumber(components.reduce((sum, c) => sum + c.metrics.responseTime, 0) / components.length)}мс
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Среднее время</div>
+                    <div className="text-sm text-gray-400 mt-2">Среднее время</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                      {Math.round(components.reduce((sum, c) => sum + c.metrics.errorRate, 0) / components.length * 100) / 100}%
+                  <div className="p-4 bg-red-900/30 backdrop-blur-sm rounded-xl border border-red-500/30">
+                    <div className="text-3xl font-bold text-red-400">
+                      {formatNumber(components.reduce((sum, c) => sum + c.metrics.errorRate, 0) / components.length)}%
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Средние ошибки</div>
+                    <div className="text-sm text-gray-400 mt-2">Средние ошибки</div>
                   </div>
                 </div>
               </div>

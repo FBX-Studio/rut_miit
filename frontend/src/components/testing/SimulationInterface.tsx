@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
 
 // Динамический импорт карты симуляции для избежания SSR проблем
 const SimulationMap = dynamic(() => import('./SimulationMap'), {
@@ -616,22 +617,25 @@ const SimulationInterface: React.FC = () => {
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {scenarios.map((scenario) => (
-            <div
+          {scenarios.map((scenario, idx) => (
+            <motion.div
               key={scenario.id}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-gray-900/50 backdrop-blur-sm border border-indigo-500/20 rounded-2xl p-5 hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] transition-all duration-300 group"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(scenario.status)}
-                  <h3 className="font-medium text-gray-900 dark:text-white">
+                  <h3 className="font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                     {scenario.name}
                   </h3>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  scenario.status === 'running' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                  scenario.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                  scenario.status === 'running' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                  scenario.status === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                  'bg-gray-500/20 text-gray-400 border-gray-500/30'
                 }`}>
                   {scenario.status === 'running' ? 'Выполняется' :
                    scenario.status === 'completed' ? 'Завершен' :
@@ -639,33 +643,33 @@ const SimulationInterface: React.FC = () => {
                 </span>
               </div>
               
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 {scenario.description}
               </p>
               
-              <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
-                <div>Транспорт: {scenario.parameters.vehicle_count}</div>
-                <div>Водители: {scenario.parameters.driver_count}</div>
-                <div>Заказы: {scenario.parameters.order_count}</div>
-                <div>Время: {scenario.parameters.time_window_hours}ч</div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 mb-4">
+                <div className="flex items-center gap-1"><Truck className="h-3 w-3 text-indigo-400" /> {scenario.parameters.vehicle_count}</div>
+                <div className="flex items-center gap-1"><Users className="h-3 w-3 text-purple-400" /> {scenario.parameters.driver_count}</div>
+                <div className="flex items-center gap-1"><Package className="h-3 w-3 text-blue-400" /> {scenario.parameters.order_count}</div>
+                <div className="flex items-center gap-1"><Clock className="h-3 w-3 text-green-400" /> {scenario.parameters.time_window_hours}ч</div>
               </div>
               
               <div className="flex space-x-2">
                 <button
                   onClick={() => startSimulation(scenario)}
                   disabled={scenario.status === 'running' || loading}
-                  className="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm font-medium hover:scale-105"
                 >
-                  <Play className="h-3 w-3 mr-1" />
+                  <Play className="h-4 w-4" />
                   Запустить
                 </button>
                 <button
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2.5 border border-purple-500/30 text-gray-300 rounded-xl hover:bg-white/5 hover:border-purple-500/50 transition-all duration-300"
                 >
-                  <Settings className="h-3 w-3" />
+                  <Settings className="h-4 w-4" />
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
