@@ -153,21 +153,21 @@ export const RecentEventsBlock = ({
   };
 
   const getEventColor = (type: string, severity: string) => {
-    if (severity === 'high') return 'text-red-600 bg-red-100 border-red-200';
-    if (severity === 'medium') return 'text-yellow-600 bg-yellow-100 border-yellow-200';
+    if (severity === 'high') return 'text-red-400 bg-red-500/20 border-red-500/30';
+    if (severity === 'medium') return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
     
     switch (type) {
       case 'delivery':
       case 'pickup':
-        return 'text-green-600 bg-green-100 border-green-200';
+        return 'text-green-400 bg-green-500/20 border-green-500/30';
       case 'incident':
-        return 'text-red-600 bg-red-100 border-red-200';
+        return 'text-red-400 bg-red-500/20 border-red-500/30';
       case 'route_change':
-        return 'text-blue-600 bg-blue-100 border-blue-200';
+        return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
       case 'order':
-        return 'text-purple-600 bg-purple-100 border-purple-200';
+        return 'text-purple-400 bg-purple-500/20 border-purple-500/30';
       default:
-        return 'text-gray-600 bg-gray-100 border-gray-200';
+        return 'text-gray-400 bg-gray-500/20 border-gray-500/30';
     }
   };
 
@@ -188,7 +188,7 @@ export const RecentEventsBlock = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm border border-gray-200 dark:border-gray-700 ${className}`}>
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
@@ -197,10 +197,10 @@ export const RecentEventsBlock = ({
               <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-white">
                 Последние события
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 {filteredEvents.length} из {events.length} событий
               </p>
             </div>
@@ -234,7 +234,7 @@ export const RecentEventsBlock = ({
                   className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     selectedFilter === filter.value
                       ? 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-700/50 dark:text-gray-400 dark:hover:bg-gray-600'
                   }`}
                 >
                   <IconComponent className="h-3 w-3 mr-1" />
@@ -247,9 +247,9 @@ export const RecentEventsBlock = ({
       </div>
 
       {/* Events Timeline */}
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="divide-y divide-gray-700/30">
         {filteredEvents.map((event, index) => (
-          <div key={event.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+          <div key={event.id} className="p-6 hover:bg-gray-800/30 transition-colors">
             <div className="flex items-start space-x-4">
               {/* Timeline indicator */}
               <div className="flex-shrink-0 relative">
@@ -257,7 +257,7 @@ export const RecentEventsBlock = ({
                   {getEventIcon(event.type)}
                 </div>
                 {index < filteredEvents.length - 1 && (
-                  <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-gray-700/50"></div>
                 )}
               </div>
 
@@ -266,7 +266,7 @@ export const RecentEventsBlock = ({
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                      <h3 className="text-sm font-medium text-white">
                         {event.title}
                       </h3>
                       {event.severity === 'high' && (
@@ -275,12 +275,12 @@ export const RecentEventsBlock = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-sm text-gray-400 mb-2">
                       {event.description}
                     </p>
                     
                     {/* Event details */}
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400">
                       <span className="flex items-center space-x-1">
                         <Clock className="h-3 w-3" />
                         <span>{formatTime(event.timestamp)}</span>
@@ -334,10 +334,10 @@ export const RecentEventsBlock = ({
       {filteredEvents.length === 0 && (
         <div className="p-12 text-center">
           <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-sm font-medium text-white mb-2">
             Нет событий
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             События появятся здесь по мере их возникновения
           </p>
         </div>

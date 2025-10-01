@@ -152,7 +152,7 @@ export const RouteEfficiencyBlock = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm border border-gray-200 dark:border-gray-700 ${className}`}>
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
@@ -161,10 +161,10 @@ export const RouteEfficiencyBlock = ({
               <Route className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-white">
                 Эффективность маршрутов
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Сравнение плановых и фактических показателей
               </p>
             </div>
@@ -173,7 +173,7 @@ export const RouteEfficiencyBlock = ({
             <select 
               value={selectedMetric}
               onChange={(e) => setSelectedMetric(e.target.value as 'distance' | 'time' | 'fuel')}
-              className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 bg-white dark:bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="distance">Расстояние</option>
               <option value="time">Время</option>
@@ -195,7 +195,7 @@ export const RouteEfficiencyBlock = ({
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Средняя эффективность</p>
+                <p className="text-sm text-gray-400">Средняя эффективность</p>
                 <p className={`text-2xl font-bold ${getEfficiencyColor(avgEfficiency)}`}>
                   {avgEfficiency}%
                 </p>
@@ -207,7 +207,7 @@ export const RouteEfficiencyBlock = ({
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Экономия/Перерасход</p>
+                <p className="text-sm text-gray-400">Экономия/Перерасход</p>
                 <p className={`text-2xl font-bold ${totalSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {formatCurrency(totalSavings)}
                 </p>
@@ -223,8 +223,8 @@ export const RouteEfficiencyBlock = ({
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Среднее отклонение</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-400">Среднее отклонение</p>
+                <p className="text-2xl font-bold text-white">
                   {avgDeviation}%
                 </p>
               </div>
@@ -235,7 +235,7 @@ export const RouteEfficiencyBlock = ({
 
         {/* Efficiency Chart */}
         <div className="mb-6">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+          <h3 className="text-sm font-medium text-white mb-4">
             Динамика эффективности за неделю
           </h3>
           <div className="h-48">
@@ -298,29 +298,29 @@ export const RouteEfficiencyBlock = ({
 
         {/* Routes Table */}
         <div>
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+          <h3 className="text-sm font-medium text-white mb-4">
             Детализация по маршрутам
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  <th className="text-left py-3 px-4 font-medium text-white">
                     Маршрут
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  <th className="text-left py-3 px-4 font-medium text-white">
                     Эффективность
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  <th className="text-left py-3 px-4 font-medium text-white">
                     Расстояние
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  <th className="text-left py-3 px-4 font-medium text-white">
                     Время
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  <th className="text-left py-3 px-4 font-medium text-white">
                     Топливо
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">
+                  <th className="text-left py-3 px-4 font-medium text-white">
                     Экономия
                   </th>
                 </tr>
@@ -330,10 +330,10 @@ export const RouteEfficiencyBlock = ({
                   <tr key={route.route_id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td className="py-3 px-4">
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">
+                        <p className="font-medium text-white">
                           {route.route_name}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-400">
                           #{route.route_id}
                         </p>
                       </div>
@@ -354,30 +354,30 @@ export const RouteEfficiencyBlock = ({
                     </td>
                     <td className="py-3 px-4">
                       <div className="text-sm">
-                        <p className="text-gray-900 dark:text-white">
+                        <p className="text-white">
                           {route.actual_distance} км
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-400">
                           план: {route.planned_distance} км
                         </p>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="text-sm">
-                        <p className="text-gray-900 dark:text-white">
+                        <p className="text-white">
                           {formatTime(route.actual_time)}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-400">
                           план: {formatTime(route.planned_time)}
                         </p>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="text-sm">
-                        <p className="text-gray-900 dark:text-white">
+                        <p className="text-white">
                           {route.actual_fuel} л
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-400">
                           план: {route.planned_fuel} л
                         </p>
                       </div>

@@ -33,7 +33,7 @@ const SimulationMap = dynamic(() => import('./SimulationMap'), {
     <div className="h-96 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-        <p className="text-gray-600 dark:text-gray-400">Загрузка карты...</p>
+        <p className="text-gray-400">Загрузка карты...</p>
       </div>
     </div>
   )
@@ -475,10 +475,10 @@ const SimulationInterface: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-white">
             Имитационное тестирование
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             Виртуальные сценарии доставки и оценка алгоритмов в реальном времени
           </p>
         </div>
@@ -504,8 +504,8 @@ const SimulationInterface: React.FC = () => {
 
       {/* Real-time Metrics */}
       {activeSimulation?.status === 'running' && realTimeMetrics && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+        <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+          <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Activity className="h-5 w-5 mr-2 animate-pulse" />
             Метрики в реальном времени
           </h2>
@@ -515,8 +515,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg mb-2">
                 <Activity className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Активные</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Активные</p>
+              <p className="text-xl font-bold text-white">
                 {realTimeMetrics.active_deliveries}
               </p>
             </div>
@@ -525,8 +525,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg mb-2">
                 <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Завершено</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Завершено</p>
+              <p className="text-xl font-bold text-white">
                 {realTimeMetrics.completed_deliveries}
               </p>
             </div>
@@ -535,8 +535,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg mb-2">
                 <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Ожидают</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Ожидают</p>
+              <p className="text-xl font-bold text-white">
                 {realTimeMetrics.pending_deliveries}
               </p>
             </div>
@@ -545,8 +545,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg mb-2">
                 <Truck className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Транспорт</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Транспорт</p>
+              <p className="text-xl font-bold text-white">
                 {realTimeMetrics.active_vehicles}
               </p>
             </div>
@@ -555,8 +555,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg mb-2">
                 <Gauge className="h-6 w-6 text-indigo-600 dark:text-indigo-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Скорость</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Скорость</p>
+              <p className="text-xl font-bold text-white">
                 {Math.round(realTimeMetrics.average_speed)} км/ч
               </p>
             </div>
@@ -565,8 +565,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg mb-2">
                 <Target className="h-6 w-6 text-teal-600 dark:text-teal-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Эффективность</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Эффективность</p>
+              <p className="text-xl font-bold text-white">
                 {Math.round(realTimeMetrics.current_efficiency * 100)}%
               </p>
             </div>
@@ -575,8 +575,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg mb-2">
                 <Timer className="h-6 w-6 text-orange-600 dark:text-orange-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Время</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Время</p>
+              <p className="text-xl font-bold text-white">
                 {realTimeMetrics.current_time}
               </p>
             </div>
@@ -585,8 +585,8 @@ const SimulationInterface: React.FC = () => {
               <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg mb-2">
                 <Clock className="h-6 w-6 text-pink-600 dark:text-pink-400 mx-auto" />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Завершение</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Завершение</p>
+              <p className="text-xl font-bold text-white">
                 {realTimeMetrics.estimated_completion}
               </p>
             </div>
@@ -596,13 +596,13 @@ const SimulationInterface: React.FC = () => {
 
       {/* Simulation Map */}
       {activeSimulation?.status === 'running' && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+        <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+          <div className="p-4 border-b border-indigo-500/20">
+            <h2 className="text-lg font-semibold text-white flex items-center">
               <MapPin className="h-5 w-5 mr-2" />
               Карта симуляции маршрута
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               Отслеживание движения водителя в реальном времени
             </p>
           </div>
@@ -611,8 +611,8 @@ const SimulationInterface: React.FC = () => {
       )}
 
       {/* Scenarios List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+        <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6">
           Сценарии симуляции
         </h2>
         
@@ -676,15 +676,15 @@ const SimulationInterface: React.FC = () => {
 
       {/* Active Simulation Events */}
       {activeSimulation && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+        <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+          <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Activity className="h-5 w-5 mr-2" />
             События симуляции
           </h2>
           
           <div className="max-h-96 overflow-y-auto space-y-2">
             {activeSimulation.events.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 text-gray-400">
                 <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Ожидание событий симуляции...</p>
               </div>
@@ -700,10 +700,10 @@ const SimulationInterface: React.FC = () => {
                 >
                   {getEventIcon(event.type)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-white">
                       {event.description}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-400">
                       {new Date(event.timestamp).toLocaleTimeString('ru-RU')}
                     </p>
                   </div>
@@ -725,9 +725,9 @@ const SimulationInterface: React.FC = () => {
       {/* Create Scenario Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-indigo-500/20">
+              <h2 className="text-xl font-semibold text-white">
                 Создать сценарий симуляции
               </h2>
             </div>
@@ -885,7 +885,7 @@ const SimulationInterface: React.FC = () => {
                     })}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <span className="ml-2 text-sm text-gray-900 dark:text-white">Час пик</span>
+                  <span className="ml-2 text-sm text-white">Час пик</span>
                 </label>
                 
                 <div className="flex-1">

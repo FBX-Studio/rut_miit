@@ -72,10 +72,10 @@ export default function SimulationLauncher({ onLaunch }: QuickSimulationProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm bg-gray-800/50 backdrop-blur-sm border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-white">
             Запуск симуляции
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -84,7 +84,7 @@ export default function SimulationLauncher({ onLaunch }: QuickSimulationProps) {
         </div>
         <button
           onClick={openFullTestingSystem}
-          className="flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="flex items-center px-3 py-2 text-sm text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           <Settings className="h-4 w-4 mr-1" />
           Настройки
@@ -103,7 +103,7 @@ export default function SimulationLauncher({ onLaunch }: QuickSimulationProps) {
                 {scenario.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <h4 className="font-medium text-gray-900 dark:text-white break-words">
+                <h4 className="font-medium text-white break-words">
                   {scenario.name}
                 </h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400 break-words">

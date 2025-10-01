@@ -101,31 +101,31 @@ export const DeliveryPerformanceBlock = ({
   };
 
   const getPerformanceColor = (percentage: number) => {
-    if (percentage >= 95) return 'text-green-600';
-    if (percentage >= 85) return 'text-yellow-600';
-    return 'text-red-600';
+    if (percentage >= 95) return 'text-green-400';
+    if (percentage >= 85) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
   const getPerformanceIcon = (percentage: number) => {
-    if (percentage >= 95) return <CheckCircle className="h-5 w-5 text-green-600" />;
-    if (percentage >= 85) return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-    return <XCircle className="h-5 w-5 text-red-600" />;
+    if (percentage >= 95) return <CheckCircle className="h-5 w-5 text-green-400" />;
+    if (percentage >= 85) return <AlertTriangle className="h-5 w-5 text-yellow-400" />;
+    return <XCircle className="h-5 w-5 text-red-400" />;
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-sm border border-gray-200 dark:border-gray-700 ${className}`}>
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-6 border-b border-indigo-500/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-green-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-white">
                 Производительность доставки
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Статистика за {data.period.toLowerCase()}
               </p>
             </div>
@@ -134,7 +134,7 @@ export const DeliveryPerformanceBlock = ({
             <select 
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value as 'day' | 'week' | 'month')}
-              className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="text-sm border border-indigo-500/30 rounded-md px-3 py-1.5 bg-gray-800/50 backdrop-blur-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="day">Сегодня</option>
               <option value="week">Эта неделя</option>
@@ -156,32 +156,32 @@ export const DeliveryPerformanceBlock = ({
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Всего доставок</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-400">Всего доставок</p>
+                <p className="text-2xl font-bold text-white">
                   {data.total_deliveries}
                 </p>
               </div>
-              <Package className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <Package className="h-8 w-8 text-blue-400" />
             </div>
           </div>
 
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Успешных</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm text-gray-400">Успешных</p>
+                <p className="text-2xl font-bold text-green-400">
                   {data.successful_deliveries}
                 </p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-green-400" />
             </div>
           </div>
 
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Среднее время</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-400">Среднее время</p>
+                <p className="text-2xl font-bold text-white">
                   {formatTime(data.average_delivery_time)}
                 </p>
               </div>
@@ -192,7 +192,7 @@ export const DeliveryPerformanceBlock = ({
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">В срок</p>
+                <p className="text-sm text-gray-400">В срок</p>
                 <p className={`text-2xl font-bold ${getPerformanceColor(data.on_time_percentage)}`}>
                   {data.on_time_percentage}%
                 </p>
@@ -206,42 +206,57 @@ export const DeliveryPerformanceBlock = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Trend Chart */}
           <div>
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+            <h3 className="text-sm font-semibold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-4">
               Динамика доставок
             </h3>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <defs>
+                    <linearGradient id="onTimeGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#10B981" stopOpacity={0.05} />
+                    </linearGradient>
+                    <linearGradient id="delayedGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#F59E0B" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" strokeOpacity={0.3} />
                   <XAxis 
                     dataKey="name" 
-                    tick={{ fontSize: 12 }}
-                    stroke="#6B7280"
+                    tick={{ fontSize: 12, fill: '#9CA3AF' }}
+                    stroke="#4B5563"
                   />
                   <YAxis 
-                    tick={{ fontSize: 12 }}
-                    stroke="#6B7280"
+                    tick={{ fontSize: 12, fill: '#9CA3AF' }}
+                    stroke="#4B5563"
                   />
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: '#1F2937',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#F9FAFB'
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      borderRadius: '12px',
+                      color: '#F9FAFB',
+                      boxShadow: '0 0 20px rgba(99, 102, 241, 0.2)'
                     }}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="onTime" 
                     stroke="#10B981" 
-                    strokeWidth={2}
+                    strokeWidth={3}
+                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: '#10B981', stroke: '#10B981', strokeWidth: 2 }}
                     name="В срок"
                   />
                   <Line 
                     type="monotone" 
                     dataKey="delayed" 
                     stroke="#F59E0B" 
-                    strokeWidth={2}
+                    strokeWidth={3}
+                    dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: '#F59E0B', stroke: '#F59E0B', strokeWidth: 2 }}
                     name="С задержкой"
                   />
                 </LineChart>
@@ -251,32 +266,50 @@ export const DeliveryPerformanceBlock = ({
 
           {/* Performance Distribution */}
           <div>
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+            <h3 className="text-sm font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
               Распределение результатов
             </h3>
             <div className="h-48 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
+                  <defs>
+                    {pieData.map((entry, index) => (
+                      <filter key={`glow-${index}`} id={`glow-${index}`}>
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    ))}
+                  </defs>
                   <Pie
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={40}
-                    outerRadius={80}
-                    paddingAngle={5}
+                    innerRadius={45}
+                    outerRadius={85}
+                    paddingAngle={3}
                     dataKey="value"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color}
+                        stroke={entry.color}
+                        strokeWidth={2}
+                        style={{ filter: `url(#glow-${index})` }}
+                      />
                     ))}
                   </Pie>
                   <Tooltip 
                     formatter={(value) => [`${value}%`, 'Процент']}
                     contentStyle={{
                       backgroundColor: '#1F2937',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#F9FAFB'
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      borderRadius: '12px',
+                      color: '#F9FAFB',
+                      boxShadow: '0 0 20px rgba(99, 102, 241, 0.2)'
                     }}
                   />
                 </PieChart>
@@ -289,7 +322,7 @@ export const DeliveryPerformanceBlock = ({
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: entry.color }}
                   ></div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                  <span className="text-xs text-gray-400">
                     {entry.name}
                   </span>
                 </div>
@@ -301,24 +334,24 @@ export const DeliveryPerformanceBlock = ({
         {/* Performance Indicators */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <Target className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <Target className="h-6 w-6 text-green-400" />
             <div>
               <p className="text-sm text-green-800 dark:text-green-200 font-medium">
                 Цель выполнена
               </p>
-              <p className="text-xs text-green-600 dark:text-green-400">
+              <p className="text-xs text-green-400">
                 Показатель в срок: {data.on_time_percentage}% (цель: 85%)
               </p>
             </div>
           </div>
 
           <div className="flex items-center space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <BarChart3 className="h-6 w-6 text-blue-400" />
             <div>
               <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
                 Рост эффективности
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
+              <p className="text-xs text-blue-400">
                 +5.2% по сравнению с прошлым периодом
               </p>
             </div>

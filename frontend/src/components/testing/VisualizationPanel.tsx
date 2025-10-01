@@ -209,9 +209,9 @@ const VisualizationPanel: React.FC = () => {
   };
 
   const getMetricColor = (improvement: number) => {
-    if (improvement > 0) return 'text-green-600';
-    if (improvement < 0) return 'text-red-600';
-    return 'text-gray-600';
+    if (improvement > 0) return 'text-green-400';
+    if (improvement < 0) return 'text-red-400';
+    return 'text-gray-400';
   };
 
   const getMetricIcon = (improvement: number) => {
@@ -431,68 +431,68 @@ const VisualizationPanel: React.FC = () => {
       </div>
 
       {/* Comparison Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <Activity className="h-5 w-5 mr-2" />
+      <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+        <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6 flex items-center">
+          <Activity className="h-5 w-5 mr-2 text-indigo-400" />
           Сравнительная таблица (до/после оптимизации)
         </h2>
         
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+          <table className="min-w-full">
+            <thead>
+              <tr className="border-b border-indigo-500/30">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   Метрика
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   До оптимизации
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   После оптимизации
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   Изменение
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   Статус
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-700/50">
               {comparisonData.map((item, index) => (
-                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                <tr key={index} className="hover:bg-gray-800/30 transition-colors duration-200">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                     {item.metric}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {item.before.toLocaleString('ru-RU')} {item.unit}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {item.after.toLocaleString('ru-RU')} {item.unit}
                   </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getMetricColor(item.improvement)}`}>
-                    <div className="flex items-center">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${getMetricColor(item.improvement)}`}>
+                    <div className="flex items-center gap-1">
                       {getMetricIcon(item.improvement)}
-                      <span className="ml-1">
+                      <span>
                         {item.improvement > 0 ? '+' : ''}{item.improvement.toFixed(1)}%
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {Math.abs(item.improvement) > 10 ? (
-                      <div className="flex items-center text-green-600">
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Значительное улучшение</span>
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg border border-green-500/30">
+                        <CheckCircle className="h-4 w-4" />
+                        <span className="text-xs font-medium">Значительное улучшение</span>
                       </div>
                     ) : Math.abs(item.improvement) > 5 ? (
-                      <div className="flex items-center text-blue-600">
-                        <Activity className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Улучшение</span>
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/30">
+                        <Activity className="h-4 w-4" />
+                        <span className="text-xs font-medium">Улучшение</span>
                       </div>
                     ) : (
-                      <div className="flex items-center text-yellow-600">
-                        <AlertCircle className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Незначительное изменение</span>
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-lg border border-yellow-500/30">
+                        <AlertCircle className="h-4 w-4" />
+                        <span className="text-xs font-medium">Незначительное изменение</span>
                       </div>
                     )}
                   </td>
