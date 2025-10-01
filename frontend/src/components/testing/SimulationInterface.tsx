@@ -20,7 +20,8 @@ import {
   Route,
   Timer,
   Target,
-  Gauge
+  Gauge,
+  Navigation
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
@@ -40,8 +41,9 @@ const SimulationMap = dynamic(() => import('./SimulationMap'), {
 });
 
 // Импорт данных симуляции
-import { mockSimulationData, startRouteAnimation, stopRouteAnimation } from './SimulationData';
+import { SimulationDriver, mockSimulationData, startRouteAnimation, stopRouteAnimation } from './SimulationData';
 import { SimulationIntegrationService } from '@/services/simulationIntegration';
+import { generateSimulationWithRealAddresses } from '@/services/simulationGenerator';
 
 interface SimulationScenario {
   id: string;
@@ -106,6 +108,7 @@ const SimulationInterface: React.FC = () => {
   const [realTimeMetrics, setRealTimeMetrics] = useState<RealTimeMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [generatedDriver, setGeneratedDriver] = useState<SimulationDriver | null>(null);
   
   const [newScenario, setNewScenario] = useState<Omit<SimulationScenario, 'id' | 'status'>>({
     name: '',
@@ -197,7 +200,16 @@ const SimulationInterface: React.FC = () => {
 
   const startSimulation = async (scenario: SimulationScenario) => {
     setLoading(true);
+    toast.loading('Генерация маршрута с реальными адресами...', { id: 'sim-start' });
+    
     try {
+      // Генерируем маршрут с реальными адресами
+      const numStops = Math.min(scenario.parameters.order_count / scenario.parameters.vehicle_count, 10);
+      const driver = await generateSimulationWithRealAddresses(Math.floor(numStops));
+      
+      setGeneratedDriver(driver);
+      toast.success('Маршрут сгенерирован!', { id: 'sim-start' });
+      
       // Имитируем запуск симуляции
       const result: SimulationResult = {
         scenario_id: scenario.id,
@@ -231,10 +243,10 @@ const SimulationInterface: React.FC = () => {
       simulateEvents(scenario);
       
       // Запускаем анимацию маршрута
-      startRouteAnimation(mockSimulationData);
+      startRouteAnimation(driver);
       
       // Синхронизируем данные с основной системой
-      await SimulationIntegrationService.syncSimulationWithMainSystem(mockSimulationData);
+      await SimulationIntegrationService.syncSimulationWithMainSystem(driver);
       
     } catch (error) {
       toast.error('Ошибка запуска симуляции');
@@ -595,7 +607,7 @@ const SimulationInterface: React.FC = () => {
       )}
 
       {/* Simulation Map */}
-      {activeSimulation?.status === 'running' && (
+      {activeSimulation?.status === 'running' && generatedDriver && (
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
           <div className="p-4 border-b border-indigo-500/20">
             <h2 className="text-lg font-semibold text-white flex items-center">
@@ -603,10 +615,13 @@ const SimulationInterface: React.FC = () => {
               Карта симуляции маршрута
             </h2>
             <p className="text-sm text-gray-400 mt-1">
-              Отслеживание движения водителя в реальном времени
+              Отслеживание движения водителя в реальном времени по реальным дорогам Москвы
             </p>
           </div>
-          <SimulationMap />
+          <SimulationMap 
+            initialDriver={generatedDriver} 
+            averageSpeed={40} // средняя скорость 40 км/ч
+          />
         </div>
       )}
 

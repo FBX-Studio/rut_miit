@@ -186,9 +186,10 @@ export class SimulationIntegrationService {
     drivers: MainAppDriver[];
   }> {
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const [routesResponse, driversResponse] = await Promise.all([
-        fetch('/api/v1/routes/active'),
-        fetch('/api/v1/drivers')
+        fetch(`${apiUrl}/api/v1/routes/active`),
+        fetch(`${apiUrl}/api/v1/drivers`)
       ]);
 
       const routes = routesResponse.ok ? await routesResponse.json() : [];
@@ -301,7 +302,8 @@ export class SimulationIntegrationService {
 
   private static async sendToAPI(endpoint: string, data: any): Promise<void> {
     try {
-      await fetch(endpoint, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      await fetch(`${apiUrl}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

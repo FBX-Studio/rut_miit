@@ -25,6 +25,7 @@ export interface SimulationDriver {
   currentLocation: [number, number];
   status: 'idle' | 'driving' | 'loading' | 'delivering' | 'break';
   route: SimulationRoutePoint[];
+  routeGeometry?: [number, number][]; // Геометрия маршрута по дорогам
   completedStops: number;
   totalStops: number;
   startTime: string;

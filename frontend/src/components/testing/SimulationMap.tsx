@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { YMaps, Map, Placemark, Polyline, TrafficControl, ZoomControl, GeolocationControl } from '@pbe/react-yandex-maps';
+import YandexMapWrapper from '../maps/YandexMapWrapper';
 import { 
   Play, 
   Pause, 
@@ -31,23 +31,53 @@ declare global {
 
 interface SimulationMapProps {
   className?: string;
+  initialDriver?: SimulationDriver;
+  onDriverUpdate?: (driver: SimulationDriver) => void;
+  averageSpeed?: number; // км/ч - средняя скорость из сценария
 }
 
-const SimulationMap: React.FC<SimulationMapProps> = ({ className = '' }) => {
-  const [driver, setDriver] = useState<SimulationDriver>(mockSimulationData);
+const SimulationMap: React.FC<SimulationMapProps> = ({ 
+  className = '', 
+  initialDriver,
+  onDriverUpdate,
+  averageSpeed = 40 // по умолчанию 40 км/ч
+}) => {
+  const [driver, setDriver] = useState<SimulationDriver>(initialDriver || mockSimulationData);
   const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Обновляем водителя при изменении initialDriver
+  useEffect(() => {
+    if (initialDriver) {
+      setDriver(initialDriver);
+      // Сбрасываем симуляцию
+      setIsPlaying(false);
+      setElapsedTime(0);
+      setCurrentSegmentIndex(0);
+      setTotalTimeLost(0);
+      setTotalTimeSaved(0);
+      setDelays([]);
+      
+      // Если есть готовая геометрия маршрута, используем её
+      if (initialDriver.routeGeometry && initialDriver.routeGeometry.length > 0) {
+        setRouteGeometry(initialDriver.routeGeometry);
+        console.log('Using pre-built route geometry with', initialDriver.routeGeometry.length, 'points');
+      }
+    }
+  }, [initialDriver]);
   const [simulationSpeed, setSimulationSpeed] = useState(1); // 1x, 2x, 4x скорость
   const [elapsedTime, setElapsedTime] = useState(0); // в секундах
   const [mapCenter, setMapCenter] = useState<[number, number]>([55.7558, 37.6176]);
   const [mapZoom, setMapZoom] = useState(12);
   const [followDriver, setFollowDriver] = useState(true);
-  const [trafficControl, setTrafficControl] = useState<any>(null);
+
   const [showOptimization, setShowOptimization] = useState(false);
   const [optimizationResult, setOptimizationResult] = useState<any>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [originalRoute, setOriginalRoute] = useState<SimulationRoutePoint[]>([]);
   const [routeGeometry, setRouteGeometry] = useState<[number, number][]>([]);
+  const [detailedRouteGeometry, setDetailedRouteGeometry] = useState<[number, number][]>([]); // Детальная геометрия от MultiRoute
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
+  const [currentRoutePosition, setCurrentRoutePosition] = useState(0); // Текущая позиция по маршруту (0-1)
   const [totalTimeLost, setTotalTimeLost] = useState(0); // Потерянное время в минутах
   const [totalTimeSaved, setTotalTimeSaved] = useState(0); // Сэкономленное время
   const [delays, setDelays] = useState<Array<{time: number, reason: string}>>([]);
@@ -94,17 +124,70 @@ const SimulationMap: React.FC<SimulationMapProps> = ({ className = '' }) => {
     };
   }, [driver.id, followDriver]);
 
-  // Построение маршрута - используем простые линии для стабильности
-  const buildRouteGeometry = useCallback(() => {
+  // Построение маршрута через серверный API
+  const buildRouteGeometry = useCallback(async () => {
     if (driver.route.length < 2) {
       return;
     }
+    
+    // Если у водителя уже есть геометрия маршрута, используем её
+    if (driver.routeGeometry && driver.routeGeometry.length > 0) {
+      setRouteGeometry(driver.routeGeometry);
+      console.log('Using existing route geometry with', driver.routeGeometry.length, 'points');
+      return;
+    }
 
-    // Используем прямые линии между точками
-    const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
-    setRouteGeometry(coords);
-    console.log('Route geometry built with', coords.length, 'points');
-  }, [driver.route]);
+    try {
+      // Отправляем запрос на бэкенд для построения маршрута
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/route-geometry/build-simple`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+          driver.route.map(stop => ({
+            lat: stop.coordinates[0],
+            lng: stop.coordinates[1]
+          }))
+        )
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.geometry && data.geometry.length > 0) {
+          // Конвертируем в формат [lat, lng]
+          const coords: [number, number][] = data.geometry.map((coord: number[]) => [coord[0], coord[1]]);
+          setRouteGeometry(coords);
+          console.log('Route geometry built via API with', coords.length, 'points');
+          
+          // Показываем информацию о маршруте если доступна
+          if (data.distance > 0) {
+            console.log('Route distance:', data.distance, 'km');
+            console.log('Route duration:', data.duration, 'min');
+            if (data.duration_in_traffic > 0) {
+              console.log('Duration with traffic:', data.duration_in_traffic, 'min');
+            }
+          }
+        } else {
+          // Fallback на прямые линии
+          const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
+          setRouteGeometry(coords);
+          console.log('Using direct lines (API returned empty geometry)');
+        }
+      } else {
+        // Fallback при ошибке API
+        const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
+        setRouteGeometry(coords);
+        console.log('Using direct lines (API error)');
+      }
+    } catch (error) {
+      // Fallback при ошибке сети
+      console.warn('Failed to build route via API, using direct lines:', error);
+      const coords: [number, number][] = driver.route.map(stop => stop.coordinates);
+      setRouteGeometry(coords);
+    }
+  }, [driver.route, driver.routeGeometry]);
 
   // Построить маршрут при загрузке
   useEffect(() => {
@@ -133,54 +216,114 @@ const SimulationMap: React.FC<SimulationMapProps> = ({ className = '' }) => {
     }
   };
 
-  // Обновление симуляции с реальным прогрессом
+  // Callback для получения детальной геометрии от MultiRoute
+  const handleRouteBuilt = useCallback((geometry: [number, number][]) => {
+    setDetailedRouteGeometry(geometry);
+    setCurrentRoutePosition(0);
+    console.log('✅ Received detailed route geometry:', geometry.length, 'points for movement simulation');
+  }, []);
+
+  // Функция расчета расстояния между двумя точками (Haversine formula)
+  const calculateDistance = useCallback((lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Радиус Земли в км
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Расстояние в км
+  }, []);
+
+  // Обновление симуляции с плавным движением по геометрии маршрута
   useEffect(() => {
-    if (isPlaying) {
-      const updateInterval = 1000 / simulationSpeed; // миллисекунды
+    if (isPlaying && detailedRouteGeometry.length > 1) {
+      // Рассчитываем длину каждого сегмента
+      const segmentDistances: number[] = [];
+      let totalDistance = 0;
+      
+      for (let i = 0; i < detailedRouteGeometry.length - 1; i++) {
+        const [lat1, lon1] = detailedRouteGeometry[i];
+        const [lat2, lon2] = detailedRouteGeometry[i + 1];
+        const dist = calculateDistance(lat1, lon1, lat2, lon2);
+        segmentDistances.push(dist);
+        totalDistance += dist;
+      }
+      
+      const speedKmH = averageSpeed * simulationSpeed; // Учитываем скорость симуляции
+      const updateIntervalMs = 50; // Обновление каждые 50мс для плавности
+      const distancePerUpdate = (speedKmH / 3600) * (updateIntervalMs / 1000); // км за 50мс
+      
+      console.log(`🚗 Starting smooth movement: ${totalDistance.toFixed(2)} km at ${averageSpeed} km/h (${speedKmH} km/h simulated)`);
+      console.log(`📍 Movement steps: ${distancePerUpdate * 1000} meters per update`);
+      
+      let distanceTraveled = 0;
+      let currentSegment = 0;
+      let distanceInSegment = 0;
       
       intervalRef.current = setInterval(() => {
-        setElapsedTime(prev => {
-          const newTime = prev + simulationSpeed;
-          
-          // Обновляем позицию водителя
-          if (routeGeometry.length > 0) {
-            const progress = (newTime / (8 * 3600)) * routeGeometry.length; // 8 часов рабочий день
-            const segmentIndex = Math.min(
-              Math.floor(progress),
-              routeGeometry.length - 1
-            );
-            
-            setCurrentSegmentIndex(segmentIndex);
-            
-            if (segmentIndex < routeGeometry.length) {
-              const newLocation = routeGeometry[segmentIndex];
-              setDriver(prev => ({
-                ...prev,
-                currentLocation: newLocation
-              }));
-              
-              // Следование за водителем
-              if (followDriver) {
-                setMapCenter(newLocation);
-              }
-              
-              // Обновляем статус остановок
-              const completedStops = Math.floor((segmentIndex / routeGeometry.length) * driver.totalStops);
-              if (completedStops > driver.completedStops) {
-                setDriver(prev => ({
-                  ...prev,
-                  completedStops
-                }));
-                
-                // Симулируем возможную задержку при завершении остановки
-                simulateRandomDelay();
-              }
-            }
-          }
-          
-          return newTime;
-        });
-      }, updateInterval);
+        distanceTraveled += distancePerUpdate;
+        distanceInSegment += distancePerUpdate;
+        
+        // Переходим к следующему сегменту если нужно
+        while (currentSegment < segmentDistances.length && distanceInSegment >= segmentDistances[currentSegment]) {
+          distanceInSegment -= segmentDistances[currentSegment];
+          currentSegment++;
+        }
+        
+        // Проверка завершения маршрута
+        if (currentSegment >= detailedRouteGeometry.length - 1) {
+          const finalLocation = detailedRouteGeometry[detailedRouteGeometry.length - 1];
+          setDriver(prev => ({
+            ...prev,
+            currentLocation: finalLocation
+          }));
+          setIsPlaying(false);
+          toast.success('🎉 Маршрут завершен!');
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          return;
+        }
+        
+        // Интерполяция между точками для плавного движения
+        const [lat1, lon1] = detailedRouteGeometry[currentSegment];
+        const [lat2, lon2] = detailedRouteGeometry[currentSegment + 1];
+        const segmentLength = segmentDistances[currentSegment];
+        
+        // Прогресс внутри текущего сегмента (0 to 1)
+        const progress = segmentLength > 0 ? Math.min(distanceInSegment / segmentLength, 1) : 1;
+        
+        // Линейная интерполяция координат
+        const interpolatedLat = lat1 + (lat2 - lat1) * progress;
+        const interpolatedLon = lon1 + (lon2 - lon1) * progress;
+        
+        const newLocation: [number, number] = [interpolatedLat, interpolatedLon];
+        
+        setDriver(prev => ({
+          ...prev,
+          currentLocation: newLocation
+        }));
+        
+        setCurrentSegmentIndex(currentSegment);
+        setCurrentRoutePosition(distanceTraveled / totalDistance);
+        
+        // Следование за водителем
+        if (followDriver) {
+          setMapCenter(newLocation);
+        }
+        
+        // Обновляем статус остановок
+        const completedStops = Math.floor((distanceTraveled / totalDistance) * driver.totalStops);
+        if (completedStops > driver.completedStops) {
+          setDriver(prev => ({
+            ...prev,
+            completedStops
+          }));
+          simulateRandomDelay();
+        }
+        
+        setElapsedTime(prev => prev + (updateIntervalMs / 1000));
+      }, updateIntervalMs);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -193,7 +336,7 @@ const SimulationMap: React.FC<SimulationMapProps> = ({ className = '' }) => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPlaying, simulationSpeed, routeGeometry, followDriver]);
+  }, [isPlaying, simulationSpeed, detailedRouteGeometry, followDriver, averageSpeed, calculateDistance, driver.totalStops, driver.completedStops]);
 
   const handlePlayPause = () => {
     if (!isPlaying && elapsedTime === 0) {
@@ -521,111 +664,61 @@ const SimulationMap: React.FC<SimulationMapProps> = ({ className = '' }) => {
 
       {/* Карта */}
       <div className="h-96 relative">
-        <YMaps
-          query={{
-            apikey: process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY || '',
-            lang: 'ru_RU',
-          }}
-        >
-          <Map
-            defaultState={{
-              center: mapCenter,
-              zoom: mapZoom,
-            }}
-            state={{
-              center: mapCenter,
-              zoom: mapZoom,
-            }}
-            width="100%"
-            height="100%"
-            options={{
-              suppressMapOpenBlock: true,
-            }}
-          >
-            {/* Маршрутная линия по дорогам */}
-            {routeGeometry.length > 0 && (
-              <Polyline
-                geometry={routeGeometry}
-                options={{
-                  balloonCloseButton: false,
-                  strokeColor: '#2563EB',
-                  strokeWidth: 5,
-                  strokeOpacity: 0.85,
-                }}
-              />
-            )}
-
-            {/* Остановки маршрута */}
-            {driver.route.map((stop, index) => (
-              <Placemark
-                key={stop.id}
-                geometry={stop.coordinates}
-                options={{
-                  preset: getStopIcon(stop),
-                  iconColor: getStopColor(stop.status),
-                }}
-                properties={{
-                  balloonContentHeader: `${index + 1}. ${stop.name}`,
-                  balloonContentBody: `
-                    <div>
-                      <p><strong>Адрес:</strong> ${stop.address}</p>
-                      <p><strong>Тип:</strong> ${stop.type === 'depot' ? 'Склад' : stop.type === 'pickup' ? 'Забор' : 'Доставка'}</p>
-                      <p><strong>Статус:</strong> ${
-                        stop.status === 'completed' ? 'Завершено' :
-                        stop.status === 'in_progress' ? 'В процессе' :
-                        stop.status === 'pending' ? 'Ожидание' : 'Задержка'
-                      }</p>
-                      ${stop.estimatedArrival ? `<p><strong>Планируемое прибытие:</strong> ${stop.estimatedArrival}</p>` : ''}
-                      ${stop.actualArrival ? `<p><strong>Фактическое прибытие:</strong> ${stop.actualArrival}</p>` : ''}
-                      ${stop.orderInfo ? `
-                        <p><strong>Заказ:</strong> ${stop.orderInfo.orderId}</p>
-                        <p><strong>Клиент:</strong> ${stop.orderInfo.customerName}</p>
-                        <p><strong>Товары:</strong> ${stop.orderInfo.items.join(', ')}</p>
-                      ` : ''}
-                    </div>
-                  `,
-                }}
-              />
-            ))}
-
-            {/* Текущая позиция водителя */}
-            <Placemark
-              geometry={driver.currentLocation}
-              options={{
-                preset: 'islands#blueDotIcon',
-                iconColor: '#10B981',
-              }}
-              properties={{
-                balloonContentHeader: `${driver.name}`,
-                balloonContentBody: `
-                  <div>
-                    <p><strong>Транспорт:</strong> ${driver.vehicleType}</p>
-                    <p><strong>Статус:</strong> ${
-                      driver.status === 'driving' ? 'В пути' :
-                      driver.status === 'delivering' ? 'Доставка' :
-                      driver.status === 'loading' ? 'Загрузка' :
-                      driver.status === 'break' ? 'Перерыв' : 'Ожидание'
-                    }</p>
-                    <p><strong>Завершено остановок:</strong> ${driver.completedStops} из ${driver.totalStops}</p>
-                  </div>
-                `,
-              }}
-            />
-
-            {/* Элементы управления картой */}
-            <TrafficControl 
-              options={{ float: 'right' }} 
-              instanceRef={(ref) => {
-                if (ref && !trafficControl) {
-                  setTrafficControl(ref);
-                  setTimeout(() => ref.showTraffic(), 100);
-                }
-              }}
-            />
-            <ZoomControl options={{ float: 'right' }} />
-            <GeolocationControl options={{ float: 'left' }} />
-          </Map>
-        </YMaps>
+        <YandexMapWrapper
+          center={mapCenter}
+          zoom={mapZoom}
+          showTraffic={true}
+          routes={routeGeometry.length > 0 ? [{
+            geometry: routeGeometry,
+            color: '#2563EB',
+            width: 5
+          }] : []}
+          onRouteBuilt={handleRouteBuilt}
+          markers={[
+            // Остановки маршрута
+            ...driver.route.map((stop, index) => ({
+              coordinates: stop.coordinates as [number, number],
+              color: getStopColor(stop.status),
+              icon: getStopIcon(stop),
+              hint: `${index + 1}. ${stop.name}`,
+              balloonContent: `
+                <div style="padding: 10px;">
+                  <h3 style="margin: 0 0 8px 0; font-weight: bold;">${stop.name}</h3>
+                  <p style="margin: 4px 0; font-size: 12px;"><strong>Адрес:</strong> ${stop.address}</p>
+                  <p style="margin: 4px 0; font-size: 12px;"><strong>Тип:</strong> ${
+                    stop.type === 'depot' ? 'Склад' : stop.type === 'pickup' ? 'Забор' : 'Доставка'
+                  }</p>
+                  <p style="margin: 4px 0; font-size: 12px;"><strong>Статус:</strong> ${
+                    stop.status === 'completed' ? 'Завершено' :
+                    stop.status === 'in_progress' ? 'В процессе' :
+                    stop.status === 'pending' ? 'Ожидание' : 'Задержка'
+                  }</p>
+                </div>
+              `
+            })),
+            // Текущая позиция водителя
+            {
+              coordinates: driver.currentLocation as [number, number],
+              color: '#10B981',
+              icon: 'islands#blueDotIcon',
+              hint: `${driver.name}`,
+              balloonContent: `
+                <div style="padding: 10px;">
+                  <h3 style="margin: 0 0 8px 0; font-weight: bold;">${driver.name}</h3>
+                  <p style="margin: 4px 0; font-size: 12px;"><strong>Транспорт:</strong> ${driver.vehicleType}</p>
+                  <p style="margin: 4px 0; font-size: 12px;"><strong>Статус:</strong> ${
+                    driver.status === 'driving' ? 'В пути' :
+                    driver.status === 'delivering' ? 'Доставка' :
+                    driver.status === 'loading' ? 'Загрузка' :
+                    driver.status === 'break' ? 'Перерыв' : 'Ожидание'
+                  }</p>
+                  <p style="margin: 4px 0; font-size: 12px;"><strong>Завершено:</strong> ${driver.completedStops} из ${driver.totalStops}</p>
+                </div>
+              `
+            }
+          ]}
+          className="w-full h-full rounded-lg"
+        />
       </div>
 
       {/* Модальное окно оптимизации */}
