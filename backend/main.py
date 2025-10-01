@@ -18,6 +18,7 @@ from app.api.v1.drivers import router as drivers_router
 from app.api.v1.routes import router as routes_router
 from app.api.v1.simulation import router as simulation_router
 from app.api.v1.testing import router as testing_router
+from app.api.v1.traffic import router as traffic_router
 from app.optimization.vrptw_solver import VRPTWSolver
 from app.optimization.adaptive_optimizer import AdaptiveOptimizer
 from app.services.yandex_maps_service import YandexMapsService
@@ -106,6 +107,7 @@ app.include_router(routes_router, prefix="/api/v1/routes")
 app.include_router(simulation_router, prefix="/api/v1/simulation")
 app.include_router(monitoring_router, prefix="/api/v1/monitoring")
 app.include_router(testing_router, prefix="/api/v1/testing")
+app.include_router(traffic_router, prefix="/api/v1/traffic")
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(websocket_router)
 

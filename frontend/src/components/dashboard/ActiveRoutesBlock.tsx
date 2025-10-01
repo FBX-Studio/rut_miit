@@ -14,6 +14,10 @@ import {
   Route,
   Navigation
 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface RouteData {
   id: number;
@@ -39,6 +43,7 @@ interface RouteData {
 interface ActiveRoutesBlockProps {
   className?: string;
   onRouteDetails?: (routeId: number) => void;
+  onDetailedView?: () => void;
 }
 
 // Mock data for demonstration
@@ -105,40 +110,38 @@ const mockRoutes: RouteData[] = [
   }
 ];
 
-export const ActiveRoutesBlock = ({ className = '', onRouteDetails }: ActiveRoutesBlockProps) => {
+export const ActiveRoutesBlock = ({ className = '', onRouteDetails, onDetailedView }: ActiveRoutesBlockProps) => {
   const [routes, setRoutes] = useState<RouteData[]>(mockRoutes);
   const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState<{ [key: number]: boolean }>({});
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "success" | "warning" | "destructive" | "secondary" => {
     switch (status) {
       case 'в пути':
-        return 'text-green-700 bg-green-100 border-green-200';
+        return 'default';
       case 'задержка':
-        return 'text-yellow-700 bg-yellow-100 border-yellow-200';
+        return 'warning';
       case 'завершён':
-        return 'text-blue-700 bg-blue-100 border-blue-200';
+        return 'success';
       case 'отменён':
-        return 'text-red-700 bg-red-100 border-red-200';
-      case 'запланирован':
-        return 'text-gray-700 bg-gray-100 border-gray-200';
+        return 'destructive';
       default:
-        return 'text-gray-700 bg-gray-100 border-gray-200';
+        return 'secondary';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'в пути':
-        return <Navigation className="h-4 w-4" />;
+        return <Navigation className="h-3 w-3" />;
       case 'задержка':
-        return <AlertTriangle className="h-4 w-4" />;
+        return <AlertTriangle className="h-3 w-3" />;
       case 'завершён':
-        return <CheckCircle className="h-4 w-4" />;
+        return <CheckCircle className="h-3 w-3" />;
       case 'отменён':
-        return <XCircle className="h-4 w-4" />;
+        return <XCircle className="h-3 w-3" />;
       default:
-        return <Clock className="h-4 w-4" />;
+        return <Clock className="h-3 w-3" />;
     }
   };
 
@@ -149,90 +152,94 @@ export const ActiveRoutesBlock = ({ className = '', onRouteDetails }: ActiveRout
     }));
   };
 
+  const activeCount = routes.filter(r => r.status === 'в пути' || r.status === 'задержка').length;
+
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+    <Card className={className}>
+      <CardHeader>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <Route className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-50 rounded-xl">
+              <Route className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Активные маршруты
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {routes.filter(r => r.status === 'в пути' || r.status === 'задержка').length} активных из {routes.length}
-              </p>
+              <CardTitle>Активные маршруты</CardTitle>
+              <CardDescription>
+                {activeCount} активных из {routes.length}
+              </CardDescription>
             </div>
           </div>
-          <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-            Показать все
-          </button>
+          {onDetailedView && (
+            <Button variant="ghost" size="sm" onClick={onDetailedView}>
+              Показать все
+            </Button>
+          )}
         </div>
-      </div>
+      </CardHeader>
 
-      {/* Routes List */}
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        {routes.map((route) => (
-          <div key={route.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-            {/* Main Route Info */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                    <Truck className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+      <CardContent className="p-0">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {routes.map((route, index) => (
+            <div 
+              key={route.id}
+              className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="p-2.5 bg-purple-50 rounded-xl">
+                    <Truck className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                        Маршрут #{route.id}
+                      </h3>
+                      <Badge variant={getStatusVariant(route.status)} className="gap-1">
+                        {getStatusIcon(route.status)}
+                        {route.status}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Truck className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{route.vehicle_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{route.driver_name}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                      Маршрут #{route.id}
-                    </h3>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(route.status)}`}>
-                      {getStatusIcon(route.status)}
-                      <span className="ml-1">{route.status}</span>
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center space-x-2">
-                      <Truck className="h-4 w-4" />
-                      <span>{route.vehicle_name}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>{route.driver_name}</span>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => toggleDetails(route.id)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => toggleDetails(route.id)}
-                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-                <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
 
-            {/* Progress Bar */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                <span>Прогресс: {route.completed_stops}/{route.total_stops} остановок</span>
-                <span>{route.progress_percentage}%</span>
+              {/* Progress Bar */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  <span className="font-medium">Прогресс</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {route.completed_stops}/{route.total_stops} точек • {route.progress_percentage}%
+                  </span>
+                </div>
+                <div className="relative h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div 
+                    className="absolute inset-y-0 left-0 bg-purple-600 rounded-full transition-all duration-500"
+                    style={{ width: `${route.progress_percentage}%` }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${route.progress_percentage}%` }}
-                ></div>
-              </div>
-            </div>
 
             {/* Key Metrics */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
@@ -304,22 +311,28 @@ export const ActiveRoutesBlock = ({ className = '', onRouteDetails }: ActiveRout
                 </div>
               </div>
             )}
-          </div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {routes.length === 0 && (
-        <div className="p-12 text-center">
-          <Route className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-            Нет активных маршрутов
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Создайте новый маршрут или дождитесь начала запланированных маршрутов
-          </p>
+              </div>
+            ))}
         </div>
-      )}
-    </div>
+
+        {/* Empty State */}
+        {routes.length === 0 && (
+          <div className="p-12 text-center">
+            <div className="inline-flex p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl mb-4">
+              <Route className="h-12 w-12 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Нет активных маршрутов
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+              Создайте новый маршрут или дождитесь начала запланированных маршрутов
+            </p>
+            <Button variant="default">
+              Создать маршрут
+            </Button>
+          </div>
+        )}
+        </CardContent>
+    </Card>
   );
 };

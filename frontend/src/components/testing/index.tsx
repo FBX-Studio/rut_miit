@@ -47,52 +47,52 @@ const LogisticsTestingSystem: React.FC = () => {
       name: 'Панель управления',
       description: 'Динамическое изменение параметров и аналитика',
       icon: Settings,
-      color: 'blue'
+      color: 'indigo'
     },
     {
       id: 'visualization',
       name: 'Визуализация данных',
       description: 'Графики, тепловые карты и сравнительные таблицы',
       icon: BarChart3,
-      color: 'green'
+      color: 'purple'
     },
     {
       id: 'simulation',
       name: 'Имитационное тестирование',
       description: 'Виртуальные сценарии и оценка алгоритмов',
       icon: Play,
-      color: 'purple'
+      color: 'violet'
     },
     {
       id: 'integration',
       name: 'Интеграция системы',
       description: 'Мониторинг компонентов и тестирование интеграции',
       icon: Link,
-      color: 'orange'
+      color: 'fuchsia'
     }
   ];
 
   const getTabColorClasses = (color: string, isActive: boolean) => {
     const colors = {
-      blue: {
-        active: 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20',
-        inactive: 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 dark:text-gray-400 dark:hover:text-blue-400'
-      },
-      green: {
-        active: 'border-green-500 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20',
-        inactive: 'border-transparent text-gray-500 hover:text-green-600 hover:border-green-300 dark:text-gray-400 dark:hover:text-green-400'
+      indigo: {
+        active: 'border-0 text-white bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-lg shadow-indigo-500/30',
+        inactive: 'border border-gray-200/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-950/20 dark:hover:to-purple-950/20'
       },
       purple: {
-        active: 'border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20',
-        inactive: 'border-transparent text-gray-500 hover:text-purple-600 hover:border-purple-300 dark:text-gray-400 dark:hover:text-purple-400'
+        active: 'border-0 text-white bg-gradient-to-r from-purple-600 to-purple-500 shadow-lg shadow-purple-500/30',
+        inactive: 'border border-gray-200/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-950/20 dark:hover:to-pink-950/20'
       },
-      orange: {
-        active: 'border-orange-500 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20',
-        inactive: 'border-transparent text-gray-500 hover:text-orange-600 hover:border-orange-300 dark:text-gray-400 dark:hover:text-orange-400'
+      violet: {
+        active: 'border-0 text-white bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30',
+        inactive: 'border border-gray-200/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gradient-to-r hover:from-violet-50 hover:to-purple-50 dark:hover:from-violet-950/20 dark:hover:to-purple-950/20'
+      },
+      fuchsia: {
+        active: 'border-0 text-white bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 shadow-lg shadow-fuchsia-500/30',
+        inactive: 'border border-gray-200/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-fuchsia-600 dark:hover:text-fuchsia-400 hover:bg-gradient-to-r hover:from-fuchsia-50 hover:to-pink-50 dark:hover:from-fuchsia-950/20 dark:hover:to-pink-950/20'
       }
     };
 
-    return colors[color as keyof typeof colors]?.[isActive ? 'active' : 'inactive'] || colors.blue[isActive ? 'active' : 'inactive'];
+    return colors[color as keyof typeof colors]?.[isActive ? 'active' : 'inactive'] || colors.indigo[isActive ? 'active' : 'inactive'];
   };
 
   const renderActiveComponent = () => {
@@ -188,17 +188,16 @@ const LogisticsTestingSystem: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base font-medium 
-                             transition-all duration-200 whitespace-nowrap
-                             ${isActive 
-                               ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 shadow-sm'
-                               : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-                             }`}
+                  className={`flex items-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-medium 
+                             transition-all duration-300 whitespace-nowrap hover:scale-105 active:scale-95
+                             ${getTabColorClasses(tab.color, isActive)}`}
                 >
-                  <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <div className={`p-2 rounded-lg ${isActive ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-800'} transition-colors`}>
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </div>
                   <span className="hidden sm:inline">{tab.name}</span>
                   <span className="sm:hidden text-xs">{tab.name.split(' ')[0]}</span>
-                  {isActive && <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 opacity-50" />}
+                  {isActive && <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 opacity-70" />}
                 </button>
               );
             })}

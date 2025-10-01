@@ -1,8 +1,9 @@
 import { ReactNode, useState } from 'react';
-import { LucideIcon } from 'lucide-react';
-import { clsx } from 'clsx';
-
-const cn = clsx;
+import { motion } from 'framer-motion';
+import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Card } from './card';
+import { Badge } from './badge';
 
 interface StatsCardProps {
   title: string;
@@ -59,71 +60,106 @@ export const StatsCard = ({
 
   if (loading) {
     return (
-      <div className={cn(
-        "bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700",
-        className
-      )}>
-        <div className="animate-pulse">
-          <div className="flex items-center justify-between mb-4">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-            <div className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <Card className={cn("p-6", className)}>
+        <div className="animate-pulse space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-24"></div>
+            <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
           </div>
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2"></div>
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-24"></div>
+          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-lg w-32"></div>
         </div>
-      </div>
+      </Card>
     );
   }
 
+  const ChangeIcon = change?.type === 'increase' ? TrendingUp : change?.type === 'decrease' ? TrendingDown : Minus;
+  
   return (
-    <div 
-      className={cn(
-        'bg-white/80 dark:bg-gray-800/80 rounded-xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50',
-        'hover:shadow-xl transition-all duration-500 hover:-translate-y-1 hover:bg-white dark:hover:bg-gray-800',
-        'group relative overflow-hidden',
-        className
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      {/* Glowing border effect */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-sm -z-20"></div>
+      <Card 
+        className={cn(
+          'p-6 transition-all duration-300 group relative',
+          'hover:shadow-[0_12px_32px_rgba(99,102,241,0.2)]',
+          className
+        )}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Gradient overlay on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5" />
+        </div>
+
       
-      {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 to-emerald-50/30 dark:from-indigo-900/20 dark:to-emerald-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
-      
-      <div className="flex items-center justify-between relative z-10">
-        <div className="flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 sm:mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300 break-words max-w-full">
-            {title}
-          </p>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight group-hover:scale-105 transition-transform duration-300 break-words max-w-full">
-            {typeof value === 'number' ? value.toLocaleString() : value}
-          </p>
-          {change && (
-            <div className="flex items-center mt-1 sm:mt-2">
-              <span className={`text-xs sm:text-sm font-medium ${getChangeColor(change.type)} transition-all duration-300`}>
-                {getChangeIcon(change.type)} {Math.abs(change.value)}%
-              </span>
-              {change.period && (
-                <span className="text-xs sm:text-sm text-gray-500 ml-2">
-                  {change.period}
-                </span>
+      <div className="space-y-4 relative z-10">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+              {title}
+            </p>
+            <motion.h3 
+              className="text-3xl font-semibold text-gray-900 dark:text-white tabular-nums"
+              animate={{ 
+                scale: isHovered ? 1.05 : 1,
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              {typeof value === 'number' ? value.toLocaleString('ru-RU') : value}
+            </motion.h3>
+          </div>
+          {Icon && (
+            <motion.div 
+              className={cn(
+                "p-3 rounded-xl flex-shrink-0 relative overflow-hidden",
+                change?.type === 'increase' && 'bg-gradient-to-br from-emerald-50 to-green-50 text-emerald-600',
+                change?.type === 'decrease' && 'bg-gradient-to-br from-red-50 to-rose-50 text-red-600',
+                (!change || change.type === 'neutral') && 'bg-gradient-to-br from-indigo-50 to-purple-50 text-indigo-600'
               )}
-            </div>
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              <Icon className="h-5 w-5 relative z-10" />
+              {/* Glow effect */}
+              <div className="absolute inset-0 blur-xl opacity-30 bg-current" />
+            </motion.div>
           )}
         </div>
-        {Icon && (
-          <div className={`p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-2xl ml-3 sm:ml-4 flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${iconColor}`}>
-            <Icon className="h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-300 group-hover:scale-110" />
+        
+        {change && (
+          <motion.div 
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Badge 
+              variant={change.type === 'increase' ? 'success' : change.type === 'decrease' ? 'destructive' : 'secondary'}
+              className="gap-1"
+            >
+              <ChangeIcon className="h-3 w-3" />
+              <span>{Math.abs(change.value)}%</span>
+            </Badge>
+            {change.period && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {change.period}
+              </span>
+            )}
+          </motion.div>
+        )}
+        
+        {children && (
+          <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
+            {children}
           </div>
         )}
       </div>
-      {children && (
-        <div className="mt-4">
-          {children}
-        </div>
-      )}
-    </div>
+      </Card>
+    </motion.div>
   );
 };

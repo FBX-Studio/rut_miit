@@ -77,42 +77,72 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
     }
   };
 
-  const StatCard = ({ title, value, icon: Icon, color = 'blue', subtitle }: {
+  const StatCard = ({ title, value, icon: Icon, color = 'indigo', subtitle }: {
     title: string;
     value: string | number;
     icon: any;
     color?: string;
     subtitle?: string;
-  }) => (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-          {subtitle && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
-          )}
-        </div>
-        <div className={`p-3 rounded-full bg-${color}-100 dark:bg-${color}-900`}>
-          <Icon className={`h-6 w-6 text-${color}-600 dark:text-${color}-400`} />
+  }) => {
+    const colorClasses = {
+      indigo: {
+        gradient: 'from-indigo-500 to-indigo-600',
+        shadow: 'shadow-[0_0_20px_rgba(99,102,241,0.3)]',
+        iconBg: 'bg-indigo-500/20',
+        iconColor: 'text-indigo-400'
+      },
+      purple: {
+        gradient: 'from-purple-500 to-purple-600',
+        shadow: 'shadow-[0_0_20px_rgba(139,92,246,0.3)]',
+        iconBg: 'bg-purple-500/20',
+        iconColor: 'text-purple-400'
+      },
+      blue: {
+        gradient: 'from-blue-500 to-blue-600',
+        shadow: 'shadow-[0_0_20px_rgba(59,130,246,0.3)]',
+        iconBg: 'bg-blue-500/20',
+        iconColor: 'text-blue-400'
+      },
+      green: {
+        gradient: 'from-green-500 to-green-600',
+        shadow: 'shadow-[0_0_20px_rgba(34,197,94,0.3)]',
+        iconBg: 'bg-green-500/20',
+        iconColor: 'text-green-400'
+      }
+    };
+    const colors = colorClasses[color as keyof typeof colorClasses] || colorClasses.indigo;
+
+    return (
+      <div className={`relative bg-gray-900/50 backdrop-blur-sm p-5 rounded-2xl border border-${color}-500/20 ${colors.shadow} hover:border-${color}-500/40 transition-all duration-300 group`}>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-400 mb-2">{title}</p>
+            <p className={`text-3xl font-bold bg-gradient-to-r ${colors.gradient} bg-clip-text text-transparent`}>{value}</p>
+            {subtitle && (
+              <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+            )}
+          </div>
+          <div className={`p-4 rounded-xl ${colors.iconBg} group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className={`h-7 w-7 ${colors.iconColor}`} />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const StatusBreakdown = ({ title, data, colors }: {
     title: string;
     data: Record<string, number>;
     colors: Record<string, string>;
   }) => (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{title}</h3>
+    <div className="bg-gray-900/50 backdrop-blur-sm p-5 rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] hover:border-indigo-500/40 transition-all duration-300">
+      <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">{title}</h3>
       <div className="space-y-3">
         {data && Object.entries(data).map(([status, count]) => (
-          <div key={status} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${colors[status] || 'bg-gray-400'}`}></div>
-              <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+          <div key={status} className="flex items-center justify-between group hover:bg-white/5 p-2 rounded-lg transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className={`w-3 h-3 rounded-full ${colors[status] || 'bg-gray-400'} shadow-[0_0_8px_currentColor]`}></div>
+              <span className="text-sm text-gray-300 capitalize">
                 {status === 'in_progress' ? 'В процессе' :
                  status === 'pending' ? 'Ожидает' :
                  status === 'completed' ? 'Завершено' :
@@ -125,7 +155,7 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
                  status}
               </span>
             </div>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">{count}</span>
+            <span className="text-sm font-bold text-white">{count}</span>
           </div>
         ))}
       </div>
@@ -135,13 +165,21 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30 rounded-2xl shadow-[0_0_60px_rgba(99,102,241,0.3)] border border-indigo-500/20 max-w-7xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="flex items-center justify-between p-6 border-b border-indigo-500/20 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
           <div className="flex items-center space-x-3">
-            <BarChart3 className="h-6 w-6 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="p-2 rounded-xl bg-indigo-500/20">
+              <BarChart3 className="h-6 w-6 text-indigo-400" />
+            </div>
+            <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               Аналитика и статистика
             </h2>
           </div>
@@ -149,14 +187,14 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
             <button
               onClick={fetchAnalytics}
               disabled={loading}
-              className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors flex items-center disabled:opacity-50"
+              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 flex items-center disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)]"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Обновить
             </button>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-xl"
             >
               <X className="h-6 w-6" />
             </button>
@@ -243,27 +281,27 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
 
               {/* API Metrics */}
               {data?.api_metrics && (
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2" />
+                <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                  <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6 flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2 text-indigo-400" />
                     Метрики API
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">{data.api_metrics?.total_requests || 0}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Всего запросов</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">{data.api_metrics?.total_requests || 0}</p>
+                      <p className="text-sm text-gray-400 mt-2">Всего запросов</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">{data.api_metrics?.avg_response_time || 0}мс</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Среднее время ответа</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">{data.api_metrics?.avg_response_time || 0}мс</p>
+                      <p className="text-sm text-gray-400 mt-2">Среднее время ответа</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-purple-600">{data.api_metrics?.optimization_requests || 0}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Оптимизаций</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-purple-500 bg-clip-text text-transparent">{data.api_metrics?.optimization_requests || 0}</p>
+                      <p className="text-sm text-gray-400 mt-2">Оптимизаций</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-orange-600">{data.api_metrics?.avg_optimization_time || 0}с</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Время оптимизации</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">{data.api_metrics?.avg_optimization_time || 0}с</p>
+                      <p className="text-sm text-gray-400 mt-2">Время оптимизации</p>
                     </div>
                   </div>
                 </div>
@@ -271,35 +309,35 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
 
               {/* Performance Stats */}
               {data?.performance_stats && (
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                    <Clock className="h-5 w-5 mr-2" />
+                <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+                  <h3 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 flex items-center">
+                    <Clock className="h-5 w-5 mr-2 text-purple-400" />
                     Показатели эффективности
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">{data.performance_stats?.successful_deliveries || 0}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Успешных доставок</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">{data.performance_stats?.successful_deliveries || 0}</p>
+                      <p className="text-sm text-gray-400 mt-2">Успешных доставок</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-red-600">{data.performance_stats?.failed_deliveries || 0}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Неудачных доставок</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">{data.performance_stats?.failed_deliveries || 0}</p>
+                      <p className="text-sm text-gray-400 mt-2">Неудачных доставок</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">{data.performance_stats?.average_delivery_time || 0}мин</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Среднее время доставки</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">{data.performance_stats?.average_delivery_time || 0}мин</p>
+                      <p className="text-sm text-gray-400 mt-2">Среднее время доставки</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-yellow-600">{data.performance_stats?.customer_satisfaction || 0}/5</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Удовлетворенность клиентов</p>
+                    <div className="text-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <p className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">{data.performance_stats?.customer_satisfaction || 0}/5</p>
+                      <p className="text-sm text-gray-400 mt-2">Удовлетворенность клиентов</p>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Quick Actions */}
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
                   Быстрые действия
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -307,26 +345,24 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({
                     onClick={() => {
                       window.open('/api/v1/monitoring/dashboard', '_blank');
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+                    className="px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 flex items-center shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] hover:scale-105"
                   >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Открыть мониторинг
                   </button>
                   <button
                     onClick={() => {
-                      // Export data functionality (placeholder)
                       toast('Функция экспорта в разработке');
                     }}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="px-5 py-3 border border-indigo-500/30 text-gray-300 rounded-xl hover:bg-white/5 hover:border-indigo-500/50 transition-all duration-300 hover:scale-105"
                   >
                     Экспорт данных
                   </button>
                   <button
                     onClick={() => {
-                      // Generate report functionality (placeholder)
                       toast('Функция генерации отчетов в разработке');
                     }}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="px-5 py-3 border border-purple-500/30 text-gray-300 rounded-xl hover:bg-white/5 hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
                   >
                     Создать отчет
                   </button>

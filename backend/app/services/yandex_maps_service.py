@@ -21,6 +21,20 @@ class TrafficInfo:
     distance_meters: int
     jam_level: int  # 0-10 scale
     description: str
+    color: str  # Color for visualization
+    
+    def to_dict(self) -> Dict:
+        """Convert to dictionary"""
+        return {
+            'segment_id': self.segment_id,
+            'traffic_factor': self.traffic_factor,
+            'speed_kmh': self.speed_kmh,
+            'travel_time_seconds': self.travel_time_seconds,
+            'distance_meters': self.distance_meters,
+            'jam_level': self.jam_level,
+            'description': self.description,
+            'color': self.color
+        }
 
 @dataclass
 class RouteInfo:
@@ -31,6 +45,23 @@ class RouteInfo:
     geometry: List[Tuple[float, float]]  # List of (lat, lon) coordinates
     traffic_segments: List[TrafficInfo]
     alternative_routes: List[Dict] = None
+    average_jam_level: int = 0
+    traffic_delay_seconds: int = 0
+    traffic_color: str = '#10B981'  # Default green
+    
+    def to_dict(self) -> Dict:
+        """Convert to dictionary for JSON response"""
+        return {
+            'total_distance_meters': self.total_distance_meters,
+            'total_time_seconds': self.total_time_seconds,
+            'traffic_time_seconds': self.traffic_time_seconds,
+            'traffic_delay_seconds': self.traffic_delay_seconds,
+            'average_jam_level': self.average_jam_level,
+            'traffic_color': self.traffic_color,
+            'geometry': self.geometry,
+            'traffic_segments': [seg.to_dict() for seg in self.traffic_segments],
+            'alternative_routes': self.alternative_routes or []
+        }
 
 class YandexMapsService:
     """

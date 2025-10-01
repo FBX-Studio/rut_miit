@@ -79,18 +79,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Subtle animated background elements */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50/30 via-transparent to-emerald-50/30 dark:from-indigo-900/20 dark:via-transparent dark:to-emerald-900/20"></div>
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-200/20 dark:bg-indigo-800/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-emerald-200/20 dark:bg-emerald-800/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        
-        {/* Floating particles for depth */}
-        <div className="absolute top-1/3 left-1/3 w-2 h-2 bg-indigo-400/40 rounded-full animate-bounce delay-500"></div>
-        <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-emerald-400/40 rounded-full animate-bounce delay-700"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-bounce delay-900"></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50/20 to-purple-50/20 dark:from-gray-900 dark:via-indigo-950/20 dark:to-purple-950/20">
       
       <NavigationHeader
         title="Маршруты"
@@ -138,136 +127,133 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Analytics Blocks - Clean Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        {/* Analytics Blocks */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ActiveRoutesBlock 
-            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
           <RecentEventsBlock 
-            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
           <DeliveryPerformanceBlock 
-            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
           <RouteEfficiencyBlock 
-            className="card-minimal"
             onDetailedView={() => setShowAnalyticsModal(true)}
           />
         </div>
 
-        {/* Map Section - Centered and Full Width */}
-        <div className="space-y-8">
-          <div className="card-minimal">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
+        {/* Map Section with gradient border */}
+        <div className="relative group">
+          {/* Gradient border effect */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 blur-sm" />
+          <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-[0_4px_20px_rgba(99,102,241,0.12)]">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Карта маршрутов
               </h2>
-              <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 transition-colors">
+              <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
                 Развернуть
               </button>
             </div>
-            <div className="flex justify-center">
-              <RouteMap
-                routes={[]}
-                selectedRouteId={selectedRouteId ?? undefined}
-                onRouteSelect={setSelectedRouteId}
-                className="h-96 w-full max-w-4xl rounded-xl"
-              />
-            </div>
+            <RouteMap
+              routes={[]}
+              selectedRouteId={selectedRouteId ?? undefined}
+              onRouteSelect={setSelectedRouteId}
+              className="h-96 w-full rounded-xl"
+            />
           </div>
-          
-          {/* Simulation Launcher - Full Width Below Map */}
-          <SimulationLauncher />
         </div>
+        
+        {/* Simulation Launcher */}
+        <SimulationLauncher />
 
-        {/* Actions Section - Minimalist */}
-        <div className="card-minimal">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight mb-6">
-            Действия
+        {/* Actions Section with gradients */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-[0_4px_20px_rgba(99,102,241,0.12)] border border-gray-100/50 dark:border-gray-800/50">
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            Быстрые действия
           </h2>
-          <div className="flex flex-wrap gap-3 sm:gap-4">
+          <div className="flex flex-wrap gap-3">
             <button 
               onClick={() => {
                 setRouteModalMode('create');
                 setShowRouteModal(true);
               }}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
-                       relative overflow-hidden group"
+              className="group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl 
+                       hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 font-medium text-sm
+                       hover:scale-105 active:scale-95"
             >
               <span className="relative z-10">Новый маршрут</span>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
             <button 
               onClick={() => {
                 setRouteModalMode('optimize');
                 setShowRouteModal(true);
               }}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
-                       relative overflow-hidden group"
+              className="group relative px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl 
+                       hover:shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 font-medium text-sm
+                       hover:scale-105 active:scale-95"
             >
               <span className="relative z-10">Оптимизировать</span>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-green-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
             <button 
               onClick={() => setShowDriverModal(true)}
-              className="px-6 py-3 bg-amber-600 text-white rounded-2xl hover:bg-amber-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
-                       relative overflow-hidden group"
+              className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl 
+                       hover:bg-gradient-to-r hover:from-gray-50 hover:to-indigo-50 dark:hover:bg-gray-700 
+                       transition-all duration-300 font-medium text-sm border border-gray-200 dark:border-gray-700
+                       hover:border-indigo-300 dark:hover:border-indigo-700 hover:scale-105 active:scale-95"
             >
-              <span className="relative z-10">Водители</span>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              Управление водителями
             </button>
             <button 
               onClick={() => setShowAnalyticsModal(true)}
-              className="px-6 py-3 bg-violet-600 text-white rounded-2xl hover:bg-violet-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
-                       relative overflow-hidden group"
+              className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl 
+                       hover:bg-gradient-to-r hover:from-gray-50 hover:to-purple-50 dark:hover:bg-gray-700 
+                       transition-all duration-300 font-medium text-sm border border-gray-200 dark:border-gray-700
+                       hover:border-purple-300 dark:hover:border-purple-700 hover:scale-105 active:scale-95"
             >
-              <span className="relative z-10">Аналитика</span>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              Аналитика
             </button>
             <button 
               onClick={() => window.location.href = '/testing'}
-              className="px-6 py-3 bg-slate-600 text-white rounded-2xl hover:bg-slate-700 
-                       transition-all duration-200 font-medium shadow-sm hover:shadow-lg hover:scale-105
-                       relative overflow-hidden group"
+              className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl 
+                       hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 dark:hover:bg-gray-700 
+                       transition-all duration-300 font-medium text-sm border border-gray-200 dark:border-gray-700
+                       hover:border-blue-300 dark:hover:border-blue-700 hover:scale-105 active:scale-95"
             >
-              <span className="relative z-10">Система тестирования</span>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              Система тестирования
             </button>
           </div>
         </div>
-
-        <RouteOptimizationModal
-          isOpen={showRouteModal}
-          onClose={() => setShowRouteModal(false)}
-          mode={routeModalMode}
-        />
-        <DriverManagementModal
-          isOpen={showDriverModal}
-          onClose={() => setShowDriverModal(false)}
-        />
-        <AnalyticsModal
-          isOpen={showAnalyticsModal}
-          onClose={() => setShowAnalyticsModal(false)}
-        />
-
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-          }}
-        />
       </div>
+
+      {/* Модальные окна вне основного контейнера */}
+      <RouteOptimizationModal
+        isOpen={showRouteModal}
+        onClose={() => setShowRouteModal(false)}
+        mode={routeModalMode}
+      />
+      <DriverManagementModal
+        isOpen={showDriverModal}
+        onClose={() => setShowDriverModal(false)}
+      />
+      <AnalyticsModal
+        isOpen={showAnalyticsModal}
+        onClose={() => setShowAnalyticsModal(false)}
+      />
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+        }}
+      />
     </div>
   );
 };

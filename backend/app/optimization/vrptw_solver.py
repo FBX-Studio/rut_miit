@@ -4,9 +4,18 @@ from datetime import datetime, timedelta
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 import logging
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 from app.models import Order, Vehicle, Driver, Route, RouteStop
 from app.core.config import settings
+from app.core.cache import distance_cache, cache_result
+from app.core.exceptions import (
+    NoFeasibleSolutionException,
+    InvalidInputException,
+    TimeWindowViolationException,
+    CapacityViolationException
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +91,8 @@ class VRPTWSolver:
         self.depot_location = (55.7558, 37.6176)  # Moscow coordinates
         self.saav_objective = SAAVObjective(*objective_weights)
         self.adaptation_count = 0
+        self.use_cache = True
+        self.executor = ThreadPoolExecutor(max_workers=4)
         
     def solve_static_routes(
         self, 
@@ -101,8 +112,16 @@ class VRPTWSolver:
             
         Returns:
             Dictionary with optimized routes and metrics
+            
+        Raises:
+            InvalidInputException: If input data is invalid
+            NoFeasibleSolutionException: If no solution can be found
         """
+        start_time = time.time()
         logger.info(f"Starting static VRPTW optimization for {len(orders)} orders")
+        
+        # Validate inputs
+        self._validate_inputs(orders, vehicles, drivers)
         
         if depot_coords:
             self.depot_location = depot_coords
@@ -111,30 +130,51 @@ class VRPTWSolver:
         self.vehicles = vehicles[:settings.max_vehicles]  # Limit vehicles
         self.drivers = drivers
         
-        # Build distance and time matrices
-        self._build_matrices()
-        
-        # Create routing model
-        manager, routing, solution = self._create_and_solve_model()
-        
-        if solution:
-            routes = self._extract_routes(manager, routing, solution)
-            metrics = self._calculate_metrics(solution, routing)
+        try:
+            # Build distance and time matrices with caching
+            self._build_matrices()
             
-            logger.info(f"Static optimization completed. Total cost: {metrics['total_cost']}")
-            return {
-                "success": True,
-                "routes": routes,
-                "metrics": metrics,
-                "optimization_type": "static"
-            }
-        else:
-            logger.error("No solution found for static VRPTW problem")
-            return {
-                "success": False,
-                "error": "No feasible solution found",
-                "optimization_type": "static"
-            }
+            # Create routing model
+            manager, routing, solution = self._create_and_solve_model()
+            
+            if solution:
+                routes = self._extract_routes(manager, routing, solution)
+                metrics = self._calculate_metrics(solution, routing)
+                
+                elapsed_time = time.time() - start_time
+                metrics['computation_time'] = elapsed_time
+                
+                logger.info(
+                    f"Static optimization completed in {elapsed_time:.2f}s. "
+                    f"Total cost: {metrics['total_cost']}, "
+                    f"SAAV objective: {metrics['saav_objective']:.3f}"
+                )
+                
+                return {
+                    "success": True,
+                    "routes": routes,
+                    "metrics": metrics,
+                    "optimization_type": "static"
+                }
+            else:
+                logger.error("No solution found for static VRPTW problem")
+                raise NoFeasibleSolutionException(
+                    "No feasible solution found for the given constraints",
+                    details={
+                        "num_orders": len(orders),
+                        "num_vehicles": len(vehicles),
+                        "num_drivers": len(drivers)
+                    }
+                )
+                
+        except NoFeasibleSolutionException:
+            raise
+        except Exception as e:
+            logger.error(f"Optimization failed: {e}", exc_info=True)
+            raise NoFeasibleSolutionException(
+                f"Optimization failed: {str(e)}",
+                details={"error_type": type(e).__name__}
+            )
     
     def local_reoptimization(
         self,
@@ -212,33 +252,97 @@ class VRPTWSolver:
             "adaptation_count": self.adaptation_count
         }
     
+    def _validate_inputs(self, orders: List[Order], vehicles: List[Vehicle], drivers: List[Driver]):
+        """
+        Validate input data for optimization
+        
+        Raises:
+            InvalidInputException: If validation fails
+        """
+        if not orders:
+            raise InvalidInputException("No orders provided")
+        
+        if not vehicles:
+            raise InvalidInputException("No vehicles provided")
+            
+        if not drivers:
+            raise InvalidInputException("No drivers provided")
+        
+        # Validate orders
+        for order in orders:
+            if not hasattr(order, 'delivery_latitude') or not hasattr(order, 'delivery_longitude'):
+                raise InvalidInputException(f"Order {order.id} missing location coordinates")
+                
+            if not hasattr(order, 'time_window_start') or not hasattr(order, 'time_window_end'):
+                raise InvalidInputException(f"Order {order.id} missing time window")
+                
+            if order.time_window_start >= order.time_window_end:
+                raise TimeWindowViolationException(
+                    f"Order {order.id} has invalid time window",
+                    details={"start": str(order.time_window_start), "end": str(order.time_window_end)}
+                )
+        
+        # Validate vehicles
+        total_capacity = sum(v.max_weight_capacity for v in vehicles)
+        total_demand = sum(o.weight for o in orders)
+        
+        if total_capacity < total_demand:
+            raise CapacityViolationException(
+                "Total vehicle capacity is insufficient for all orders",
+                details={"total_capacity": total_capacity, "total_demand": total_demand}
+            )
+    
     def _build_matrices(self):
-        """Build distance and time matrices for all locations"""
+        """Build distance and time matrices for all locations with caching"""
         locations = [self.depot_location]
         
         # Add order locations
         for order in self.orders:
             locations.append((order.delivery_latitude, order.delivery_longitude))
         
+        # Try to get from cache if enabled
+        if self.use_cache:
+            cached_matrix = distance_cache.get_matrix(locations)
+            if cached_matrix is not None:
+                logger.debug("Using cached distance matrix")
+                self.distance_matrix = cached_matrix
+                self._build_time_matrix_from_distance()
+                return
+        
         num_locations = len(locations)
         self.distance_matrix = np.zeros((num_locations, num_locations))
-        self.time_matrix = np.zeros((num_locations, num_locations))
         
-        # Calculate distances and times (simplified Euclidean for demo)
-        for i in range(num_locations):
+        # Calculate distances in parallel for better performance
+        def calculate_distance_row(i):
+            row = np.zeros(num_locations)
+            lat1, lon1 = locations[i]
             for j in range(num_locations):
                 if i == j:
-                    self.distance_matrix[i][j] = 0
-                    self.time_matrix[i][j] = 0
+                    row[j] = 0
                 else:
-                    # Haversine distance approximation
-                    lat1, lon1 = locations[i]
                     lat2, lon2 = locations[j]
-                    distance = self._haversine_distance(lat1, lon1, lat2, lon2)
-                    
-                    self.distance_matrix[i][j] = distance
-                    # Assume average speed of 40 km/h in city
-                    self.time_matrix[i][j] = int((distance / 40) * 60)  # minutes
+                    row[j] = self._haversine_distance(lat1, lon1, lat2, lon2)
+            return i, row
+        
+        # Use thread pool for parallel computation
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = [executor.submit(calculate_distance_row, i) for i in range(num_locations)]
+            for future in futures:
+                i, row = future.result()
+                self.distance_matrix[i] = row
+        
+        # Cache the distance matrix
+        if self.use_cache:
+            distance_cache.set_matrix(locations, self.distance_matrix)
+            logger.debug("Distance matrix cached")
+        
+        # Build time matrix from distance matrix
+        self._build_time_matrix_from_distance()
+    
+    def _build_time_matrix_from_distance(self):
+        """Build time matrix from distance matrix"""
+        # Assume average speed of 40 km/h in city
+        self.time_matrix = (self.distance_matrix / 40 * 60).astype(int)  # minutes
     
     def _haversine_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
         """Calculate Haversine distance between two points"""
