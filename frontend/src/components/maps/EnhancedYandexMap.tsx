@@ -79,6 +79,7 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
   const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
   const [selectedStop, setSelectedStop] = useState<RouteStop | null>(null);
   const [trafficVisible, setTrafficVisible] = useState(showTraffic);
+  const [trafficControl, setTrafficControl] = useState<any>(null);
   const mapRef = useRef<any>(null);
 
   // Обработка клика на остановку
@@ -166,6 +167,17 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
     `;
   };
 
+  // Управление отображением пробок
+  useEffect(() => {
+    if (!mapInstance || !trafficControl) return;
+
+    if (trafficVisible) {
+      trafficControl.showTraffic();
+    } else {
+      trafficControl.hideTraffic();
+    }
+  }, [trafficVisible, mapInstance, trafficControl]);
+
   // Real-time обновления позиций
   useEffect(() => {
     if (!realTimeUpdates) return;
@@ -206,7 +218,17 @@ export const EnhancedYandexMap: React.FC<EnhancedYandexMapProps> = ({
             {/* Контролы */}
             <ZoomControl options={{ float: 'right' }} />
             <GeolocationControl options={{ float: 'left' }} />
-            {trafficVisible && <TrafficControl options={{ float: 'right' }} />}
+            <TrafficControl 
+              options={{ float: 'right' }} 
+              instanceRef={(ref) => {
+                if (ref && !trafficControl) {
+                  setTrafficControl(ref);
+                  if (trafficVisible) {
+                    setTimeout(() => ref.showTraffic(), 100);
+                  }
+                }
+              }}
+            />
 
             {/* Маршруты */}
             {routes.map((route, index) => (

@@ -79,15 +79,21 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50/20 to-purple-50/20 dark:from-gray-900 dark:via-indigo-950/20 dark:to-purple-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30 relative overflow-hidden">
+      {/* Animated background effects */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
       
       <NavigationHeader
         title="Маршруты"
         subtitle="Мониторинг доставки в реальном времени"
         actions={
           <div className="flex items-center space-x-3">
-            <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-rose-500'} ${isConnected ? 'animate-pulse' : ''}`}></div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-rose-500'} ${isConnected ? 'animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]' : ''}`}></div>
+            <span className="text-sm font-medium text-gray-300">
               {isConnected ? 'В сети' : 'Не в сети'}
             </span>
           </div>
@@ -95,36 +101,51 @@ const Dashboard = () => {
       />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-12">
-        {/* Stats Cards - Minimalist Design */}
+        {/* Stats Cards with animations */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-          <StatsCard
-            title="Маршруты"
-            value={stats?.total_routes || 0}
-            icon={MapPin}
-            change={{ value: 12, type: 'increase', period: 'за месяц' }}
-            className="card-minimal"
-          />
-          <StatsCard
-            title="Активные"
-            value={stats?.active_routes || 0}
-            icon={Truck}
-            change={{ value: 8, type: 'increase', period: 'за месяц' }}
-            className="card-minimal animate-pulse-subtle"
-          />
-          <StatsCard
-            title="В ожидании"
-            value={stats?.pending_orders || 0}
-            icon={Package}
-            change={{ value: 5, type: 'decrease', period: 'за месяц' }}
-            className="card-minimal"
-          />
-          <StatsCard
-            title="В срок"
-            value={`${stats?.on_time_delivery_rate || 0}%`}
-            icon={Clock}
-            change={{ value: 3, type: 'increase', period: 'за месяц' }}
-            className="card-minimal"
-          />
+          <div className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(99,102,241,0.25)] transition-all duration-300 hover:scale-105 animate-fadeIn">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-indigo-500/20 rounded-xl border border-indigo-500/30 group-hover:scale-110 transition-transform duration-300">
+                <MapPin className="h-6 w-6 text-indigo-400" />
+              </div>
+              <div className="text-sm text-green-400 font-medium">+12%</div>
+            </div>
+            <div className="text-3xl font-bold text-white mb-1">{stats?.total_routes || 0}</div>
+            <div className="text-sm text-gray-400">Маршруты</div>
+          </div>
+
+          <div className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.15)] hover:border-purple-500/40 hover:shadow-[0_0_30px_rgba(139,92,246,0.25)] transition-all duration-300 hover:scale-105 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-purple-500/20 rounded-xl border border-purple-500/30 group-hover:scale-110 transition-transform duration-300 animate-pulse">
+                <Truck className="h-6 w-6 text-purple-400" />
+              </div>
+              <div className="text-sm text-green-400 font-medium">+8%</div>
+            </div>
+            <div className="text-3xl font-bold text-white mb-1">{stats?.active_routes || 0}</div>
+            <div className="text-sm text-gray-400">Активные</div>
+          </div>
+
+          <div className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:border-blue-500/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.25)] transition-all duration-300 hover:scale-105 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+                <Package className="h-6 w-6 text-blue-400" />
+              </div>
+              <div className="text-sm text-red-400 font-medium">-5%</div>
+            </div>
+            <div className="text-3xl font-bold text-white mb-1">{stats?.pending_orders || 0}</div>
+            <div className="text-sm text-gray-400">В ожидании</div>
+          </div>
+
+          <div className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-green-500/20 shadow-[0_0_20px_rgba(34,197,94,0.15)] hover:border-green-500/40 hover:shadow-[0_0_30px_rgba(34,197,94,0.25)] transition-all duration-300 hover:scale-105 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-green-500/20 rounded-xl border border-green-500/30 group-hover:scale-110 transition-transform duration-300">
+                <Clock className="h-6 w-6 text-green-400" />
+              </div>
+              <div className="text-sm text-green-400 font-medium">+3%</div>
+            </div>
+            <div className="text-3xl font-bold text-white mb-1">{stats?.on_time_delivery_rate || 0}%</div>
+            <div className="text-sm text-gray-400">В срок</div>
+          </div>
         </div>
 
         {/* Analytics Blocks */}
@@ -143,34 +164,36 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Map Section with gradient border */}
-        <div className="relative group">
-          {/* Gradient border effect */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 blur-sm" />
-          <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-[0_4px_20px_rgba(99,102,241,0.12)]">
+        {/* Map Section with animated gradient border */}
+        <div className="relative group animate-fadeIn" style={{ animationDelay: '0.5s' }}>
+          {/* Animated gradient border effect */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 blur-sm animate-gradient" />
+          <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 Карта маршрутов
               </h2>
-              <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+              <button className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
                 Развернуть
               </button>
             </div>
-            <RouteMap
-              routes={[]}
-              selectedRouteId={selectedRouteId ?? undefined}
-              onRouteSelect={setSelectedRouteId}
-              className="h-96 w-full rounded-xl"
-            />
+            <div className="relative rounded-xl overflow-hidden border border-indigo-500/20">
+              <RouteMap
+                routes={[]}
+                selectedRouteId={selectedRouteId ?? undefined}
+                onRouteSelect={setSelectedRouteId}
+                className="h-96 w-full"
+              />
+            </div>
           </div>
         </div>
         
         {/* Simulation Launcher */}
         <SimulationLauncher />
 
-        {/* Actions Section with gradients */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-[0_4px_20px_rgba(99,102,241,0.12)] border border-gray-100/50 dark:border-gray-800/50">
-          <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        {/* Actions Section with animations */}
+        <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
             Быстрые действия
           </h2>
           <div className="flex flex-wrap gap-3">
@@ -180,11 +203,10 @@ const Dashboard = () => {
                 setShowRouteModal(true);
               }}
               className="group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl 
-                       hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 font-medium text-sm
-                       hover:scale-105 active:scale-95"
+                       shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]
+                       transition-all duration-300 font-medium text-sm hover:scale-105 active:scale-95"
             >
               <span className="relative z-10">Новый маршрут</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
             <button 
               onClick={() => {
@@ -192,36 +214,32 @@ const Dashboard = () => {
                 setShowRouteModal(true);
               }}
               className="group relative px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl 
-                       hover:shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 font-medium text-sm
-                       hover:scale-105 active:scale-95"
+                       shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]
+                       transition-all duration-300 font-medium text-sm hover:scale-105 active:scale-95"
             >
               <span className="relative z-10">Оптимизировать</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-green-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
             <button 
               onClick={() => setShowDriverModal(true)}
-              className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl 
-                       hover:bg-gradient-to-r hover:from-gray-50 hover:to-indigo-50 dark:hover:bg-gray-700 
-                       transition-all duration-300 font-medium text-sm border border-gray-200 dark:border-gray-700
-                       hover:border-indigo-300 dark:hover:border-indigo-700 hover:scale-105 active:scale-95"
+              className="px-6 py-3 bg-gray-800/50 backdrop-blur-sm text-white rounded-xl 
+                       border border-indigo-500/30 hover:border-indigo-500/50
+                       transition-all duration-300 font-medium text-sm hover:scale-105 active:scale-95"
             >
               Управление водителями
             </button>
             <button 
               onClick={() => setShowAnalyticsModal(true)}
-              className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl 
-                       hover:bg-gradient-to-r hover:from-gray-50 hover:to-purple-50 dark:hover:bg-gray-700 
-                       transition-all duration-300 font-medium text-sm border border-gray-200 dark:border-gray-700
-                       hover:border-purple-300 dark:hover:border-purple-700 hover:scale-105 active:scale-95"
+              className="px-6 py-3 bg-gray-800/50 backdrop-blur-sm text-white rounded-xl 
+                       border border-purple-500/30 hover:border-purple-500/50
+                       transition-all duration-300 font-medium text-sm hover:scale-105 active:scale-95"
             >
               Аналитика
             </button>
             <button 
               onClick={() => window.location.href = '/testing'}
-              className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl 
-                       hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 dark:hover:bg-gray-700 
-                       transition-all duration-300 font-medium text-sm border border-gray-200 dark:border-gray-700
-                       hover:border-blue-300 dark:hover:border-blue-700 hover:scale-105 active:scale-95"
+              className="px-6 py-3 bg-gray-800/50 backdrop-blur-sm text-white rounded-xl 
+                       border border-blue-500/30 hover:border-blue-500/50
+                       transition-all duration-300 font-medium text-sm hover:scale-105 active:scale-95"
             >
               Система тестирования
             </button>

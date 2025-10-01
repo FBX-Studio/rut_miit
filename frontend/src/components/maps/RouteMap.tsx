@@ -165,11 +165,12 @@ export const RouteMap = ({
   center = [55.7558, 37.6176], // Moscow coordinates
   zoom = 10,
   height = '400px',
-  showTraffic = false,
+  showTraffic = true,
   realTimeTracking = false,
   className = '',
 }: RouteMapProps) => {
   const [mapInstance, setMapInstance] = useState<any>(null);
+  const [trafficControl, setTrafficControl] = useState<any>(null);
 
   const formatTime = (timeString?: string) => {
     if (!timeString) return 'N/A';
@@ -276,13 +277,20 @@ export const RouteMap = ({
           }}
         >
           {/* Traffic control */}
-          {showTraffic && (
-            <TrafficControl 
-              options={{ 
-                floatIndex: 100,
-              } as any} 
-            />
-          )}
+          <TrafficControl 
+            options={{ 
+              float: 'right',
+              floatIndex: 100,
+            } as any} 
+            instanceRef={(ref) => {
+              if (ref && !trafficControl) {
+                setTrafficControl(ref);
+                if (showTraffic) {
+                  setTimeout(() => ref.showTraffic(), 100);
+                }
+              }
+            }}
+          />
 
           {/* Route button for manual route building */}
           <RouteButton 

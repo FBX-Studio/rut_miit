@@ -40,7 +40,7 @@ const SimulationMap = dynamic(() => import('./SimulationMap'), {
 });
 
 // Импорт данных симуляции
-import { mockDriverData, startRouteAnimation, stopRouteAnimation } from './SimulationData';
+import { mockSimulationData, startRouteAnimation, stopRouteAnimation } from './SimulationData';
 import { SimulationIntegrationService } from '@/services/simulationIntegration';
 
 interface SimulationScenario {
@@ -231,10 +231,10 @@ const SimulationInterface: React.FC = () => {
       simulateEvents(scenario);
       
       // Запускаем анимацию маршрута
-      startRouteAnimation(mockDriverData);
+      startRouteAnimation(mockSimulationData);
       
       // Синхронизируем данные с основной системой
-      await SimulationIntegrationService.syncSimulationWithMainSystem(mockDriverData);
+      await SimulationIntegrationService.syncSimulationWithMainSystem(mockSimulationData);
       
     } catch (error) {
       toast.error('Ошибка запуска симуляции');

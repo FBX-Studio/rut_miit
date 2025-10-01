@@ -211,6 +211,29 @@ export const generateRouteAnimation = (
   return points;
 };
 
+// Функция для расчета реального расстояния между точками (формула гаверсинусов)
+export const calculateDistance = (
+  point1: [number, number],
+  point2: [number, number]
+): number => {
+  const R = 6371; // Радиус Земли в км
+  const dLat = toRadians(point2[0] - point1[0]);
+  const dLon = toRadians(point2[1] - point1[1]);
+  
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRadians(point1[0])) * Math.cos(toRadians(point2[0])) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+  
+  return distance;
+};
+
+const toRadians = (degrees: number): number => {
+  return degrees * (Math.PI / 180);
+};
+
 // Функция для обновления позиции водителя в реальном времени
 export const updateDriverPosition = (
   driver: SimulationDriver,
