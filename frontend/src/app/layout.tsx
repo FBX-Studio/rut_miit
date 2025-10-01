@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers/Providers';
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   description: 'Продвинутая система оптимизации задачи маршрутизации транспорта с временными окнами (ВРПТВ) с мониторингом в реальном времени и адаптивной реоптимизацией.',
   keywords: 'ВРПТВ, оптимизация маршрутов, логистика, доставка, управление автопарком, мониторинг в реальном времени',
   authors: [{ name: 'Команда ВРПТВ Системы' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'ВРПТВ Система - Панель оптимизации маршрутов',
@@ -19,6 +18,11 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ru_RU',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

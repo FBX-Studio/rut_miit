@@ -338,7 +338,7 @@ const TestingDashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-white">
             Система тестирования логистики
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -351,24 +351,24 @@ const TestingDashboard: React.FC = () => {
               fetchActiveScenarios();
               fetchAnalytics();
             }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:scale-105 transition-colors flex items-center"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4" />
             Обновить
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+            className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-500 hover:to-emerald-500 transition-all duration-300 shadow-[0_0_15px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:scale-105 transition-colors flex items-center"
           >
-            <Play className="h-4 w-4 mr-2" />
+            <Play className="h-4 w-4" />
             Создать сценарий
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
+      <div className="border-b border-indigo-500/20 bg-gray-900/30 backdrop-blur-sm rounded-t-2xl overflow-hidden">
+        <nav className="flex space-x-1 px-2 pt-2">
           {[
             { id: 'scenarios', label: 'Тестовые сценарии', icon: Play },
             { id: 'analytics', label: 'Аналитика', icon: BarChart3 },
@@ -377,13 +377,13 @@ const TestingDashboard: React.FC = () => {
             <button
               key={id}
               onClick={() => setSelectedTab(id as any)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
+              className={`px-4 py-3 font-medium text-sm flex items-center gap-2 rounded-t-xl transition-all duration-300 ${
                 selectedTab === id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                  ? 'bg-gray-900/50 text-blue-400 border-b-2 border-blue-500'
+                  : 'text-gray-400 hover:text-gray-300 hover:bg-gray-900/30'
               }`}
             >
-              <Icon className="h-4 w-4 mr-2" />
+              <Icon className="h-4 w-4" />
               {label}
             </button>
           ))}
@@ -394,9 +394,9 @@ const TestingDashboard: React.FC = () => {
        {selectedTab === 'scenarios' && (
          <div className="space-y-6">
            {/* Active Scenarios */}
-           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+           <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
              <div className="flex items-center justify-between mb-4">
-               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+               <h2 className="text-lg font-semibold text-white">
                  Активные сценарии
                </h2>
                {activeScenarios.some(s => s.status === 'running') && (
@@ -404,7 +404,7 @@ const TestingDashboard: React.FC = () => {
                    onClick={() => setShowParameterModal(true)}
                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center"
                  >
-                   <Settings className="h-4 w-4 mr-2" />
+                   <Settings className="h-4 w-4" />
                    Изменить параметр
                  </button>
                )}
@@ -423,13 +423,13 @@ const TestingDashboard: React.FC = () => {
                    return (
                      <div
                        key={scenario.scenario_id}
-                       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                       className="bg-gray-800/50 backdrop-blur-sm border border-purple-500/20 rounded-xl hover:border-purple-500/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-300 p-4"
                      >
                        <div className="flex items-center justify-between">
                          <div className="flex items-center space-x-3">
                            {getStatusIcon(scenario.status)}
                            <div>
-                             <h3 className="font-medium text-gray-900 dark:text-white">
+                             <h3 className="font-medium text-white">
                                {scenario.scenario_id}
                              </h3>
                              <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -465,7 +465,7 @@ const TestingDashboard: React.FC = () => {
                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                            <div className="flex items-center justify-between mb-3">
                              <h4 className="font-medium text-blue-900 dark:text-blue-100 flex items-center">
-                               <Clock className="h-4 w-4 mr-2" />
+                               <Clock className="h-4 w-4" />
                                Отслеживание времени доставки
                              </h4>
                              <div className="text-right">
@@ -528,25 +528,25 @@ const TestingDashboard: React.FC = () => {
                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                          <div className="text-center">
                            <p className="text-sm text-gray-500 dark:text-gray-400">Изменений</p>
-                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                           <p className="text-lg font-semibold text-white">
                              {scenario.parameter_changes.length}
                            </p>
                          </div>
                          <div className="text-center">
                            <p className="text-sm text-gray-500 dark:text-gray-400">Реоптимизаций</p>
-                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                           <p className="text-lg font-semibold text-white">
                              {scenario.reoptimization_count}
                            </p>
                          </div>
                          <div className="text-center">
                            <p className="text-sm text-gray-500 dark:text-gray-400">Маршруты до</p>
-                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                           <p className="text-lg font-semibold text-white">
                              {scenario.metrics_before?.total_routes || 0}
                            </p>
                          </div>
                          <div className="text-center">
                            <p className="text-sm text-gray-500 dark:text-gray-400">Маршруты после</p>
-                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                           <p className="text-lg font-semibold text-white">
                              {scenario.metrics_after?.total_routes || '-'}
                            </p>
                          </div>
@@ -563,8 +563,8 @@ const TestingDashboard: React.FC = () => {
       {selectedTab === 'analytics' && (
         <div className="space-y-6">
           {/* Driver Load Analysis */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Users className="h-5 w-5 mr-2" />
               Анализ нагрузки водителей
             </h2>
@@ -602,7 +602,7 @@ const TestingDashboard: React.FC = () => {
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {driverAnalysis.map((driver) => (
                       <tr key={driver.driver_id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                           Водитель #{driver.driver_id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -621,13 +621,13 @@ const TestingDashboard: React.FC = () => {
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                           {Math.round(driver.experience_factor * 100)}%
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                           {Math.round(driver.efficiency_score * 100)}%
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                           {driver.current_routes}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -658,8 +658,8 @@ const TestingDashboard: React.FC = () => {
 
           {/* Vehicle Distribution Analysis */}
           {vehicleAnalysis && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+              <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                 <Truck className="h-5 w-5 mr-2" />
                 Анализ распределения транспорта
               </h2>
@@ -683,13 +683,13 @@ const TestingDashboard: React.FC = () => {
 
               {vehicleAnalysis.recommendations.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-sm font-medium text-white mb-2">
                     Рекомендации:
                   </h3>
                   <ul className="space-y-1">
                     {vehicleAnalysis.recommendations.map((rec, index) => (
                       <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                        <TrendingUp className="h-4 w-4 mr-2 text-blue-500" />
+                        <TrendingUp className="h-4 w-4 text-blue-500" />
                         {rec}
                       </li>
                     ))}
@@ -703,8 +703,8 @@ const TestingDashboard: React.FC = () => {
 
       {selectedTab === 'simulation' && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)] p-6">
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Activity className="h-5 w-5 mr-2" />
               Симуляция доставки
             </h2>
@@ -720,9 +720,9 @@ const TestingDashboard: React.FC = () => {
       {/* Create Scenario Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.15)]-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-indigo-500/20 bg-gray-900/30 backdrop-blur-sm rounded-t-2xl overflow-hidden">
+              <h2 className="text-xl font-semibold text-white">
                 Создать тестовый сценарий
               </h2>
             </div>
@@ -777,7 +777,7 @@ const TestingDashboard: React.FC = () => {
                   onChange={(e) => setNewScenario({ ...newScenario, auto_reoptimize: e.target.checked })}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="auto_reoptimize" className="ml-2 block text-sm text-gray-900 dark:text-white">
+                <label htmlFor="auto_reoptimize" className="ml-2 block text-sm text-white">
                   Автоматическая реоптимизация при изменениях
                 </label>
               </div>
@@ -785,12 +785,12 @@ const TestingDashboard: React.FC = () => {
               {/* Parameters */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-medium text-white">
                     Параметры для изменения
                   </h3>
                   <button
                     onClick={addParameter}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:scale-105 transition-colors text-sm"
                   >
                     Добавить параметр
                   </button>
@@ -805,7 +805,7 @@ const TestingDashboard: React.FC = () => {
                 ) : (
                   <div className="space-y-4">
                     {newScenario.parameters.map((param, index) => (
-                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <div key={index} className="bg-gray-800/50 backdrop-blur-sm border border-purple-500/20 rounded-xl hover:border-purple-500/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-300 p-4">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -849,7 +849,7 @@ const TestingDashboard: React.FC = () => {
                           <div className="flex items-end">
                             <button
                               onClick={() => removeParameter(index)}
-                              className="w-full px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
+                              className="w-full px-3 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl hover:from-red-500 hover:to-rose-500 transition-all duration-300 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:shadow-[0_0_25px_rgba(244,63,94,0.4)] hover:scale-105 transition-colors text-sm"
                             >
                               Удалить
                             </button>
@@ -885,9 +885,9 @@ const TestingDashboard: React.FC = () => {
               <button
                 onClick={createScenario}
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center"
+                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:scale-105 transition-colors disabled:opacity-50 flex items-center"
               >
-                {loading && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+                {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
                 Создать и запустить
               </button>
             </div>
@@ -900,7 +900,7 @@ const TestingDashboard: React.FC = () => {
          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
              <div className="flex items-center justify-between mb-4">
-               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+               <h3 className="text-lg font-semibold text-white">
                  Изменить параметр
                </h3>
                <button
@@ -997,7 +997,7 @@ const TestingDashboard: React.FC = () => {
                    }
                  }}
                  disabled={!selectedScenario}
-                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                 className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                >
                  Применить
                </button>

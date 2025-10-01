@@ -40,9 +40,9 @@ const nextConfig = {
     return config;
   },
   
-  // Experimental features
+  // Experimental features (appDir is now stable in Next.js 14)
   experimental: {
-    appDir: true,
+    // appDir is now stable, no longer needed
   },
   
   // TypeScript configuration
